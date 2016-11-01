@@ -1,0 +1,12 @@
+Package: Cops
+Version: 3.1
+Date: 2016-08-11
+Title: C-OPS Processing
+Author: Bernard Gentili <gentili@obs-vlfr.fr>
+Maintainer: Bernard Gentili <gentili@obs-vlfr.fr>; Simon Belanger <simon_belanger@uqar.ca>
+Depends: R (>= 2.0), tcltk, e1071, stringr
+Description: COPS Processing
+License: GPL version 2 or newer
+URL: http://www.r-project.org, http://www.obs-vlfr.fr
+Packaged:
+LazyData: TRUE

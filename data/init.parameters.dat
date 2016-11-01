@@ -1,0 +1,38 @@
+###############################################################################################################################
+# lines beginning with # are comments; blank lines are skipped
+# EACH LINE HAS THREE FIELDS DELIMITED BY ";"                                                                                 #
+# DO NOT MODIFY THE FIRST TWO FIELDS                                                                                          #
+# IF THE THIRD FIELD CONTAINS SEVERAL VALUES, THESE VALUES ARE SEPARARTED BY ","                                              #
+# IF THE TYPE OF THE THIRD FIELD (GIVEN BY THE SECOND FIELD) IS "character", THE BLANK CHARACTERS (" ") ARE TAKEN INTO ACCOUNT#
+###############################################################################################################################
+
+verbose;logical;TRUE
+
+# constants ##########################################
+indice.water;numeric; 1.34
+rau.Fresnel;numeric; 0.043
+
+# width and height of graphics windows ###############
+win.width;numeric; 9
+win.height;numeric; 7
+
+# optics description #################################
+instruments.optics;character;Ed0,EdZ,LuZ
+tiltmax.optics;numeric; 10,5,5
+time.interval.for.smoothing.optics;numeric; 40, 40,40
+sub.surface.removed.layer.optics;numeric; 0, 0.1, 0
+delta.capteur.optics;numeric; 0, -0.09, 0.25
+radius.instrument.optics;numeric; 0.035, 0.035, 0.035
+
+# look INTO a data file
+format.date;character;%d/%m/%Y %H:%M:%S
+instruments.others;character;Master
+depth.is.on;character;LuZ
+
+# look at the NAME of a data file
+number.of.fields.before.date;numeric; 0
+
+# time window : 2 values (unit = second) first = beginning, second = end; experiment starts at 0
+time.window;numeric;0, 10000
+# for smoothing purpose
+depth.discretization;numeric; 0, 0.01, 1, 0.02, 2, 0.05, 5, 0.1, 10, 0.2, 20, 0.5, 50, 1, 100, 2, 200, 5, 500

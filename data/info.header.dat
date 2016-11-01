@@ -1,0 +1,33 @@
+#######################################################################################################################################
+#                           this file is a table with a maximum of 12 fields separated by ";"                                         #
+#######################################################################################################################################
+# the 8 first fields are mandatory                                                                                                    #
+#######################################################################################################################################
+#-fields-- 1 2 3 4 ------#                                                                                                            #
+#-------------------------                                                                                                            #
+# field #1 : file name                                                                                                                #
+# field #2 : longitude (decimal degs)                                                                                                 #
+# field #3 : latitude (decimal degs)                                                                                                  #
+# field #4 : a positive value, 0, or NA                                                                                               #
+#           if > 0, it is the chlorophyll concentration and is used to calculate absorption at each wavelength (case 1 waters model)  #
+#           if = 0, the absorption coefficients for all wavelengths must be found in a file called absorption.cops.dat                #
+#           if NA, no shadow correction                                                                                               #
+#######################################################################################################################################
+#-fields-- 5 6 7 8 ------#                                                                                                            #
+#-------------------------                                                                                                            #
+# NB : fields 5 6 7 8 are defined for the whole cast in file init.cops.dat                                                            #
+#      if no peculiar value is needed for an experiment, just put a "x" in the field, the value in init.cops.dat is kept              #
+#-------------------------                                                                                                            #
+# field #5 : time.window, 2 numeric values separated by ","; no space                                                                 #
+# field #6 : sub.surface.removed.layer, N numeric separated by ","; no space (N is the nuber of optics instruments - respect order)   #
+# field #7 : tiltmax, N numeric separated by ","; no space (N is the nuber of optics instruments - respect order)                     #
+# field #8 : time.interval.for.smoothing, N numeric separated by ","; no space (N is the number of optics instruments - respect order)#
+#                                                                                                                                     #
+#######################################################################################################################################
+# 4 optional fields ( #9 #10 #11 and #12 ) : names of files containing dark measures                                                  #
+#######################################################################################################################################
+# examples                                                                                                                            #
+#110923_0237_001_data.txt;7.1;43.9;0.1;0,90;0.1,0.05,0.1;10,10,5;40,60,80;110923_0237_004_data.txt                                    #
+#110923_0237_001_data.txt;7.1;43.9;0;x;0.1,0.05,0.1;x;x;110923_0237_004_data.txt;110923_0237_005_data.txt                             #
+#110923_0237_001_data.txt;7.1;43.9;0.2;x;x;10,10,5;40,60,80                                                                           #
+##################################################################################################################################### #
