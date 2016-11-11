@@ -37,6 +37,14 @@ process.EuZ <- function(cops.raw, cops.dd, cops.black, cops.Ed0) {
 	KZ.fitted <- K$KZ.fitted
 	K0.fitted <- K$K0.fitted
 
+	# Extrapolate EuZ to 0- using linear method
+	K <- compute.Ksurf.linear(Depth, aop,
+	                          r2.threshold = 0.99,
+	                          detect.lim = 5e-5)
+	K.surf <- K$Kx
+	Z.interval <- K$Z.interval
+	EuZ.0m.linear <- K$X.0m
+
 # PLOT
 	aop.cols <- rainbow.modified(length(waves))
 	if(INTERACTIVE) x11(width = win.width, height = win.height)
@@ -86,6 +94,9 @@ process.EuZ <- function(cops.raw, cops.dd, cops.black, cops.Ed0) {
 		EuZ.fitted = aop.fitted,
 		KZ.EuZ.fitted = KZ.fitted,
 		K0.EuZ.fitted = K0.fitted,
-		EuZ.0m = aop.0
+		EuZ.0m = aop.0,
+		K.EuZ.surf = K.surf,
+		EuZ.Z.interval = Z.interval,
+		EuZ.0m.linear = EuZ.0m.linear
 	))
 }

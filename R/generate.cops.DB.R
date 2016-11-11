@@ -20,7 +20,7 @@ generate.cops.DB <- function(path="./",
   ndirs = length(dirs)
 
   #
-  nwaves = length(waves.DB)
+nwaves = length(waves.DB)
   Rrs.m = matrix(ncol=nwaves, nrow = ndirs)
   Kd.1p.m = matrix(ncol=nwaves, nrow = ndirs)
   Kd.10p.m = matrix(ncol=nwaves, nrow = ndirs)

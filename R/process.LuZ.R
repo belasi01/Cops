@@ -5,7 +5,7 @@ process.LuZ <- function(cops.raw, cops.dd, cops.black, cops.Ed0) {
 	aop <- cops.raw$LuZ
 	correction <- cops.Ed0$Ed0.correction
 	aop[aop <= 0] <- NA
-	aop <- aop * correction  
+	aop <- aop * correction
 	waves <- as.numeric(cops.raw$LuZ.waves)
 	Depth <- cops.dd$Depth
 	depth.fitted <- cops.dd$depth.fitted
@@ -29,7 +29,7 @@ process.LuZ <- function(cops.raw, cops.dd, cops.black, cops.Ed0) {
 	tilt <- tilt[Depth.kept]
 
 # METHOD loess to fit this aop
-	#browser() 
+	#browser()
 	span <- time.interval.for.smoothing.optics["LuZ"] / cops.dd$cops.duration.secs
 	fitted <- fit.with.loess(waves, Depth, log(aop), span, depth.fitted, span.wave.correction = TRUE)
 	aop.fitted <- exp(fitted$aop.fitted)
@@ -38,14 +38,31 @@ process.LuZ <- function(cops.raw, cops.dd, cops.black, cops.Ed0) {
 	KZ.fitted <- K$KZ.fitted
 	K0.fitted <- K$K0.fitted
 
+# Extrapolate Luz to 0- using linear method
+	K <- compute.Ksurf.linear(Depth, aop,
+	                         r2.threshold = 0.99,
+	                         detect.lim = 5e-5)
+	K.surf <- K$Kx
+	Z.interval <- K$Z.interval
+	ix.Z.interval <- K$ix.Z.interval
+	LuZ.0m.linear <- K$X.0m
+	LuZ.fitted <- matrix(NA, ncol=dim(aop.fitted)[2], nrow=dim(aop.fitted)[1])
+  for (i in 1:length(waves)) {
+    if (!is.na(LuZ.0m.linear[i])) LuZ.fitted[,i] <- LuZ.0m.linear[i] * exp(-depth.fitted*K.surf[i])
+  }
+
 # PLOT
 	aop.cols <- rainbow.modified(length(waves))
 	if(INTERACTIVE) x11(width = win.width, height = win.height)
 	#matplot(aop, Depth, type = "p", log = "x", ylim = rev(range(c(0, Depth))), pch = ".", cex = 1, xlab = "LuZ", col = aop.cols)
   matplot(aop, Depth, type = "p", log = "x", ylim = c(5,0), xlim=c(1e-5,max(aop, na.rm=T)), pch = ".", cex = 1, xlab = "LuZ", col = aop.cols)
   grid(col = 1)
-	matplot(aop.fitted, depth.fitted, type = "l", lty = 1, lwd = 2, add = TRUE, col = aop.cols)
+	matplot(aop.fitted, depth.fitted, type = "l",
+	        lty = 1, lwd = 2, add = TRUE, col = aop.cols)
+	matplot(LuZ.fitted, depth.fitted, type = "l",
+	        lty = 2, lwd = 2, add = TRUE, col = aop.cols)
 	points(aop.0, rep(0, length(aop.0)), col = aop.cols)
+	points(diag(aop[ix.Z.interval,]), Z.interval, cex=1.5, pch = 19,col = aop.cols)
 	par(xpd = TRUE)
 	legend(10^par("usr")[1], par("usr")[4], legend = waves, xjust = 0, yjust = 0, lty = 1, lwd = 2, col = aop.cols, ncol = ceiling(length(waves) / 2), cex = 0.75)
 	par(xpd = FALSE)
@@ -88,6 +105,9 @@ process.LuZ <- function(cops.raw, cops.dd, cops.black, cops.Ed0) {
 		LuZ.fitted = aop.fitted,
 		KZ.LuZ.fitted = KZ.fitted,
 		K0.LuZ.fitted = K0.fitted,
-		LuZ.0m = aop.0
+		LuZ.0m = aop.0,
+		K.LuZ.surf = K.surf,
+		LuZ.Z.interval = Z.interval,
+		LuZ.0m.linear = LuZ.0m.linear
 	))
 }

@@ -15,38 +15,48 @@ compute.aops <- function(cops) {
 	if("EuZ" %in% instruments.optics) {
 		waves.u <- cops$EuZ.waves
 		EuZ.0m <- cops$EuZ.0m
+		EuZ.0m.linear <- cops$EuZ.0m.linear
 		if(cops$SHADOW.CORRECTION) {
 			shadow.coef.EuZ <- shadow.correction("EuZ", cops)
 			EuZ.0m <- EuZ.0m / shadow.coef.EuZ$EuZ.shad.correction
+			EuZ.0m.linear <- cops$EuZ.0m.linear / shadow.coef.EuZ$EuZ.shad.correction
 		}
 		LuZ.0m <- EuZ.0m / cops$Q.sun.nadir
+		LuZ.0m.linear <- EuZ.0m.linear / cops$Q.sun.nadir
 	}
 	if("LuZ" %in% instruments.optics) {
 		waves.u <- cops$LuZ.waves
 		LuZ.0m <- cops$LuZ.0m
+		LuZ.0m.linear <- cops$LuZ.0m.linear
 		if(cops$SHADOW.CORRECTION) {
 			shadow.coef.LuZ <- shadow.correction("LuZ", cops)
 			LuZ.0m <- LuZ.0m / shadow.coef.LuZ$LuZ.shad.correction
+			LuZ.0m.linear <- LuZ.0m.linear / shadow.coef.LuZ$LuZ.shad.correction
 		}
 		EuZ.0m <- LuZ.0m * cops$Q.sun.nadir
+		EuZ.0m.linear <- LuZ.0m.linear * cops$Q.sun.nadir
 	}
 ####################
 
 	mymessage("Computing Lw.0p ...", head = "-")
 	Lw.0p <- LuZ.0m * (1 - rau.Fresnel) / indice.water^2
+	Lw.0p.linear <- LuZ.0m.linear * (1 - rau.Fresnel) / indice.water^2
 
 	mymessage("Computing nLw.0p ...", head = "-")
 	nLw.0p <- Lw.0p / Ed0.0p * etirr(waves.u)
+	nLw.0p.linear <- Lw.0p.linear / Ed0.0p * etirr(waves.u)
 
 	mymessage("Computing Rrs.0p ...", head = "-")
 	Rrs.0p <- Lw.0p / Ed0.0p
+	Rrs.0p.linear <- Lw.0p.linear / Ed0.0p
 
 	mymessage("Computing Ed0.0m ...", head = "-")
 	Ed0.0m <- 0.96 * Ed0.0p
 
 	mymessage("Computing R.0m ...", head = "-")
 	R.0m <- EuZ.0m / Ed0.0m
-	
+	R.0m.linear <- EuZ.0m.linear / Ed0.0m
+
 # PLOT
 	if(INTERACTIVE) x11(width = win.width, height = win.height)
 	par(mfrow = c(2, 3))
@@ -72,7 +82,7 @@ compute.aops <- function(cops) {
 		} else {
 			shadow.correction.type <- "absorption from chlorophyll\ncase 1 waters model"
 		}
-		plot(waves.u, shadow.coef.EuZ$EuZ.shad.correction, type = "b", xlim = range(waves.u), ylim = c(0.2, 1), xlab = expression(lambda ~~ nm), ylab = "shadow correction for EuZ", main = shadow.correction.type) 
+		plot(waves.u, shadow.coef.EuZ$EuZ.shad.correction, type = "b", xlim = range(waves.u), ylim = c(0.2, 1), xlab = expression(lambda ~~ nm), ylab = "shadow correction for EuZ", main = shadow.correction.type)
 		abline(h = seq(0.2, 1, 0.1), lty = 3)
 	} else {
 		if("EuZ" %in% cops$instruments.optics) {
@@ -86,7 +96,7 @@ compute.aops <- function(cops) {
 		} else {
 			shadow.correction.type <- "absorption from chlorophyll\ncase 1 waters model"
 		}
-		plot(waves.u, shadow.coef.LuZ$LuZ.shad.correction, type = "b", xlim = range(waves.u), ylim = c(0.2, 1), xlab = expression(lambda ~~ nm), ylab = "shadow correction for LuZ", main = shadow.correction.type) 
+		plot(waves.u, shadow.coef.LuZ$LuZ.shad.correction, type = "b", xlim = range(waves.u), ylim = c(0.2, 1), xlab = expression(lambda ~~ nm), ylab = "shadow correction for LuZ", main = shadow.correction.type)
 		abline(h = seq(0.2, 1, 0.1), lty = 3)
 	} else {
 		if("LuZ" %in% cops$instruments.optics) {
@@ -104,6 +114,10 @@ compute.aops <- function(cops) {
 		Lw.0p = Lw.0p,
 		nLw.0p = nLw.0p,
 		R.0m = R.0m,
-		Rrs.0p = Rrs.0p
+		Rrs.0p = Rrs.0p,
+		Lw.0p.linear = Lw.0p.linear,
+		nLw.0p.linear = nLw.0p.linear,
+		R.0m.linear = R.0m.linear,
+		Rrs.0p.linear = Rrs.0p.linear
 	)))
 }
