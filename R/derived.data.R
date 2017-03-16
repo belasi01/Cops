@@ -86,7 +86,8 @@ derived.data <- function(lon, lat, cops.init, cops.raw) {
 #Added by Servet Cizmeli and Simon Belanger
 			    print("Reading GPS file: ")
 			    print(gps.file)
-			    # Modified by Simon Bélanger on Aug 2016 to process GPS data obtained with uprofile 1.9.10 and after
+			    # Modified by Simon Bélanger on Aug 2016 to process
+			    # GPS data obtained with uprofile 1.9.10 and after
 			    if (str_detect(gps.file, "GPS_")) {
 			      ext = unlist(strsplit(gps.file, "[.]"))[2]
 			      if (ext == "tsv" || ext =="txt") {
@@ -101,6 +102,7 @@ derived.data <- function(lon, lat, cops.init, cops.raw) {
 			      names(gps.data)[4] <- "GpsTime"
 			      names(gps.data)[1] <- "ComputerTime"
 			    } else {
+			      ext = unlist(strsplit(gps.file, "[.]"))[2]
 			      if (ext == "tsv" || ext =="txt") {
 			        gps.data <- read.table(gps.file,sep="\t",
 			                               colClasses = c("character","numeric","character","numeric","numeric","numeric"),header=TRUE)
@@ -180,7 +182,19 @@ derived.data <- function(lon, lat, cops.init, cops.raw) {
 	maxdepth <- max(Depth[Depth.good]+ delta.capteur.optics["LuZ"])
 	depth.fitted <- depth.fitted[depth.fitted <= maxdepth]
 
-	ret <- c(ret, list(change.position = change.position, longitude = longitude, latitude = latitude, dates = dates, date.mean = dte, cops.duration.secs = cops.duration.secs, day = day, month = month, year = year, sunzen = sunzen, Depth = Depth, Depth.good = Depth.good, depth.fitted = depth.fitted))
+	ret <- c(ret, list(change.position = change.position,
+	                   longitude = longitude,
+	                   latitude = latitude,
+	                   dates = dates,
+	                   date.mean = dte,
+	                   cops.duration.secs = cops.duration.secs,
+	                   day = day,
+	                   month = month,
+	                   year = year,
+	                   sunzen = sunzen,
+	                   Depth = Depth,
+	                   Depth.good = Depth.good,
+	                   depth.fitted = depth.fitted))
 
 # PLOT
 	if(INTERACTIVE) x11(width = win.width, height = win.height)

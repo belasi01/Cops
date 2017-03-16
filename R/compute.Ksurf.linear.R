@@ -10,14 +10,20 @@ compute.Ksurf.linear <- function (Depth, aop,
   Z.interval= rep(NA,nwl)
   ix.Z.interval= rep(NA,nwl)
 
-  max.depth = delta.depth + min(Depth, na.rm = T)
-  ix.max.depth = which.min(abs(Depth - max.depth))
-  min.depth = min(Depth, na.rm = T)+0.5
-
   # loop on each wavelength
   for (w in 1:nwl) {
     #
     print(paste("K linear for", dimnames(aop)[[2]][w]))
+
+    if (dimnames(aop)[[2]][w] < 700) {
+      max.depth = delta.depth + min(Depth, na.rm = T)
+      ix.max.depth = which.min(abs(Depth - max.depth))
+      min.depth = min(Depth, na.rm = T)+0.5
+    } else {
+      max.depth = 0.6 + min(Depth, na.rm = T)
+      ix.max.depth = which.min(abs(Depth - max.depth))
+      min.depth = min(Depth, na.rm = T)+0.5
+    }
 
     r2 = 0
     # Start the extrapolation at 0.5 m below the first depth

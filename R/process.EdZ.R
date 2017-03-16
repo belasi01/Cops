@@ -45,6 +45,9 @@ process.EdZ <- function(cops.raw, cops.dd, cops.black, cops.Ed0) {
 	Z.interval <- K$Z.interval
 	EdZ.0m.linear <- K$X.0m
 
+	# Compute PAR at depth
+	PAR <- compute.PARz(depth.fitted, waves, aop.fitted, aop.0)
+
 # PLOT
 	aop.cols <- rainbow.modified(length(waves))
 	if(INTERACTIVE) x11(width = win.width, height = win.height)
@@ -98,6 +101,9 @@ process.EdZ <- function(cops.raw, cops.dd, cops.black, cops.Ed0) {
 		EdZ.0m = aop.0,
 		K.EdZ.surf = K.surf,
 		EdZ.Z.interval = Z.interval,
-		EdZ.0m.linear = EdZ.0m.linear
+		EdZ.0m.linear = EdZ.0m.linear,
+		z.f.PAR       = PAR$z.f.PAR,
+		PAR.z         = PAR$PAR.z,
+		PAR.at.z      = PAR$PAR.at.z
 	))
 }

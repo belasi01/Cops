@@ -57,6 +57,10 @@ compute.aops <- function(cops) {
 	R.0m <- EuZ.0m / Ed0.0m
 	R.0m.linear <- EuZ.0m.linear / Ed0.0m
 
+	mymessage("Computing Forel-Ule Color ...", head = "-")
+	FU <- Rrs2FU(waves.u, Rrs.0p)$FU
+	FU.linear <- Rrs2FU(waves.u, Rrs.0p.linear)$FU
+
 # PLOT
 	if(INTERACTIVE) x11(width = win.width, height = win.height)
 	par(mfrow = c(2, 3))
@@ -118,6 +122,8 @@ compute.aops <- function(cops) {
 		Lw.0p.linear = Lw.0p.linear,
 		nLw.0p.linear = nLw.0p.linear,
 		R.0m.linear = R.0m.linear,
-		Rrs.0p.linear = Rrs.0p.linear
+		Rrs.0p.linear = Rrs.0p.linear,
+		FU = FU,
+		FU.linear = FU.linear
 	)))
 }
