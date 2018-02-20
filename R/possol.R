@@ -1,19 +1,26 @@
-possol <- function (month,jday,tu,xlon,xlat) {
-#     solar position (zenithal angle asol,azimuthal angle phi0
-#                     in degrees)
-#     jday is the number of the day in the month
+#' Solar position as a function of date and time UTC and position (lat, lon)
+#'
+#'@param month is the month (1 to 12)
+#'@param day is the day of the month (1-31)
+#'@param tu is the time UTC in decimal format (0.0 to 23.999)
+#'@param xlon is the longitude in decimal degrees
+#'@param xlat is the latitude in decimal degrees
+#'
+#' @return Returns a vector os two numeric for the zenithal and azimuthal angles in degrees
+#'     day is the number of the day in the month
+#'
+#'@author Bernard Gentilly
+#'
+possol <- function (month,day,tu,xlon,xlat) {
+
 	ia = 0
-	if (month <= 2) nojour=31*(month-1)+jday else {
-		if (month > 8) nojour=31*(month-1)-floor((month-2)/2)-2+jday else
-			nojour=31*(month-1)-floor((month-1)/2)-2+jday
+	if (month <= 2) nojour=31*(month-1)+day else {
+		if (month > 8) nojour=31*(month-1)-floor((month-2)/2)-2+day else
+			nojour=31*(month-1)-floor((month-1)/2)-2+day
 		if(ia != 0 && (ia %% 4) == 0) nojour=nojour+1
 	}
 	pi=3.14159265
 	fac=pi/180.
-#     solar position (zenithal angle asol,azimuthal angle phi0
-#                     in degrees)
-#     nojour is the day number in the year
-#    mean solar time (heure decimale)
 	tsm=tu+xlon/15.
 	xla=xlat*fac
 	tet=2.*pi*nojour/365.

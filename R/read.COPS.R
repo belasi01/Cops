@@ -1,3 +1,29 @@
+#'
+#'   Read Compact Optical Profiling System (COPS) files in both CSV and TSV formats
+#'
+#'@param file is the file name without the full path
+#'@param number.of.fields.before.date is the number of fields begore the date in the file name.
+#'    For example the file COPS_IML4_150626_1546_C_data_001.csv contains 2 fields before the date.
+#'@param instruments.optics is the radiometer ids contained in the file.
+#'    The default is instruments.optics=c("Ed0", "EdZ", "LuZ")
+#'
+#'@return
+#'    A long list is returned. It typically includes matrices for Ed0, Edz and LuZ or EuZ.
+#'    For each sensor there is a vector of wavelengths (Ed0.waves, EdZ.waves, etc.).
+#'    Various data frame are also found:
+#'  \itemize{
+#'  \item{Ed0.anc contains two columns for Pitch and Roll;}
+#'  \item{EdZ.anc contains two columns for Pitch and Roll;}
+#'  \item{LuZ.anc or EuZ.anc contains two columns for Temperature and Depth;}
+#'  \item{Others contains other fields for time and BioShade (if available)}
+#' }
+#'  To access the Depth of the profiler, for instance, one need to ListName$LuZ.anc$Depth
+#'
+#'
+#' @author Simon Bélanger
+#'
+#'
+#'
 read.COPS <- function(file,number.of.fields.before.date,instruments.optics=c("Ed0", "EdZ", "LuZ")) {
   dirdat=getwd()
   instruments.others = "NA"

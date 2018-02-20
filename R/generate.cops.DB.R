@@ -1,8 +1,21 @@
 #'
-#' Generate an AOPs data base from a list of directories
+#' Generate an AOPs data base derived from COPS light profiles for a list of directories
 #'
+#' @description The AOPs (Kd_s, Rrs) derived from valid profiles are averaged.
 #'
+#' @param path is the path where the file directories.for.cops.dat containing the data folders
+#' to merge in the data base.
+#' @param wave.DB is a vector of wavelengths to include un the data base. Default is
+#' waves.DB=c(305, 320, 330, 340,380, 412, 443, 465,490, 510, 532, 555,589, 625, 665, 683, 694, 710, 780)
+#' @param mission is a string for the name of the mission. It will be used for the file names of the output.
+
 #'
+#' @return It returns a list object named COPS.DB containing matrices of mean and standdar devidation
+#' of Kd1p, Kd10p, Rrs, Ed0.0p,  Ed0.f and vectors for
+#' date, lat, lon sunzen and waves
+#'
+#' The object COPS.DB is saved in RData format. The data are also saved in ASCII (.dat with comma separator)
+#' and a figure showing the measured rho_w spectra of the data base is produced.
 #'
 generate.cops.DB <- function(path="./",
                              waves.DB=c(305, 320, 330, 340,
@@ -275,6 +288,7 @@ setwd(path)
   save(COPS.DB, file = paste("COPS.DB.",mission,".RData", sep=""))
   write.table(all, file = paste("COPS.DB.",mission,".dat", sep=""), sep=",", quote=F, row.names=F)
 
+  return(COPS.BD)
 }
 
 mean.parameter <- function(par) {
