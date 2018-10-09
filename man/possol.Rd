@@ -19,7 +19,11 @@ possol(month, day, tu, xlon, xlat)
 }
 \value{
 Returns a vector os two numeric for the zenithal and azimuthal angles in degrees
+day is the number of the day in the month
 }
 \description{
 Solar position as a function of date and time UTC and position (lat, lon)
+}
+\author{
+Bernard Gentilly
 }

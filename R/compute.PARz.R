@@ -1,3 +1,25 @@
+#'   Compute PAR at depth from surface irradiance (Ed0+) and profile of
+#'   downwelling irradiance (EdZ)
+#'
+#'   @param Depth is a vector of depth corresponding to the EdZ measurements
+#'   @param waves is a vector of wavelength of EdZ and Ed0+
+#'   @param Edz is a matrix of EdZ (col=waves; row=Depth) after nomalization to Ed.0 variation
+#'   @param Ed.0 is a is a vector surface irradiance
+#'   @param f.PAR is a vector of numeric values corresponting to light fraction.
+#'   The depth (in m) of each light fraction will be computed.
+#'   Default is f.PAR=c(0.001, 0.01, 0.1,0.5)
+#'   @param z.fixed  is a vector of numeric values corresponting to depth at which light fraction will be calculated.
+#'   Default is z.fixed=c(5,10,20,30,40)
+#'
+#'  @return The program will return three vectors for
+#'  1) the depth of each PAR fraction requested (z.f.PAR);
+#'  2) the fraction of PAR at the depth requested (PAR.at.z);
+#'  3) the vector of PAR at all depth Z (PAR.z)
+#'
+#'  @author Simon Bélanger
+#'
+#'  @export
+#'
 compute.PARz <- function(Depth, waves, Edz, Ed.0,
                          f.PAR=c(0.001, 0.01, 0.1,0.5),
                          z.fixed=c(5,10,20,30,40)) {
@@ -10,7 +32,7 @@ compute.PARz <- function(Depth, waves, Edz, Ed.0,
 
   # integrated
   fx.linear <- approxfun(waves, Q0)
-  PAR.0m = integrate(fx.linear, 350, 700, subdivisions=350, stop.on.error = FALSE)[1]
+  PAR.0m = integrate(fx.linear, 380, 700, subdivisions=350, stop.on.error = FALSE)[1]
   PAR.0m = PAR.0m$value
 
 
@@ -20,7 +42,7 @@ compute.PARz <- function(Depth, waves, Edz, Ed.0,
     QZ = Edz[i,] * waves / (h*c) * 10000/1e6 #
     # integrated
     fx.linear <- approxfun(waves, QZ)
-    tmp = integrate(fx.linear, 350, 700, subdivisions=350, stop.on.error = FALSE)[1]
+    tmp = integrate(fx.linear, 380, 700, subdivisions=350, stop.on.error = FALSE)[1]
     PAR.z[i] = tmp$value
   }
 
