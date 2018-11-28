@@ -52,7 +52,7 @@ file.parts <- unlist(strsplit(file, "_"))
 
   #########################
 
-	if(instruments.others == "NA") {
+	if(toupper(instruments.others) == "NA") {
 	  instruments <- instruments.optics
 	} else {
 	  instruments <- c(instruments.optics, instruments.others)
