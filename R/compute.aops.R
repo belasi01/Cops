@@ -21,8 +21,11 @@ compute.aops <- function(cops) {
 			EuZ.0m <- EuZ.0m / shadow.coef.EuZ$EuZ.shad.correction
 			EuZ.0m.linear <- cops$EuZ.0m.linear / shadow.coef.EuZ$EuZ.shad.correction
 		}
-		LuZ.0m <- EuZ.0m / cops$Q.sun.nadir
-		LuZ.0m.linear <- EuZ.0m.linear / cops$Q.sun.nadir
+		# Added by Simon Bélanger to deal with cases when both EuZ and LuZ are present
+		if(!("LuZ" %in% instruments.optics)) {
+		  LuZ.0m <- EuZ.0m / cops$Q.sun.nadir
+	  	LuZ.0m.linear <- EuZ.0m.linear / cops$Q.sun.nadir
+		}
 	}
 	if("LuZ" %in% instruments.optics) {
 		waves.u <- cops$LuZ.waves
@@ -33,8 +36,10 @@ compute.aops <- function(cops) {
 			LuZ.0m <- LuZ.0m / shadow.coef.LuZ$LuZ.shad.correction
 			LuZ.0m.linear <- LuZ.0m.linear / shadow.coef.LuZ$LuZ.shad.correction
 		}
-		EuZ.0m <- LuZ.0m * cops$Q.sun.nadir
-		EuZ.0m.linear <- LuZ.0m.linear * cops$Q.sun.nadir
+		if(!("EuZ" %in% instruments.optics)) {
+		  EuZ.0m <- LuZ.0m * cops$Q.sun.nadir
+		  EuZ.0m.linear <- LuZ.0m.linear * cops$Q.sun.nadir
+		}
 	}
 ####################
 
@@ -57,9 +62,25 @@ compute.aops <- function(cops) {
 	R.0m <- EuZ.0m / Ed0.0m
 	R.0m.linear <- EuZ.0m.linear / Ed0.0m
 
+	mymessage("Computing R.0p ...", head = "-")
+	R.0p <- EuZ.0m / Ed0.0p / 0.96
+	R.0p.linear <- EuZ.0m.linear / Ed0.0p / 0.96
+
 	mymessage("Computing Forel-Ule Color ...", head = "-")
 	FU <- Rrs2FU(waves.u, Rrs.0p)$FU
 	FU.linear <- Rrs2FU(waves.u, Rrs.0p.linear)$FU
+
+	if (("LuZ" %in% instruments.optics) && ("EuZ" %in% instruments.optics)) {
+	  mymessage("Computing Q factor ...", head = "-")
+	  Q <- EuZ.0m / LuZ.0m
+	  Q.linear <- EuZ.0m.linear / LuZ.0m.linear
+	  ## Set NA to unrealistic values due to noise
+	  Q[Q>10] <-NA
+	  Q.linear[Q.linear>10] <-NA
+	} else {
+	  Q <- NULL
+	  Q.linear <- NULL
+	}
 
 # PLOT
 	if(INTERACTIVE) x11(width = win.width, height = win.height)
@@ -108,6 +129,20 @@ compute.aops <- function(cops) {
 			text(1, 1, "NO SHADOW CORRECTION FOR LuZ", adj = c(0.5, 0.5))
 		}
 	}
+
+	if(!is.null(Q)) {
+	  par(mfrow = c(2, 1))
+	  plot(waves.u,Q, xlab = expression(lambda ~~ nm), ylab = "Measured Q factor", type = "l")
+	  lines(waves.u,Q.linear,lty=2)
+	  plot(1, 1, type = "n", log = "y", xlim = range(waves.u), ylim = c(0.00005, 0.1), xlab = expression(lambda ~~ nm), ylab = expression(rho[w]), axes = FALSE, frame.plot = TRUE)
+	  axis(1)
+	  axis.log(2, grid = TRUE, col = 1, lwd = 0.5, lty = 2)
+	  lines(waves.u, R.0p, type = "b")
+	  lines(waves.u, pi*Rrs.0p, lty =2)
+	  lines(waves.u, R.0p.linear, type = "b", col=2)
+	  lines(waves.u, pi*Rrs.0p.linear, lty =2,col=2)
+	  legend("topright", c("from EuZ","from LuZ*pi"), col=c(1,1), lty=c(1,2))
+	}
 	par(mfrow = c(1, 1))
 
 	if(!is.null(shadow.coef.EuZ) & !is.null(shadow.coef.LuZ)) shadow.list <- c(shadow.coef.EuZ, shadow.coef.EuZ)
@@ -118,12 +153,16 @@ compute.aops <- function(cops) {
 		Lw.0p = Lw.0p,
 		nLw.0p = nLw.0p,
 		R.0m = R.0m,
+		R.0p = R.0p,
 		Rrs.0p = Rrs.0p,
 		Lw.0p.linear = Lw.0p.linear,
 		nLw.0p.linear = nLw.0p.linear,
 		R.0m.linear = R.0m.linear,
+		R.0p.linear = R.0p.linear,
 		Rrs.0p.linear = Rrs.0p.linear,
 		FU = FU,
-		FU.linear = FU.linear
+		FU.linear = FU.linear,
+		Q = Q,
+		Q.linear = Q.linear
 	)))
 }
