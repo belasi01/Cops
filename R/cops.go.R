@@ -1,4 +1,4 @@
-cops.go <- function(interactive = TRUE) {
+cops.go <- function(interactive = TRUE, ASCII=FALSE) {
 	assign("INTERACTIVE", interactive, env = .GlobalEnv)
 	data("eu.hydrolight")
 	data("thuillier.completed.by.AM0AM1")
@@ -25,7 +25,7 @@ cops.go <- function(interactive = TRUE) {
 					stop()
 				}
 				mymessage(paste("PROCESSING DIRECTORY", dirdat), head = "@", tail = "@")
-				process.cops(dirdat)
+				process.cops(dirdat, ASCII=FALSE)
 				plot.Rrs.Kd.for.station(dirdat)
 			}
 		}

@@ -1,4 +1,4 @@
-process.cops <- function(dirdat) {
+process.cops <- function(dirdat, ASCII=FALSE) {
 	# initialisation file
 
 	generic.init.file <- paste( Sys.getenv("R_COPS_DATA_DIR"), "init.parameters.dat", sep = "/")
@@ -57,8 +57,11 @@ str(absorption.tab)
 	if(!file.exists(dirres)) dir.create(dirres)
 
 	# ascii results directory
-	dirasc <- paste(dirdat, "ASC", sep = "/")
-	if(!file.exists(dirasc)) dir.create(dirasc)
+	if (ASCII) {
+	  dirasc <- paste(dirdat, "ASC", sep = "/")
+	  if(!file.exists(dirasc)) dir.create(dirasc)
+	}
+
 
 	# pdf directory
 	dirpdf <- paste(dirdat, "PDF", sep = "/")
@@ -165,8 +168,10 @@ str(absorption.tab)
       if(verbose) str(cops.info)
 
       save.file <- paste(dirres, paste(cops.file, "RData", sep = "."), sep = "/")
-      asc.filedir <- paste(dirasc, paste(cops.file, "asc", sep = "."), sep = "/")
-      if(!file.exists(asc.filedir)) dir.create(asc.filedir)
+      if (ASCII) {
+        asc.filedir <- paste(dirasc, paste(cops.file, "asc", sep = "."), sep = "/")
+        if(!file.exists(asc.filedir)) dir.create(asc.filedir)
+      }
       pdf.file <- paste(dirpdf, paste(cops.file, "pdf", sep = "."), sep = "/")
       if(!INTERACTIVE) {
         pdf(file = pdf.file, width = 11, height = 8)
@@ -215,7 +220,9 @@ str(absorption.tab)
       if(verbose) str(cops.Qf)
 
       # ALL OBJECTS TOGETHER IN (nearly) FINAL list
-      cops <- c(cops.init, cops.info, cops.raw, cops.dd, cops.black, cops.Ed0, cops.EuZ, cops.LuZ, cops.EdZ, cops.Qf)
+      cops <- c(cops.init, cops.info, cops.raw, cops.dd,
+                cops.black, cops.Ed0, cops.EuZ, cops.LuZ,
+                cops.EdZ, cops.Qf)
 
       # COMPUTE SURFACE AOPs ---> cops.aops
       cops.aops <- compute.aops(cops)
@@ -227,7 +234,7 @@ str(absorption.tab)
 
       save(file = save.file, cops)
 
-      dump.asc(asc.filedir, cops)
+      if (ASCII) dump.asc(asc.filedir, cops)
       # initialize global init parameters for next experiment
       assign("time.window", cops.init00$time.window, env = .GlobalEnv)
       assign("sub.surface.removed.layer.optics", cops.init00$sub.surface.removed.layer.optics, env = .GlobalEnv)
@@ -315,8 +322,10 @@ str(absorption.tab)
       if(verbose) str(cops.info)
 
       save.file <- paste(dirres, paste(cops.file, "RData", sep = "."), sep = "/")
-      asc.filedir <- paste(dirasc, paste(cops.file, "asc", sep = "."), sep = "/")
-      if(!file.exists(asc.filedir)) dir.create(asc.filedir)
+      if (ASCII) {
+        asc.filedir <- paste(dirasc, paste(cops.file, "asc", sep = "."), sep = "/")
+        if(!file.exists(asc.filedir)) dir.create(asc.filedir)
+      }
       pdf.file <- paste(dirpdf, paste(cops.file, "pdf", sep = "."), sep = "/")
       if(!INTERACTIVE) {
         pdf(file = pdf.file, width = 11, height = 8)
@@ -354,7 +363,7 @@ str(absorption.tab)
 
       save(file = save.file, cops)
 
-      dump.asc(asc.filedir, cops)
+      if (ASCII) dump.asc(asc.filedir, cops)
       # initialize global init parameters for next experiment
       assign("time.window", cops.init00$time.window, env = .GlobalEnv)
       assign("sub.surface.removed.layer.optics", cops.init00$sub.surface.removed.layer.optics, env = .GlobalEnv)

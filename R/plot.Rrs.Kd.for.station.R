@@ -25,7 +25,7 @@ plot.Rrs.Kd.for.station <- function(plot.wd="./", depthEdZ = 1) {
   wl = cops$LuZ.waves
   nwl = length(wl)
 
-  png(filename = "Rrs.png",
+  png(filename = "../Rrs.png",
       width = 550, height = 480, units = "px",
       pointsize = 14, bg = "white")
   plot(wl[1:nwl], cops$Rrs.0p[1:nwl], xlab="Wavelenght", ylab="Rrs0+",
@@ -38,7 +38,7 @@ plot.Rrs.Kd.for.station <- function(plot.wd="./", depthEdZ = 1) {
     lines(wl[1:nwl], cops$Rrs.0p.linear[1:nwl], col=i, lwd=2, lty=2)
   }
 
-  legend("bottomleft", listfile, lwd=rep(2,nf), col=seq(nf))
+  legend("topright", listfile, lwd=rep(2,nf), col=seq(nf), bg="transparent")
   dev.off()
 
   load(paste(listfile[1], ".RData", sep=""))
@@ -53,7 +53,7 @@ plot.Rrs.Kd.for.station <- function(plot.wd="./", depthEdZ = 1) {
 
   load(paste(listfile[1], ".RData", sep=""))
   ix = which(cops$depth.fitted == depthEdZ)
-  png(filename = "Kd.png",
+  png(filename = "../Kd.png",
       width = 550, height = 480, units = "px",
       pointsize = 14, bg = "white")
   plot(wl, cops$K0.EdZ.fitted[ix,],
@@ -66,7 +66,7 @@ plot.Rrs.Kd.for.station <- function(plot.wd="./", depthEdZ = 1) {
     lines(wl[2:nwl], cops$K.EdZ.surf[2:nwl], col=i, lty=2, lwd=2)
   }
 
-  legend("topright", listfile, lwd=rep(2,nf), col=seq(nf))
+  legend("topright", listfile, lwd=rep(2,nf), col=seq(nf), bg="transparent")
   dev.off()
 
 

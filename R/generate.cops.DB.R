@@ -10,7 +10,8 @@
 #' @param mission is a string for the name of the mission. It will be used for the file names of the output.
 
 #'
-#' @return It returns a list object named COPS.DB containing matrices of mean and standdar devidation
+#' @return It returns a list object named COPS.DB containing matrices of
+#' mean and standard deviation
 #' of Kd1p, Kd10p, Rrs, Ed0.0p,  Ed0.f and vectors for
 #' date, lat, lon sunzen and waves
 #'
@@ -46,6 +47,7 @@ nwaves = length(waves.DB)
 
 
   date = rep(NA, ndirs)
+  stationID = rep("ID", ndirs)
   sunzen = rep(NA, ndirs)
   lat = rep(NA, ndirs)
   lon = rep(NA, ndirs)
@@ -284,11 +286,30 @@ nwaves = length(waves.DB)
                         lat = lat,
                         lon = lon)
   }
-setwd(path)
+
+  setwd(path)
+  ### Extract the Station ID from the paths
+  for (d in 1:ndirs) {
+    res=unlist(strsplit(as.character(dirs[d]), "/"))
+    for (i in 1:length(res)){
+      xx = str_locate(res[i], "_Station")
+      if (!is.na(xx[1])) {
+        datestation=unlist(strsplit(res[i], "_Station"))
+        # Remove "_" from station name to avoid error with Latex
+        if (str_detect(datestation[2], "_")) {
+          yy = unlist(strsplit(datestation[2], "_"))
+
+          stationID[d] = paste(yy, collapse=" ")
+        }   else stationID[d] =   datestation[2]
+      }
+    }
+  }
+
+  COPS.DB$stationID <- stationID
   save(COPS.DB, file = paste("COPS.DB.",mission,".RData", sep=""))
   write.table(all, file = paste("COPS.DB.",mission,".dat", sep=""), sep=",", quote=F, row.names=F)
 
-  return(COPS.BD)
+  return(COPS.DB)
 }
 
 mean.parameter <- function(par) {
