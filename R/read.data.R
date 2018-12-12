@@ -34,7 +34,8 @@ file.parts <- unlist(strsplit(file, "_"))
 	# end
 
 	# Added by Simon
-	ext = unlist(strsplit(file.c, "[.]"))[2]
+	index_ext = length(unlist(strsplit(file.c, "[.]")))	# for station names with periods, ex. G604.5
+	ext = unlist(strsplit(file.c, "[.]"))[index_ext]
 	if (ext == "tsv" || ext =="txt") {
 	  x = read.table(file = file.c, header = TRUE, as.is = TRUE, sep = "\t", check.names = FALSE)
 	} else{ x = read.table(file = file.c, header = TRUE, as.is = TRUE, sep = ",", check.names = FALSE)}
