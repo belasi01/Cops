@@ -61,6 +61,8 @@ compute.Ksurf.linear <- function (Depth, aop,
 
     } else {
       print(paste("No measurements above the detection limit at", dimnames(aop)[[2]][w]))
+      depth.intervals = seq(min.depth,max.depth,0.1)
+      r2       = rep(NA, length(depth.intervals))
     }
 
   }
