@@ -20,9 +20,9 @@
 #'  To access the Depth of the profiler, for instance, one need to ListName$LuZ.anc$Depth
 #'
 #'
-#' @author Simon Bélanger
+#' @author Simon Belanger
 #'
-#'
+#' @export
 #'
 read.COPS <- function(file,number.of.fields.before.date,instruments.optics=c("Ed0", "EdZ", "LuZ")) {
   dirdat=getwd()
@@ -41,7 +41,7 @@ read.COPS <- function(file,number.of.fields.before.date,instruments.optics=c("Ed
   dte <- as.POSIXct(strptime(paste(y, m, d, H, M, sep = ""), format = "%y%m%d%H%M"))
   tim <- as.numeric(H) + as.numeric(M) / 60
 
-  # Modified by Simon Bélanger on Aug 2016 to process COPS data obtained with uprofile 1.9.10 and after
+  # Modified by Simon Belanger on Aug 2016 to process COPS data obtained with uprofile 1.9.10 and after
   # These files end by URC.csv or URC.tsv"
   if (str_detect(file, "URC.")) {
    # print("COPS data acquisition using uProfile 1.9.10 or later")

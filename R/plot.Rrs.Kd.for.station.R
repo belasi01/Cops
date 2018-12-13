@@ -1,14 +1,20 @@
-#
-#    This function plot the Rrs and K0 at 1m depth for the cast retained
-#    It reads the files "remove.cops.dat" and then load the RData file
-#    that are stored in the "./BIN/" directory.
-#
-#   It produces 2 plots in PNG format in the  "./BIN/" directory.
-#
-#     By Simon Bélanger, UQAR, 23/02/2016
+#'
+#'    This function plot the replicates of Rrs and
+#'    the integrated Kd (K0) from surface to a given depth
+#'    for the cast retained (i.e. value of one in the remove.cops.dat)
+#'    It reads the files "remove.cops.dat" and then load the RData file
+#'    that are stored in the "./BIN/" directory.
+#'
+#'    @param path is the path where raw COPS data are located.
+#'    @param depthEdZ is the depth of the ingetration of Kd. Default is 1 meter
+#'
+#'  @return It produces 2 plots in PNG format in the working directory.
+#'
+#' @author  Simon Belanger, UQAR
+#' @export
 
-plot.Rrs.Kd.for.station <- function(plot.wd="./", depthEdZ = 1) {
-  setwd(plot.wd)
+plot.Rrs.Kd.for.station <- function(path="./", depthEdZ = 1) {
+  setwd(path)
   plot.wd = getwd()
   remove.file <- "remove.cops.dat"
   remove.tab <- read.table(remove.file, header = FALSE, colClasses = "character", sep = ";")
@@ -57,7 +63,7 @@ plot.Rrs.Kd.for.station <- function(plot.wd="./", depthEdZ = 1) {
       width = 550, height = 480, units = "px",
       pointsize = 14, bg = "white")
   plot(wl, cops$K0.EdZ.fitted[ix,],
-       xlab="Wavelenght", ylab="K0_Edz(1m)",
+       xlab="Wavelenght", ylab="K0_Edz",
        lwd=2, type="l",  main=getwd(), sub=cops$dates[1])
 
   for (i in 1:nf){
@@ -71,7 +77,7 @@ plot.Rrs.Kd.for.station <- function(plot.wd="./", depthEdZ = 1) {
 
 
   load(paste(listfile[1], ".RData", sep=""))
-  plot(wl[2:nwl], cops$K0.EdZ.fitted[ix,2:nwl], xlab="Wavelenght", ylab="K0_Edz(1m)",
+  plot(wl[2:nwl], cops$K0.EdZ.fitted[ix,2:nwl], xlab="Wavelenght", ylab="K0_Edz",
        lwd=2, type="l",  main=getwd(), sub=cops$dates[1])
 
   for (i in 1:nf){

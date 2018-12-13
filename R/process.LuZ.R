@@ -42,14 +42,16 @@ process.LuZ <- function(cops.raw, cops.dd, cops.black, cops.Ed0) {
 	K <- compute.Ksurf.linear(Depth, aop,
 	                         r2.threshold = 0.99,
 	                         detect.lim = 5e-5)
-	K.surf <- K$Kx
-	Z.interval <- K$Z.interval
-	ix.Z.interval <- K$ix.Z.interval
-	LuZ.0m.linear <- K$X.0m
-	LuZ.fitted <- matrix(NA, ncol=dim(aop.fitted)[2], nrow=dim(aop.fitted)[1])
-  for (i in 1:length(waves)) {
-    if (!is.na(LuZ.0m.linear[i])) LuZ.fitted[,i] <- LuZ.0m.linear[i] * exp(-depth.fitted*K.surf[i])
-  }
+	  K.surf <- K$Kx
+	  Z.interval <- K$Z.interval
+	  ix.Z.interval <- K$ix.Z.interval
+	  LuZ.0m.linear <- K$X.0m
+	  LuZ.fitted <- matrix(NA, ncol=dim(aop.fitted)[2], nrow=dim(aop.fitted)[1])
+	  for (i in 1:length(waves)) {
+	    if (!is.na(LuZ.0m.linear[i])) LuZ.fitted[,i] <- LuZ.0m.linear[i] * exp(-depth.fitted*K.surf[i])
+	  }
+
+
 
 # PLOT
 	aop.cols <- rainbow.modified(length(waves))

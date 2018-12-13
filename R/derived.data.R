@@ -18,12 +18,12 @@ derived.data <- function(lon, lat, cops.init, cops.raw) {
 	names(ret) <- paste(instruments, "tilt", sep = ".")
 
 # dates
-	#### Added by Simon Bélanger, 31 march 2016
+	#### Added by Simon Belanger, 31 march 2016
 	if (str_detect(cops.raw$Others$DateTime[1], "PM") | str_detect(cops.raw$Others$DateTime[1], "AM")) {
 	  cops.raw$Others$DateTime = convert.time.12h.to.24h.string(cops.raw$Others$DateTime, cops.init, 0)
 	}
 	####
-	dates <- as.POSIXct(strptime(cops.raw$Others$DateTime, format = format.date))
+	dates <- as.POSIXct(strptime(cops.raw$Others$DateTime, format = format.date[1]))
 
 	dates.secs.from.beginning <- as.numeric(dates) - min(as.numeric(dates))
 	dates.good <- dates.secs.from.beginning >= time.window[1] & dates.secs.from.beginning <= time.window[2]
@@ -86,7 +86,7 @@ derived.data <- function(lon, lat, cops.init, cops.raw) {
 #Added by Servet Cizmeli and Simon Belanger
 			    print("Reading GPS file: ")
 			    print(gps.file)
-			    # Modified by Simon Bélanger on Aug 2016 to process
+			    # Modified by Simon Belanger on Aug 2016 to process
 			    # GPS data obtained with uprofile 1.9.10 and after
 			    if (str_detect(gps.file, "GPS_")) {
 			      ext = unlist(strsplit(gps.file, "[.]"))[2]
@@ -121,8 +121,29 @@ derived.data <- function(lon, lat, cops.init, cops.raw) {
      			if (str_detect(gps.data$GpsTime[1], "PM") | str_detect(gps.data$GpsTime[1], "AM")) {
      			  gps.data$GpsTime = convert.time.12h.to.24h.string(gps.data$GpsTime, cops.init, 0)
      			}
-     			gps.data$GpsTime <- as.POSIXct(strptime(gps.data$GpsTime,  format = cops.init$format.date))
-     			gps.data$ComputerTime <- as.POSIXct(strptime(gps.data$ComputerTime,  format = cops.init$format.date))
+
+			    ### Add by S Belanger in 2018 to deal with GPS having different
+			    ### DateTime format than the COPS profiles (in was the case in 2015).
+			    ### The user need to provide two format.date in the init.cops.dat file
+			    ### separated by coma.
+			    if (length(cops.init$format.date)==2) {
+			      gps.data$GpsTime <- as.POSIXct(strptime(gps.data$GpsTime,  format = cops.init$format.date[2]))
+			      gps.data$ComputerTime <- as.POSIXct(strptime(gps.data$ComputerTime,  format = cops.init$format.date[2]))
+			    } else {
+			      gps.data$GpsTime <- as.POSIXct(strptime(gps.data$GpsTime,  format = cops.init$format.date[1]))
+			      gps.data$ComputerTime <- as.POSIXct(strptime(gps.data$ComputerTime,  format = cops.init$format.date[1]))
+			    }
+          if (is.na(gps.data$GpsTime[1])) {
+            print("WARNING: It seems that the GPS time format differs from the CAST files")
+            print("1. Check the time format inside the GPS file")
+            print("2. If it differs from the format of the DateTime column of the CAST files,")
+            print("   than add a second time format in the init.cops.dat at the  ")
+            print("   format.date field (separated by coma).")
+            print("  ")
+            print(" Teminate processing of that profile.")
+            return(0)
+          }
+
      			valid_gps <- gps.data$GpsTime > min(dates) & gps.data$GpsTime < max(dates)
      			if (any(valid_gps)) {
      			  longitude <- median(gps.data$Longitude[valid_gps], na.rm = TRUE)
