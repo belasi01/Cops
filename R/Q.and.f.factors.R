@@ -1,8 +1,9 @@
+#' Retrieve the Q factor
 Q.and.f.factors <- function(cops.info, cops.raw, cops.dd, cops.EuZ, cops.LuZ) {
 	waves <- NULL
   if(is.null(cops.EuZ)) waves <- cops.raw$LuZ.waves
 	if(is.null(cops.LuZ)) waves <- cops.raw$EuZ.waves
-	if(is.null(waves)) waves <- cops.raw$EuZ.waves # Added by Simon Bélanger on Nov 30th 2018 to handle COPS data having both EuZ and LuZ
+	if(is.null(waves)) waves <- cops.raw$EuZ.waves # Added by Simon Belanger on Nov 30th 2018 to handle COPS data having both EuZ and LuZ
 	Q.sun.nadir <- rep(pi,length(waves))
 	Q.0 <- rep(pi,length(waves))
 	f.sun <- rep(0.33,length(waves))

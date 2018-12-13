@@ -21,7 +21,7 @@ compute.aops <- function(cops) {
 			EuZ.0m <- EuZ.0m / shadow.coef.EuZ$EuZ.shad.correction
 			EuZ.0m.linear <- cops$EuZ.0m.linear / shadow.coef.EuZ$EuZ.shad.correction
 		}
-		# Added by Simon Bélanger to deal with cases when both EuZ and LuZ are present
+		# Added by Simon Belanger to deal with cases when both EuZ and LuZ are present
 		if(!("LuZ" %in% instruments.optics)) {
 		  LuZ.0m <- EuZ.0m / cops$Q.sun.nadir
 	  	LuZ.0m.linear <- EuZ.0m.linear / cops$Q.sun.nadir

@@ -1,9 +1,10 @@
-# Script to convert the COPS time in UTC in 24h format file
-#
-# Writen by Simon Bélanger
-
+#' Script to convert the COPS time in UTC in 24h format file
+#'
+#' @author by Simon Belanger
+#' @export
 convert.time.12h.to.24h.string <- function(DateTime, cops.init,  UTClag) {
-  TimeLocal = as.POSIXct(strptime(DateTime, format = cops.init$format.date))
+
+  TimeLocal = as.POSIXct(strptime(DateTime, format = cops.init$format.date[1]))
   dates.secs.from.beginning <- as.numeric(TimeLocal) - min(as.numeric(TimeLocal))
 
   n = length(TimeLocal)
@@ -21,7 +22,7 @@ convert.time.12h.to.24h.string <- function(DateTime, cops.init,  UTClag) {
   TimeUTC = as.POSIXct(as.numeric(Time24) + UTClag*3600, origin="1970-01-01")
 
   # update the COPS data matrix and write as TSV file
-  DateTime = format(TimeUTC, cops.init$format.date)
+  DateTime = format(TimeUTC, cops.init$format.date[1])
 
   return(DateTime)
 }

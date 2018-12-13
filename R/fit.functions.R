@@ -12,23 +12,23 @@ fit.with.loess <- function(waves, Depth, aop, span, depth.fitted, span.wave.corr
 		} else {
 			 span.w.corr <- 1
 		}
-	  
+
 	  #### Check if there is any good data
-	  # Added by Simon Bélanger, 2016-02-11
-	  
+	  # Added by Simon Belanger, 2016-02-11
+
 		 if (all(is.infinite(aop[,i]) | is.na(aop[,i]))) {
       print(paste("No valid data at: ", waves[i]))
-      
+
 		 } else {
-		   ix.good = which(!is.infinite(aop[,i]) & !is.na(aop[,i])) 
+		   ix.good = which(!is.infinite(aop[,i]) & !is.na(aop[,i]))
 		   if (length(ix.good)> 3 ) { # ADDED
-		     
-		     fit.func <- loess(aop[ix.good,i] ~ Depth[ix.good], span = span * span.w.corr, 
-		                       control = loess.control(surface = "direct")) 
+
+		     fit.func <- loess(aop[ix.good,i] ~ Depth[ix.good], span = span * span.w.corr,
+		                       control = loess.control(surface = "direct"))
 		     aop.fitted[,i] <- predict(fit.func, depth.fitted)
 		     aop.0[i] <- predict(fit.func, 0)
 		     cat(waves[i], "(", span.w.corr, ")", " ")
-		     
+
 		   } else {
 		     print(paste("Not enough valid data at: ", waves[i]))
 		   }

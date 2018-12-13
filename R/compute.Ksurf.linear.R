@@ -9,6 +9,7 @@ compute.Ksurf.linear <- function (Depth, aop,
   Kx        = rep(NA,nwl)
   Z.interval= rep(NA,nwl)
   ix.Z.interval= rep(NA,nwl)
+  r2.all = rep(NA,nwl)
 
   # loop on each wavelength
   for (w in 1:nwl) {
@@ -58,19 +59,28 @@ compute.Ksurf.linear <- function (Depth, aop,
     Kx[w]            <- Kx.tmp[ix.mar.r2]
     Z.interval[w]    <- depth.intervals[ix.mar.r2]
     ix.Z.interval[w] <- ix.z[ix.mar.r2]
+    r2.all[w]        <- r2[ix.mar.r2]
 
     } else {
       print(paste("No measurements above the detection limit at", dimnames(aop)[[2]][w]))
-      depth.intervals = seq(min.depth,max.depth,0.1)
-      r2       = rep(NA, length(depth.intervals))
     }
 
   }
+
+  if (all(is.na(Z.interval))) {
+    print("$$$$$$$$$$$$$$$$$$$$$")
+    print("WARNING : No valid data for surface fitting")
+    print("Check if it is a good profile.")
+    print("It could be a Bioshade")
+    print("$$$$$$$$$$$$$$$$$$$$$")
+    return(0)
+  }
+
 
     return(list(X.0m= X.0m,
                 Kx  = Kx,
                 Z.interval=Z.interval,
                 ix.Z.interval=ix.Z.interval,
-                r2 = r2[ix.mar.r2]))
+                r2 = r2.all))
 
   }

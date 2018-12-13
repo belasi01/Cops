@@ -16,7 +16,7 @@
 #'  2) the fraction of PAR at the depth requested (PAR.at.z);
 #'  3) the vector of PAR at all depth Z (PAR.z)
 #'
-#'  @author Simon Bélanger
+#'  @author Simon Belanger
 #'
 #'  @export
 #'

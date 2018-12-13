@@ -27,7 +27,7 @@ Default is z.fixed=c(5,10,20,30,40)
 \item the vector of PAR at all depth Z (PAR.z)
 }
 
-@author Simon Bélanger
+@author Simon Belanger
 
 @export
 }
