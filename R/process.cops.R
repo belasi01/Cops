@@ -335,8 +335,10 @@ str(absorption.tab)
       plot.init.info(cops.init, cops.info)
       # READ FILE ---> cops.raw
       mymessage(paste("      ", "reading", cops.file))
-      print("YYYYYY")
+      #print("YYYYYY")
+
       cops.raw <- read.data(cops.file)
+
       if(verbose) str(cops.raw)
       # CALCULATE DERIVED DATA ---> cops.dd
       cops.dd <- derived.data(info.longitude, info.latitude, cops.init, cops.raw)

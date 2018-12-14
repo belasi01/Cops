@@ -5,6 +5,16 @@ file.parts <- unlist(strsplit(file, "_"))
 		cat(file, "does not exists\n")
 		stop()
 	}
+
+	if (str_detect(file, "_SB_")) {
+	  print("Shadow band file format detected")
+	  print("Change the init parameters")
+	  number.of.fields.before.date.tmp <- number.of.fields.before.date
+	  number.of.fields.before.date <- number.of.fields.before.date - 1
+	  instruments.optics.tmp <- instruments.optics
+	  instruments.optics <- "Ed0"
+	}
+
 	dte <- file.parts[number.of.fields.before.date + 1]
 	tim <- file.parts[number.of.fields.before.date + 2]
 

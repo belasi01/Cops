@@ -1,5 +1,16 @@
 derived.data <- function(lon, lat, cops.init, cops.raw) {
 	mymessage(paste("      ", "calculating derived data"))
+
+
+  if (str_detect(cops.raw$file, "_SB_")) {
+    print("Shadow band file format detected")
+    print("Change the init parameters")
+    number.of.fields.before.date.tmp <- number.of.fields.before.date
+    number.of.fields.before.date <- number.of.fields.before.date - 1
+    instruments.optics.tmp <- instruments.optics
+    instruments.optics <- "Ed0"
+  }
+
 	instruments <- c(instruments.optics)
 	d2r <- pi / 180
 # tilt from Poll and Pitch
