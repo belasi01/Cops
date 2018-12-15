@@ -1,4 +1,4 @@
-shadow.correction <- function(instr, cops) {  
+shadow.correction <- function(instr, cops, SB=NA) {
 	mymessage("shadow correction")
 	chl <- cops$chl
 	SHADOW.CORRECTION <- cops$SHADOW.CORRECTION
@@ -44,9 +44,17 @@ shadow.correction <- function(instr, cops) {
 		aR <- absorption.values * radius.instrument.optics[instr]
 	}
 	names(aR) <- waves
-	egc <- GreggCarder.f(julian.day, longitude, latitude, sunzen, lam.sel = waves)
-	Edif <- egc$Edif
-	Edir <- egc$Edir
+
+	### Add the case when the Shadow Band data is available (Simon Belanger 2018/12/15)
+	if (is.na(SB)) {
+	  egc <- GreggCarder.f(julian.day, longitude, latitude, sunzen, lam.sel = waves)
+	  Edif <- egc$Edif
+	  Edir <- egc$Edir
+	} else {
+	  Edif <- SB$Ed0.dif
+	  Edir <- SB$Ed0.tot - Edif
+	}
+	###
 	ratio.edsky.edsun <- Edif / Edir
 	epss <- shadow.epsilon(instr, aR, sunzen, ratio.edsky.edsun)
 	eps.sun <- epss$eps.sun
