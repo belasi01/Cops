@@ -29,7 +29,7 @@ derived.data <- function(lon, lat, cops.init, cops.raw) {
 	names(ret) <- paste(instruments, "tilt", sep = ".")
 
 # dates
-	#### Added by Simon Belanger, 31 march 2016
+	##### Added by Simon Belanger, 31 march 2016
 	if (str_detect(cops.raw$Others$DateTime[1], "PM") | str_detect(cops.raw$Others$DateTime[1], "AM")) {
 	  cops.raw$Others$DateTime = convert.time.12h.to.24h.string(cops.raw$Others$DateTime, cops.init, 0)
 	}
@@ -183,7 +183,7 @@ derived.data <- function(lon, lat, cops.init, cops.raw) {
 	}
 	cat("longitude :", longitude, "\n")
 	cat("latitude :", latitude, "\n")
-  cat("date: ", dte,"\n")
+	print(paste("date: ", dte))
 
 # sun-zenith angle
 	day <- as.numeric(format(dte, format = "%d"))
@@ -196,58 +196,81 @@ derived.data <- function(lon, lat, cops.init, cops.raw) {
   print(month)
 	sunzen <- possol(month, day, ah, longitude, latitude)[1]
 
-# ELIMINATE A FEW INVALID DEPTHS
-	Depth <- cops.raw[[paste(depth.is.on, "anc", sep = ".")]]$Depth #+ delta.capteur.optics["LuZ"]
-# median filter on Depth with big delta to remove a few inappropriate depths
-	delta <- max(Depth) / length(Depth) * 50
-	Depth.filtered <- filtre.mediane(3, Depth, delta = delta, fill = TRUE, replace = FALSE)
-	Depth.good <- !is.na(Depth.filtered)
+	if (str_detect(cops.raw$file, "_SB_")) {
+	  Depth<-NULL
+	  Depth.good<-NULL
+	  depth.fitted <- NULL
+	  ret <- c(ret, list(change.position = change.position,
+	                     longitude = longitude,
+	                     latitude = latitude,
+	                     dates = dates,
+	                     date.mean = dte,
+	                     cops.duration.secs = cops.duration.secs,
+	                     day = day,
+	                     month = month,
+	                     year = year,
+	                     sunzen = sunzen,
+	                     Depth = Depth,
+	                     Depth.good = Depth.good,
+	                     depth.fitted = depth.fitted))
+	} else {
+	  # ELIMINATE A FEW INVALID DEPTHS
+	  Depth <- cops.raw[[paste(depth.is.on, "anc", sep = ".")]]$Depth #+ delta.capteur.optics["LuZ"]
+	  # median filter on Depth with big delta to remove a few inappropriate depths
+	  delta <- max(Depth) / length(Depth) * 50
+	  Depth.filtered <- filtre.mediane(3, Depth, delta = delta, fill = TRUE, replace = FALSE)
+	  Depth.good <- !is.na(Depth.filtered)
 
-# agglomerate dates.good with Depth.good
-	Depth.good <- Depth.good & dates.good
+	  # agglomerate dates.good with Depth.good
+	  Depth.good <- Depth.good & dates.good
 
-# depth where data will be fitted
-	depth.fitted <- NULL
-	for(i in seq(1, length(depth.discretization) - 2, 2)) {
-		depth.fitted <- append(depth.fitted, seq(depth.discretization[i], depth.discretization[i + 2] - depth.discretization[i + 1] / 2, depth.discretization[i + 1]))
+	  # depth where data will be fitted
+	  depth.fitted <- NULL
+	  for(i in seq(1, length(depth.discretization) - 2, 2)) {
+	    depth.fitted <- append(depth.fitted, seq(depth.discretization[i], depth.discretization[i + 2] - depth.discretization[i + 1] / 2, depth.discretization[i + 1]))
+	  }
+	  maxdepth <- max(Depth[Depth.good]+ delta.capteur.optics["LuZ"])
+	  depth.fitted <- depth.fitted[depth.fitted <= maxdepth]
+
+	  ret <- c(ret, list(change.position = change.position,
+	                     longitude = longitude,
+	                     latitude = latitude,
+	                     dates = dates,
+	                     date.mean = dte,
+	                     cops.duration.secs = cops.duration.secs,
+	                     day = day,
+	                     month = month,
+	                     year = year,
+	                     sunzen = sunzen,
+	                     Depth = Depth,
+	                     Depth.good = Depth.good,
+	                     depth.fitted = depth.fitted))
+	  # PLOT
+	  if(INTERACTIVE) x11(width = win.width, height = win.height)
+	  plot(dates, Depth, ylim = rev(range(Depth)), xlab = "Time (HH:MM:SS)", ylab = "Depth", main = paste(dte, "   duration =", cops.duration.secs, "s", "   lon =", round(longitude, digits = 3), "   lat =", round(latitude, digits = 3), "   sun-zenith angle =", round(sunzen, digits = 2), "deg."), cex.main = 1, axes = FALSE, frame.plot = TRUE)
+	  grid(col = 1)
+	  axis.POSIXct(1, dates, format = "%H:%M:%S")
+	  axis(2)
+	  points(dates[!Depth.good], Depth[!Depth.good], pch = 20, col = 2, cex = 2)
+	  legend("bottomleft", legend = paste(length(which(!Depth.good)), "points removed"), text.col = 2, cex = 2)
+	  if(change.position) legend("topright", legend = c("Longitude and Latitute found", "   (BioGPS column present)", "VALUES MODIFIED"), text.col = 3, cex = 1)
+	  if(INTERACTIVE) x11(width = win.width, height = win.height)
+	  par(mfrow = c(1, length(instruments)))
+	  for(instr in instruments) {
+	    tilt <- ret[[paste(instr, "tilt", sep = ".")]]
+	    if(!is.null(tilt)) {
+	      plot(tilt[Depth.good], Depth[Depth.good], ylim = rev(range(Depth)), xlab = "Tilt", ylab = "Depth", main = instr)
+	      grid(col = 1)
+	      points(tilt[!Depth.good], Depth[!Depth.good], col = 2)
+	    }
+	  }
+	  par(mfrow = c(1, 1))
+
 	}
-	maxdepth <- max(Depth[Depth.good]+ delta.capteur.optics["LuZ"])
-	depth.fitted <- depth.fitted[depth.fitted <= maxdepth]
 
-	ret <- c(ret, list(change.position = change.position,
-	                   longitude = longitude,
-	                   latitude = latitude,
-	                   dates = dates,
-	                   date.mean = dte,
-	                   cops.duration.secs = cops.duration.secs,
-	                   day = day,
-	                   month = month,
-	                   year = year,
-	                   sunzen = sunzen,
-	                   Depth = Depth,
-	                   Depth.good = Depth.good,
-	                   depth.fitted = depth.fitted))
 
-# PLOT
-	if(INTERACTIVE) x11(width = win.width, height = win.height)
-	plot(dates, Depth, ylim = rev(range(Depth)), xlab = "Time (HH:MM:SS)", ylab = "Depth", main = paste(dte, "   duration =", cops.duration.secs, "s", "   lon =", round(longitude, digits = 3), "   lat =", round(latitude, digits = 3), "   sun-zenith angle =", round(sunzen, digits = 2), "deg."), cex.main = 1, axes = FALSE, frame.plot = TRUE)
-	grid(col = 1)
-	axis.POSIXct(1, dates, format = "%H:%M:%S")
-	axis(2)
-	points(dates[!Depth.good], Depth[!Depth.good], pch = 20, col = 2, cex = 2)
-	legend("bottomleft", legend = paste(length(which(!Depth.good)), "points removed"), text.col = 2, cex = 2)
-	if(change.position) legend("topright", legend = c("Longitude and Latitute found", "   (BioGPS column present)", "VALUES MODIFIED"), text.col = 3, cex = 1)
-	if(INTERACTIVE) x11(width = win.width, height = win.height)
-	par(mfrow = c(1, length(instruments)))
-	for(instr in instruments) {
-		tilt <- ret[[paste(instr, "tilt", sep = ".")]]
-		if(!is.null(tilt)) {
-			plot(tilt[Depth.good], Depth[Depth.good], ylim = rev(range(Depth)), xlab = "Tilt", ylab = "Depth", main = instr)
-			grid(col = 1)
-			points(tilt[!Depth.good], Depth[!Depth.good], col = 2)
-		}
-	}
-	par(mfrow = c(1, 1))
+
+
 
 	ret
 }
