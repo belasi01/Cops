@@ -8,7 +8,7 @@ compute.aTOT.discrete.GE <- function (path, date_station, discrete_part_abs_file
   
   station.nb=substring(date_station,18,23) # two extra spaces for case "G604.5"
 
-  source('./spectral.aw.R', echo=TRUE)
+  #source('./spectral.aw.R', echo=TRUE)
   
   
   #Load and get Ap at COPS wavelengths
