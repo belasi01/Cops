@@ -17,10 +17,11 @@ compute.aTOT.from.Kd <- function (path, date_station) {
 
   #Load wavelenghts from COPS
   lambda = c(340, 412, 443, 465, 490, 510, 532, 555, 560, 589, 625, 665, 670, 683, 694, 710, 765, 780, 875)
+  
   nb_lambda = length(lambda)
   
   #Use processed COPS data, saved 
-  files.dat=read.csv(file=paste(path,"L2/",date_station,"/COPS/remove.cops.dat", sep = ""), sep = ";", header = FALSE)
+  files.dat=read.csv(file=paste(path,date_station,"/COPS/remove.cops.dat", sep = ""), sep = ";", header = FALSE)
   index_good_casts = which(files.dat$V2==1)
   nb_good_casts = length(index_good_casts)
   R_lambda_casts = array(data=0.0, dim=c(nb_good_casts,nb_lambda))
@@ -28,7 +29,7 @@ compute.aTOT.from.Kd <- function (path, date_station) {
   
   for (c in 1:nb_good_casts) {
     kept_cast = files.dat$V1[index_good_casts[c]]
-    load(paste(path,"L2/",date_station,"/COPS/BIN/",kept_cast,".RData",sep = ""))
+    load(paste(path,date_station,"/COPS/BIN/",kept_cast,".RData",sep = ""))
     
     R_lambda_casts[c,] = cops$R.0m.linear
     
@@ -57,10 +58,10 @@ compute.aTOT.from.Kd <- function (path, date_station) {
   
   # Plot and save results
   if (station.nb != "409") {
-    png(filename = paste(path,"L2/",date_station,"/COPS/absorption.cops.png", sep=""))
-    plot(lambda, a.tot, 
+    png(filename = paste(path, date_station,"/COPS/absorption.cops.png", sep=""))
+    plot(lambda[!is.na(a.tot)], a.tot[!is.na(a.tot)], 
          xlab = "Wavelenght", ylab="Absorption", pch=19,
-         ylim=c(0, max(a.tot)))
+         ylim=c(0, max(a.tot, na.rm = TRUE)))
     
     #lines(lambda, a.p.station, col=2, lwd=3)
     #source('./spectral.aw.R', echo=TRUE)
@@ -72,7 +73,7 @@ compute.aTOT.from.Kd <- function (path, date_station) {
   }
   
   # write results in file absorption.cops.dat
-  file=paste(path,"L2/",date_station,"/COPS/absorption.cops.dat", sep="")
+  file=paste(path,date_station,"/COPS/absorption.cops.dat", sep="")
   df = read.table(file,sep=";")
   nfile = length(df$V1) - 1
   a.mat = matrix(a.tot, nrow=nfile, ncol=19, byrow=T)

@@ -137,8 +137,6 @@ str(absorption.tab)
             library(stringr)
             date_station = str_extract(str_split(dirdat,"/"),"20[0-9]{2}[0-1][0-9][0-3][0-9]_StationG[0-9]{3}[.]?[0-9]?")
             path = substring(dirdat,1,str_locate(dirdat,date_station)[1]-1)
-            #source("compute.aTOT.discrete.GE.R")
-            #source(paste(substring(Sys.getenv("R_COPS_DATA_DIR"),1,nchar(Sys.getenv("R_COPS_DATA_DIR"))-5),"R/compute.aTOT.discrete.GE.R",sep="/"))
             compute.aTOT.discrete.GE(path, date_station, discrete_part_abs_file, discrete_cdom_file)
           }
           
@@ -150,8 +148,6 @@ str(absorption.tab)
           library(stringr)
           date_station = str_extract(str_split(dirdat,"/"),"20[0-9]{2}[0-1][0-9][0-3][0-9]_StationG[0-9]{3}[.]?[0-9]?")
           path = substring(dirdat,1,str_locate(dirdat,date_station)[1]-1)
-          #source("compute.aTOT.from.Kd.R")
-          #source(paste(substring(Sys.getenv("R_COPS_DATA_DIR"),1,nchar(Sys.getenv("R_COPS_DATA_DIR"))-5),"R/compute.aTOT.from.Kd.R",sep="/"))
           compute.aTOT.from.Kd(path, date_station)
           
         } else {
