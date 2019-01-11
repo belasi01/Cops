@@ -11,6 +11,8 @@
 # field #4 : a positive value, 0, or NA                                                                                               #
 #           if > 0, it is the chlorophyll concentration and is used to calculate absorption at each wavelength (case 1 waters model)  #
 #           if = 0, the absorption coefficients for all wavelengths must be found in a file called absorption.cops.dat                #
+#           if = 98, the absorption coefficients are computed from discrete IOPs in directories.discreteIOPs.dat                      #
+#           if = 99, the absorption coefficients are computed from a = Kd 0.90[1+2.25R]^-1 [1-R]  Morel & Marioneta 2001              #
 #           if NA, no shadow correction                                                                                               #
 #######################################################################################################################################
 #-fields-- 5 6 7 8 ------#                                                                                                            #

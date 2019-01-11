@@ -109,6 +109,47 @@ str(absorption.tab)
           absorption.values <- unlist(absorption.tab[cops.file, ])
           absorption.waves <- as.numeric(names(absorption.tab))
           chl <- NA
+        } else if (abs(chl-98) < 0.000001) {
+          if(!file.exists("directories.for.cops.dat")) {
+            cat("CREATE a file named directories.discreteIOPs.dat in current directory (where R is launched)\n")
+            cat("  and put in it the names of the discrete IOPs data files for particulate absorption and cdom (one by line, in order)\n")
+            cat("  default: /Data/Insitu/GreenEdge/2016/DiscreteIOPs/GE-Amundsen-particulate_absorption_120517.csv\n")
+            cat("           /Data/Insitu/GreenEdge/2016/DiscreteIOPs/cdom_amundsen_2016.csv\n")
+            cat("Program STOP, this file may be edited before rerunning")
+            
+            # keep copy in execution directory
+            header.info.file <- paste(Sys.getenv("R_COPS_DATA_DIR"), "directories.discreteIOPs.dat", sep = "/")
+            info.file <- paste(dirdat, "directories.discreteIOPs.dat", sep = "/") 
+            file.copy(from = header.info.file, to = info.file)
+            stop()
+          } else {
+            dirIOPs <- scan(file = "directories.discreteIOPs.dat", "", sep = "\n", comment.char = "#")
+            for(dirIOP in dirIOPs) {
+              if(!file.exists(dirIOP)) {
+                cat(dirIOP, "does not exist")
+                stop()
+              }
+            }
+            discrete_part_abs_file = dirIOPs[1]
+            discrete_cdom_file = dirIOPs[2]
+           
+            # date_station must be a substring in the dirdat path, for instance "20160706_StationG604.5" or "20160706_StationG604"
+            library(stringr)
+            date_station = str_extract(str_split(dirdat,"/"),"20[0-9]{2}[0-1][0-9][0-3][0-9]_StationG[0-9]{3}[.]?[0-9]?")
+            path = substring(dirdat,1,str_locate(dirdat,date_station)[1]-1)
+            compute.aTOT.discrete.GE.from.Kd(path, date_station, discrete_part_abs_file, discrete_cdom_file)
+          }
+          
+          absorption.values <- unlist(absorption.tab[cops.file, ])
+          absorption.waves <- as.numeric(names(absorption.tab))
+          chl <- NA
+        } else if (abs(chl-99) < 0.000001) {
+          # date_station must be a substring in the dirdat path, for instance "20160706_StationG604.5" or "20160706_StationG604"
+          library(stringr)
+          date_station = str_extract(str_split(dirdat,"/"),"20[0-9]{2}[0-1][0-9][0-3][0-9]_StationG[0-9]{3}[.]?[0-9]?")
+          path = substring(dirdat,1,str_locate(dirdat,date_station)[1]-1)
+          compute.aTOT.from.Kd(path, date_station)
+          
         } else {
           absorption.values <- NA
           absorption.waves <- NA
