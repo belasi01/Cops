@@ -8,9 +8,10 @@
 # field #1 : file name                                                                                                                #
 # field #2 : longitude (decimal degs)                                                                                                 #
 # field #3 : latitude (decimal degs)                                                                                                  #
-# field #4 : a positive value, 0, or NA                                                                                               #
+# field #4 : a positive value, 0, 999, or NA                                                                                               #
 #           if > 0, it is the chlorophyll concentration and is used to calculate absorption at each wavelength (case 1 waters model)  #
 #           if = 0, the absorption coefficients for all wavelengths must be found in a file called absorption.cops.dat                #
+#           If 999, the absorption coefficients are derived from Kd near the sea surface
 #           if NA, no shadow correction                                                                                               #
 #######################################################################################################################################
 #-fields-- 5 6 7 8 ------#                                                                                                            #

@@ -18,7 +18,7 @@ process.cops <- function(dirdat, ASCII=FALSE) {
 		file.copy(from = header.info.file, to = info.file)
 		files.in.dirdat <- list.files(dirdat)
 		files.in.dirdat <- files.in.dirdat[! files.in.dirdat %in% c("init.cops.dat", "info.cops.dat")]
-		lines.in.info.file <- paste(files.in.dirdat, "NA", "NA", "NA", "x", "x", "x","x", sep = ";")
+		lines.in.info.file <- paste(files.in.dirdat, "NA", "NA", "999", "x", "x", "x","x", sep = ";")
 		write(file = info.file, lines.in.info.file, append = TRUE, ncolumns = 1)
 		cat("EDIT file", info.file, "and CUSTOMIZE IT\n")
 		cat("  this file must contain as much lines as cops-experiments you want to process\n")
@@ -115,11 +115,11 @@ str(absorption.tab)
       absorption.waves <- NA
       if(!is.na(chl)) {
         SHADOW.CORRECTION <- TRUE
-        if(chl < 0.000001) {
+        if(chl < 0.000001) { #### Use the absorption values provided
           absorption.values <- unlist(absorption.tab[cops.file, ])
           absorption.waves <- as.numeric(names(absorption.tab))
           chl <- NA
-        } else {
+        } else { # Use an estimation of absorption
           absorption.values <- NA
           absorption.waves <- NA
         }
