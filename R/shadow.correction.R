@@ -10,7 +10,8 @@ shadow.correction <- function(instr, cops, SB=NA) {
 	latitude <- cops$latitude
 	waves <- cops[[paste(instr, "waves", sep = ".")]]
 	julian.day <- as.numeric(format(date.mean, format = "%j"))
-	if(! is.na(chl)) {
+	if(! is.na(chl) && chl != 999) { #### Use Morel and Maritorena model to
+	                   #### get absorption from CHL, but if 999 then use the Kd derived absorption
 # 350-700
 		chlTMP <- chl
 		chlTMP <- min(chlTMP, 9.99999)
@@ -34,14 +35,30 @@ shadow.correction <- function(instr, cops, SB=NA) {
 		i.wavesUV <- wavesTMP < 350
 		aR[i.wavesUV] <- popt.f.a(350.001, chlTMP) * radius.instrument.optics[instr]
 	} else {
-		agree.waves <- isTRUE(all.equal(absorption.waves, waves, scale = 1, tolerance = 1))
-		if(!agree.waves) {
-			cat("wavelengths in file absorption.cops.dat do not agree with wavelengths of", instr, "instrument\n")
-			cat(instr, ":", waves, "\n")
-			cat("file absorption.cops.dat", ":", absorption.waves, "\n")
-			stop()
-		}
-		aR <- absorption.values * radius.instrument.optics[instr]
+	  if (chl == 999) { #### CHL == 999 mean used Kd-derived absorption
+	    Kd = cops$K.EdZ.surf
+	    Q  = pi
+	    if (!is.null(cops$LuZ.0m.linear)) {
+	      R = (cops$LuZ.0m.linear*Q)/cops$EdZ.0m.linear
+	    }
+	    if (!is.null(cops$EuZ.0m.linear)) {
+	      R = cops$EuZ.0m.linear/cops$EdZ.0m.linear
+	    }
+
+	    # From Morel and Maritorena JGR 2001 eq 8'
+	    absorption.values <- Kd*0.9*(1-R)/(1+2.25*R)
+	    cops$absorption.values <- absorption.values
+	    aR <- absorption.values * radius.instrument.optics[instr]
+	  } else {
+	    agree.waves <- isTRUE(all.equal(absorption.waves, waves, scale = 1, tolerance = 1))
+	    if(!agree.waves) {
+	      cat("wavelengths in file absorption.cops.dat do not agree with wavelengths of", instr, "instrument\n")
+	      cat(instr, ":", waves, "\n")
+	      cat("file absorption.cops.dat", ":", absorption.waves, "\n")
+	      stop()
+	    }
+	    aR <- absorption.values * radius.instrument.optics[instr]
+	  }
 	}
 	names(aR) <- waves
 
@@ -61,9 +78,12 @@ shadow.correction <- function(instr, cops, SB=NA) {
 	eps.sky <- epss$eps.sky
 	eps <- epss$eps
 	correction <- 1 - eps
-	corr.names <- c("shad.aR", "shad.Edif", "shad.Edir", "shad.ratio.edsky.edsun", "shad.eps.sun", "shad.eps.sky", "shad.eps", "shad.correction")
+	corr.names <- c("shad.aR", "shad.Edif", "shad.Edir", "shad.ratio.edsky.edsun",
+	                "shad.eps.sun", "shad.eps.sky", "shad.eps", "shad.correction")
 	corr.names <- paste(instr, corr.names, sep = ".")
-	corr.list <- list(aR, Edif, Edir, ratio.edsky.edsun, eps.sun, eps.sky, eps, correction)
+	corr.names <- c(corr.names,"absorption.values", "absorption.waves")
+	corr.list <- list(aR, Edif, Edir, ratio.edsky.edsun, eps.sun,
+	                  eps.sky, eps, correction, absorption.values, waves)
 	names(corr.list) <- corr.names
 	corr.list
 }

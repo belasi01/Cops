@@ -134,7 +134,12 @@ compute.aops <- function(cops.data) {
 		if(is.na(cops.data$chl)) {
 			shadow.correction.type <- "measured absorption"
 		} else {
-			shadow.correction.type <- "absorption from chlorophyll\ncase 1 waters model"
+		  if (cops.data$chl == 999) {
+		    shadow.correction.type <- "absorption estimated from Kd and R"
+
+		  } else {
+		    shadow.correction.type <- "absorption from chlorophyll\ncase 1 waters model"
+		  }
 		}
 		plot(waves.u, shadow.coef.EuZ$EuZ.shad.correction, type = "b", xlim = range(waves.u), ylim = c(0.2, 1), xlab = expression(lambda ~~ nm), ylab = "shadow correction for EuZ", main = shadow.correction.type)
 		abline(h = seq(0.2, 1, 0.1), lty = 3)
@@ -147,9 +152,14 @@ compute.aops <- function(cops.data) {
 	if(!is.null(shadow.coef.LuZ)) {
 		if(is.na(cops.data$chl)) {
 			shadow.correction.type <- "measured absorption"
+		} else 	{
+		  if (cops.data$chl == 999) {
+		  shadow.correction.type <- "absorption estimated from Kd and R"
+
 		} else {
-			shadow.correction.type <- "absorption from chlorophyll\ncase 1 waters model"
+		  shadow.correction.type <- "absorption from chlorophyll\ncase 1 waters model"
 		}
+	}
 		plot(waves.u, shadow.coef.LuZ$LuZ.shad.correction, type = "b", xlim = range(waves.u), ylim = c(0.2, 1), xlab = expression(lambda ~~ nm), ylab = "shadow correction for LuZ", main = shadow.correction.type)
 		abline(h = seq(0.2, 1, 0.1), lty = 3)
 	} else {
