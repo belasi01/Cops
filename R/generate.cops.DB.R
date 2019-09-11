@@ -287,6 +287,7 @@ nwaves = length(waves.DB)
                         lon = lon)
   }
 
+
   setwd(path)
   ### Extract the Station ID from the paths
   for (d in 1:ndirs) {
