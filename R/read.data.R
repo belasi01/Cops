@@ -46,9 +46,42 @@ file.parts <- unlist(strsplit(file, "_"))
 	# Added by Simon
 	index_ext = length(unlist(strsplit(file.c, "[.]")))	# for station names with periods, ex. G604.5
 	ext = unlist(strsplit(file.c, "[.]"))[index_ext]
+
 	if (ext == "tsv" || ext =="txt") {
-	  x = read.table(file = file.c, header = TRUE, as.is = TRUE, sep = "\t", check.names = FALSE)
-	} else{ x = read.table(file = file.c, header = TRUE, as.is = TRUE, sep = ",", check.names = FALSE)}
+	  # Added by Simon Bélanger in 2019 to check if the file begin with a Header
+	  id = file(file.c, "r")
+	  line = unlist(strsplit(readLines(con=id, n =1), "\t")) # Reads the first header line
+	  if (line[1] == "Start of Header") {
+	    print("The File contains a header. Counting the number of header lines...")
+	    nhead = 1
+	    while (line[1] != "End of Header"){
+	      line = unlist(strsplit(readLines(con=id, n =1), "\t"))
+	      print(line)
+	      nhead = nhead +1
+	    }
+	  } else {nhead=0}
+	  close(id)
+
+	  x = read.table(file = file.c, header = TRUE, as.is = TRUE, sep = "\t", check.names = FALSE, skip = nhead)
+	} else {
+	  # Added by Simon Bélanger in 2019 to check if the file begin with a Header
+	  id = file(file.c, "r")
+	  line = unlist(strsplit(readLines(con=id, n =1), ",")) # Reads the first header line
+	  if (is.na(line)) line = 0
+	  if (line[1] == "Start of Header") {
+	    print("The File contains a header. Counting the number of header lines...")
+	    nhead = 1
+	    while (line[1] != "End of Header"){
+	      line = unlist(strsplit(readLines(con=id, n =1), ","))
+	      if (is.na(line)) line = 0
+	     # print(line)
+	      nhead = nhead +1
+	    }
+	  } else {nhead=0}
+	  close(id)
+    print(paste("Number of header line to skip is", nhead))
+	  x = read.table(file = file.c, header = TRUE, as.is = TRUE, sep = ",", check.names = FALSE, skip = nhead)
+	  }
 	# END
 
   ns <- names(x)
