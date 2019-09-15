@@ -2,7 +2,7 @@ derived.data <- function(lon, lat, cops.init, cops.raw) {
 	mymessage(paste("      ", "calculating derived data"))
 	instruments <- c(instruments.optics)
 	d2r <- pi / 180
-# tilt from Poll and Pitch
+# tilt from Roll and Pitch
 	ret <- list()
 	for(instr in instruments) {
 		instr.anc <- paste(instr, "anc", sep = ".")
@@ -61,7 +61,8 @@ derived.data <- function(lon, lat, cops.init, cops.raw) {
 		if(is.na(lon) | is.na(lat)) {
 # look for a gps file
 			gps.files <- paste(dirdat, cops.raw$potential.gps.file, sep = "/")
-			if(! file.exists(gps.files)) {
+			if(! file.exists(gps.files))
+			{
 				cat("longitude and(or) latitude not available\n")
 				cat(cops.raw$potential.gps.files, "\n")
 				cat("3 possibilities :\n")
@@ -88,38 +89,19 @@ derived.data <- function(lon, lat, cops.init, cops.raw) {
 			    print(gps.file)
 			    # Modified by Simon Belanger on Aug 2016 to process
 			    # GPS data obtained with uprofile 1.9.10 and after
-			    if (str_detect(gps.file, "GPS_")) {
-			      ext = unlist(strsplit(gps.file, "[.]"))[2]
-			      if (ext == "tsv" || ext =="txt") {
-			        gps.data <- read.table(gps.file,sep="\t",
-			                               colClasses = c("character","character","numeric","character","numeric","numeric","numeric"),header=TRUE)
+			    if (str_detect(gps.file, "GPS_"))
+			      {   gps.data <- fread(file=gps.file, colClasses = c("character","character","numeric","character","numeric","numeric","numeric") )
 
-			      } else {
-			        gps.data <- read.table(gps.file,sep=",",
-			                               colClasses = c("character","character","numeric","character","numeric","numeric","numeric"),header=TRUE)
-
-			      }
-			      names(gps.data)[4] <- "GpsTime"
-			      names(gps.data)[1] <- "ComputerTime"
-			    } else {
-			      ext = unlist(strsplit(gps.file, "[.]"))[2]
-			      if (ext == "tsv" || ext =="txt") {
-			        gps.data <- read.table(gps.file,sep="\t",
-			                               colClasses = c("character","numeric","character","numeric","numeric","numeric"),header=TRUE)
-			      } else {
-			        gps.data <- read.table(gps.file,sep=",",
-			                               colClasses = c("character","numeric","character","numeric","numeric","numeric"),header=TRUE)
-			      }
-			      names(gps.data)[3] <- "GpsTime"
-			      names(gps.data)[1] <- "ComputerTime"
+                names(gps.data)[4] <- "GpsTime"
+			          names(gps.data)[1] <- "ComputerTime"
 			    }
 			    ### END
 
-     			if (str_detect(gps.data$ComputerTime[1], "PM") | str_detect(gps.data$ComputerTime[1], "AM")) {
-     			  gps.data$ComputerTime = convert.time.12h.to.24h.string(gps.data$ComputerTime, cops.init, 0)
-     			}
-     			if (str_detect(gps.data$GpsTime[1], "PM") | str_detect(gps.data$GpsTime[1], "AM")) {
-     			  gps.data$GpsTime = convert.time.12h.to.24h.string(gps.data$GpsTime, cops.init, 0)
+				if (str_detect(gps.data$ComputerTime[1], "PM") | str_detect(gps.data$ComputerTime[1], "AM"))
+				{	gps.data$ComputerTime = convert.time.12h.to.24h.string(gps.data$ComputerTime, cops.init, 0)
+     		}
+     			if (str_detect(gps.data$GpsTime[1], "PM") | str_detect(gps.data$GpsTime[1], "AM"))
+     			{  gps.data$GpsTime = convert.time.12h.to.24h.string(gps.data$GpsTime, cops.init, 0)
      			}
 
 			    ### Add by S Belanger in 2018 to deal with GPS having different
@@ -129,10 +111,14 @@ derived.data <- function(lon, lat, cops.init, cops.raw) {
 			    if (length(cops.init$format.date)==2) {
 			      gps.data$GpsTime <- as.POSIXct(strptime(gps.data$GpsTime,  format = cops.init$format.date[2]))
 			      gps.data$ComputerTime <- as.POSIXct(strptime(gps.data$ComputerTime,  format = cops.init$format.date[2]))
+			      print("if")
 			    } else {
 			      gps.data$GpsTime <- as.POSIXct(strptime(gps.data$GpsTime,  format = cops.init$format.date[1]))
 			      gps.data$ComputerTime <- as.POSIXct(strptime(gps.data$ComputerTime,  format = cops.init$format.date[1]))
+			      print("else")
 			    }
+
+
           if (is.na(gps.data$GpsTime[1])) {
             print("WARNING: It seems that the GPS time format differs from the CAST files")
             print("1. Check the time format inside the GPS file")
@@ -145,6 +131,8 @@ derived.data <- function(lon, lat, cops.init, cops.raw) {
           }
 
      			valid_gps <- gps.data$GpsTime > min(dates) & gps.data$GpsTime < max(dates)
+
+
      			if (any(valid_gps)) {
      			  longitude <- median(gps.data$Longitude[valid_gps], na.rm = TRUE)
      			  latitude <- median(gps.data$Latitude[valid_gps], na.rm = TRUE)

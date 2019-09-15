@@ -13,6 +13,7 @@
 
 
 cops.go <- function(interactive = FALSE, ASCII=FALSE) {
+  library(data.table)
 	assign("INTERACTIVE", interactive, env = .GlobalEnv)
 	data("eu.hydrolight")
 	data("thuillier.completed.by.AM0AM1")
