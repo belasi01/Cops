@@ -39,7 +39,7 @@ cops.go <- function(interactive = FALSE, ASCII=FALSE) {
 					stop()
 				}
 				mymessage(paste("PROCESSING DIRECTORY", dirdat), head = "@", tail = "@")
-				process.cops(dirdat)
+				process.cops(dirdat, ASCII)
 				plot.Rrs.Kd.for.station(dirdat)
 			}
 		}
