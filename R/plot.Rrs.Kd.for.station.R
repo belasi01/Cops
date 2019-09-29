@@ -44,7 +44,7 @@ plot.Rrs.Kd.for.station <- function(path="./", depthEdZ = 1) {
     lines(wl[1:nwl], cops$Rrs.0p.linear[1:nwl], col=i, lwd=2, lty=2)
   }
 
-  legend("topright", substr(listfile, 5, 12), lwd=rep(2,nf), col=seq(nf), bg="transparent")
+  legend("topright", substr(listfile, regexpr("CAST", listfile, fixed = T), regexpr("\\d\\d\\d", listfile)+2), lwd=rep(2,nf), col=seq(nf), bg="transparent")
   dev.off()
 
   load(paste(listfile[1], ".RData", sep=""))
