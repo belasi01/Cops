@@ -67,6 +67,21 @@ str(absorption.tab)
 	dirpdf <- paste(dirdat, "PDF", sep = "/")
 	if(!file.exists(dirpdf)) dir.create(dirpdf)
 
+	#kept <- remove.tab[[2]] != "0"
+	kept.cast <- remove.tab[[2]] == "1"
+	kept.bioS <- remove.tab[[2]] == "2"
+	kept <- kept.cast | kept.bioS
+	cat("discarded experiments", info.tab[!kept, 1], "\n")
+	cat("processed Profile experiments", info.tab[kept.cast, 1], "\n")
+	cat("processed BioShade experiments", info.tab[kept.bioS, 1], "\n")
+	info.tab <- info.tab[kept, ]
+	remove.tab <- remove.tab[kept, ]
+
+	#### order the file to process to allow Shadow Band processing first
+	ix <- sort.int(as.numeric(remove.tab$V2), decreasing = T, index.return = T)$ix
+	remove.tab<-remove.tab[ix,]
+	info.tab<-info.tab[ix,]
+
 	assign("dirres", dirres, env = .GlobalEnv)
 	assign("dirdat", dirdat, env = .GlobalEnv)
 	assign("dirpdf", dirpdf, env = .GlobalEnv)
@@ -75,15 +90,7 @@ str(absorption.tab)
 	assign("info.tab", info.tab,  env = .GlobalEnv)
 	assign("remove.tab", remove.tab,  env = .GlobalEnv)
 
-	#kept <- remove.tab[[2]] != "0"
-  kept.cast <- remove.tab[[2]] == "1"
-  kept.bioS <- remove.tab[[2]] == "2"
-  kept <- kept.cast | kept.bioS
-	cat("discarded experiments", info.tab[!kept, 1], "\n")
-	cat("processed Profile experiments", info.tab[kept.cast, 1], "\n")
-  cat("processed BioShade experiments", info.tab[kept.bioS, 1], "\n")
-	info.tab <- info.tab[kept, ]
-	remove.tab <- remove.tab[kept, ]
+
 
 	if(all(!kept)) {
 		cat("NOTHING TO DO\n")
@@ -108,11 +115,11 @@ str(absorption.tab)
       absorption.waves <- NA
       if(!is.na(chl)) {
         SHADOW.CORRECTION <- TRUE
-        if(chl < 0.000001) {
+        if(chl < 0.000001) { #### Use the absorption values provided
           absorption.values <- unlist(absorption.tab[cops.file, ])
           absorption.waves <- as.numeric(names(absorption.tab))
           chl <- NA
-        } else {
+        } else { # Use an estimation of absorption
           absorption.values <- NA
           absorption.waves <- NA
         }
@@ -230,6 +237,7 @@ str(absorption.tab)
 
       # ADD cops.aops TO THE FINAL list
       cops <- c(cops, cops.aops)
+      cops$absorption.values <- cops.aops$absorption.values
       if(verbose) str(cops)
 
       save(file = save.file, cops)
@@ -335,8 +343,10 @@ str(absorption.tab)
       plot.init.info(cops.init, cops.info)
       # READ FILE ---> cops.raw
       mymessage(paste("      ", "reading", cops.file))
-      print("YYYYYY")
+      #print("YYYYYY")
+
       cops.raw <- read.data(cops.file)
+
       if(verbose) str(cops.raw)
       # CALCULATE DERIVED DATA ---> cops.dd
       cops.dd <- derived.data(info.longitude, info.latitude, cops.init, cops.raw)

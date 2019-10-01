@@ -1,44 +1,73 @@
-compute.aops <- function(cops) {
+compute.aops <- function(cops.data) {
 
 ####################
 	mymessage("Computing derived AOPs ...", head = "+", tail = "-")
 
 ####################
 # down AOPs
-	waves.d <- cops$EdZ.waves
-	Ed0.0p <- cops$Ed0.0p
+	waves.d <- cops.data$EdZ.waves
+	Ed0.0p <- cops.data$Ed0.0p
 
 ####################
 # up   AOPs + SHADOW.CORRECTION
 	shadow.coef.EuZ <- NULL
 	shadow.coef.LuZ <- NULL
+	shadow.band <- FALSE
 	if("EuZ" %in% instruments.optics) {
-		waves.u <- cops$EuZ.waves
-		EuZ.0m <- cops$EuZ.0m
-		EuZ.0m.linear <- cops$EuZ.0m.linear
-		if(cops$SHADOW.CORRECTION) {
-			shadow.coef.EuZ <- shadow.correction("EuZ", cops)
-			EuZ.0m <- EuZ.0m / shadow.coef.EuZ$EuZ.shad.correction
-			EuZ.0m.linear <- cops$EuZ.0m.linear / shadow.coef.EuZ$EuZ.shad.correction
+		waves.u <- cops.data$EuZ.waves
+		EuZ.0m <- cops.data$EuZ.0m
+		EuZ.0m.linear <- cops.data$EuZ.0m.linear
+		if(cops.data$SHADOW.CORRECTION) {
+		  if (any(remove.tab[,2]=="2")) {
+		    print("Shadow band measurements available for the shadow correction")
+		    ix.shadow <- which(remove.tab[,2]=="2")
+		    print(remove.tab[ix.shadow,1])
+		    SB.RData <- paste("./BIN/",remove.tab[ix.shadow,1],".RData", sep="")
+		    if (file.exists(SB.RData)){
+		      print(paste("Loading the Shadow band data:",SB.RData))
+		      load(SB.RData)
+		      SB<-cops
+		      shadow.band <- TRUE
+		      shadow.coef.EuZ <- shadow.correction("EuZ", cops.data, SB=SB)
+		    } else shadow.coef.EuZ <- shadow.correction("EuZ", cops.data)
+		  } else {
+		    shadow.coef.EuZ <- shadow.correction("EuZ", cops.data)
+		  }
+		  EuZ.0m <- EuZ.0m / shadow.coef.EuZ$EuZ.shad.correction
+		  EuZ.0m.linear <- cops.data$EuZ.0m.linear / shadow.coef.EuZ$EuZ.shad.correction
 		}
 		# Added by Simon Belanger to deal with cases when both EuZ and LuZ are present
 		if(!("LuZ" %in% instruments.optics)) {
-		  LuZ.0m <- EuZ.0m / cops$Q.sun.nadir
-	  	LuZ.0m.linear <- EuZ.0m.linear / cops$Q.sun.nadir
+		  LuZ.0m <- EuZ.0m / cops.data$Q.sun.nadir
+	  	LuZ.0m.linear <- EuZ.0m.linear / cops.data$Q.sun.nadir
 		}
 	}
 	if("LuZ" %in% instruments.optics) {
-		waves.u <- cops$LuZ.waves
-		LuZ.0m <- cops$LuZ.0m
-		LuZ.0m.linear <- cops$LuZ.0m.linear
-		if(cops$SHADOW.CORRECTION) {
-			shadow.coef.LuZ <- shadow.correction("LuZ", cops)
-			LuZ.0m <- LuZ.0m / shadow.coef.LuZ$LuZ.shad.correction
-			LuZ.0m.linear <- LuZ.0m.linear / shadow.coef.LuZ$LuZ.shad.correction
+		waves.u <- cops.data$LuZ.waves
+		LuZ.0m <- cops.data$LuZ.0m
+		LuZ.0m.linear <- cops.data$LuZ.0m.linear
+		if(cops.data$SHADOW.CORRECTION) {
+		  if (any(remove.tab[,2]=="2")) {
+		    print("Shadow band measurements available for the shadow correction")
+		    ix.shadow <- which(remove.tab[,2]=="2")
+		    print(remove.tab[ix.shadow,1])
+		    SB.RData <- paste("./BIN/",remove.tab[ix.shadow,1],".RData", sep="")
+		    if (file.exists(SB.RData)){
+		      load(SB.RData)
+		      SB<-cops
+		      shadow.band <- TRUE
+		      shadow.coef.LuZ <- shadow.correction("LuZ", cops.data, SB=SB)
+		    } else shadow.coef.LuZ <- shadow.correction("LuZ", cops.data)
+		  } else {
+		    shadow.coef.LuZ <- shadow.correction("LuZ", cops.data)
+		  }
+		  LuZ.0m <- LuZ.0m / shadow.coef.LuZ$LuZ.shad.correction
+		  LuZ.0m.linear <- LuZ.0m.linear / shadow.coef.LuZ$LuZ.shad.correction
+
 		}
 		if(!("EuZ" %in% instruments.optics)) {
-		  EuZ.0m <- LuZ.0m * cops$Q.sun.nadir
-		  EuZ.0m.linear <- LuZ.0m.linear * cops$Q.sun.nadir
+		  EuZ.0m <- LuZ.0m * cops.data$Q.sun.nadir
+		  EuZ.0m.linear <- LuZ.0m.linear * cops.data$Q.sun.nadir
 		}
 	}
 ####################
@@ -102,29 +131,39 @@ compute.aops <- function(cops) {
 	axis.log(2, grid = TRUE, col = 1, lwd = 0.5, lty = 2)
 	lines(waves.u, Rrs.0p, type = "b")
 	if(!is.null(shadow.coef.EuZ)) {
-		if(is.na(cops$chl)) {
+		if(is.na(cops.data$chl)) {
 			shadow.correction.type <- "measured absorption"
 		} else {
-			shadow.correction.type <- "absorption from chlorophyll\ncase 1 waters model"
+		  if (cops.data$chl == 999) {
+		    shadow.correction.type <- "absorption estimated from Kd and R"
+
+		  } else {
+		    shadow.correction.type <- "absorption from chlorophyll\ncase 1 waters model"
+		  }
 		}
 		plot(waves.u, shadow.coef.EuZ$EuZ.shad.correction, type = "b", xlim = range(waves.u), ylim = c(0.2, 1), xlab = expression(lambda ~~ nm), ylab = "shadow correction for EuZ", main = shadow.correction.type)
 		abline(h = seq(0.2, 1, 0.1), lty = 3)
 	} else {
-		if("EuZ" %in% cops$instruments.optics) {
+		if("EuZ" %in% cops.data$instruments.optics) {
 			plot(1, 1, type = "n", axes = FALSE, ann = FALSE)
 			text(1, 1, "NO SHADOW CORRECTION FOR EuZ", adj = c(0.5, 0.5))
 		}
 	}
 	if(!is.null(shadow.coef.LuZ)) {
-		if(is.na(cops$chl)) {
+		if(is.na(cops.data$chl)) {
 			shadow.correction.type <- "measured absorption"
+		} else 	{
+		  if (cops.data$chl == 999) {
+		  shadow.correction.type <- "absorption estimated from Kd and R"
+
 		} else {
-			shadow.correction.type <- "absorption from chlorophyll\ncase 1 waters model"
+		  shadow.correction.type <- "absorption from chlorophyll\ncase 1 waters model"
 		}
+	}
 		plot(waves.u, shadow.coef.LuZ$LuZ.shad.correction, type = "b", xlim = range(waves.u), ylim = c(0.2, 1), xlab = expression(lambda ~~ nm), ylab = "shadow correction for LuZ", main = shadow.correction.type)
 		abline(h = seq(0.2, 1, 0.1), lty = 3)
 	} else {
-		if("LuZ" %in% cops$instruments.optics) {
+		if("LuZ" %in% cops.data$instruments.optics) {
 			plot(1, 1, type = "n", axes = FALSE, ann = FALSE)
 			text(1, 1, "NO SHADOW CORRECTION FOR LuZ", adj = c(0.5, 0.5))
 		}
@@ -163,6 +202,7 @@ compute.aops <- function(cops) {
 		FU = FU,
 		FU.linear = FU.linear,
 		Q = Q,
-		Q.linear = Q.linear
+		Q.linear = Q.linear,
+		shadow.band=shadow.band
 	)))
 }

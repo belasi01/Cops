@@ -9,20 +9,27 @@ Q.and.f.factors <- function(cops.info, cops.raw, cops.dd, cops.EuZ, cops.LuZ) {
 	f.sun <- rep(0.33,length(waves))
 	f.0 <- rep(0.33,length(waves))
 	chl <- cops.info$chl
+
 	if(! is.na(chl)) {
-		sunzen <- cops.dd$sunzen
-		i <- 0
-		for(w in waves) {
-			i <- i + 1
-			conditions.Q <- c(w,sunzen,log(chl), 0, 0)
-			Q.sun.nadir[i] <- popt.f.Q(conditions.Q)$Q
-			conditions.Q <- c(w,0,log(chl), 0, 0)
-			Q.0[i] <- popt.f.Q(conditions.Q)$Q
-			conditions.f <- c(w,sunzen,log(chl))
-			f.sun[i] <- popt.f.f(conditions.f)$f
-			conditions.f <- c(w,0,log(chl))
-			f.0[i] <- popt.f.f(conditions.f)$f
-		}
+	  if (chl == 999) {
+	    chl <- NA
+	  } else {
+	    sunzen <- cops.dd$sunzen
+	    i <- 0
+	    for(w in waves) {
+	      i <- i + 1
+	      conditions.Q <- c(w,sunzen,log(chl), 0, 0)
+	      Q.sun.nadir[i] <- popt.f.Q(conditions.Q)$Q
+	      conditions.Q <- c(w,0,log(chl), 0, 0)
+	      Q.0[i] <- popt.f.Q(conditions.Q)$Q
+	      conditions.f <- c(w,sunzen,log(chl))
+	      f.sun[i] <- popt.f.f(conditions.f)$f
+	      conditions.f <- c(w,0,log(chl))
+	      f.0[i] <- popt.f.f(conditions.f)$f
+	    }
+
+	  }
+
 	}
 	list(Q.0 = Q.0, Q.sun.nadir = Q.sun.nadir, f.0 = f.0, f.sun = f.sun)
 }
