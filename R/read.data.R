@@ -50,12 +50,12 @@ file.parts <- unlist(strsplit(file, "_"))
 	if (ext == "tsv" || ext =="txt") {
 	  # Added by Simon Bélanger in 2019 to check if the file begin with a Header
 	  id = file(file.c, "r")
-	  line = unlist(strsplit(readLines(con=id, n =1), "\t")) # Reads the first header line
+	  line = readLines(con=id, n =1) # Reads the first header line
 	  if (line[1] == "Start of Header") {
 	    print("The File contains a header. Counting the number of header lines...")
 	    nhead = 1
 	    while (line[1] != "End of Header"){
-	      line = unlist(strsplit(readLines(con=id, n =1), "\t"))
+	      line = readLines(con=id, n =1)
 	      print(line)
 	      nhead = nhead +1
 	    }
@@ -66,13 +66,13 @@ file.parts <- unlist(strsplit(file, "_"))
 	} else {
 	  # Added by Simon Bélanger in 2019 to check if the file begin with a Header
 	  id = file(file.c, "r")
-	  line = unlist(strsplit(readLines(con=id, n =1), ",")) # Reads the first header line
+	  line = readLines(con=id, n =1) # Reads the first header line
 	  if (is.na(line)) line = 0
 	  if (line[1] == "Start of Header") {
 	    print("The File contains a header. Counting the number of header lines...")
 	    nhead = 1
 	    while (line[1] != "End of Header"){
-	      line = unlist(strsplit(readLines(con=id, n =1), ","))
+	      line = readLines(con=id, n =1)
 	      if (is.na(line)) line = 0
 	     # print(line)
 	      nhead = nhead +1
