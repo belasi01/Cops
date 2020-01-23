@@ -33,29 +33,29 @@ generate.cops.DB <- function(path="./",
 
   ndirs = length(dirs)
 
-  #
 nwaves = length(waves.DB)
-  Rrs.m = matrix(ncol=nwaves, nrow = ndirs)
-  Kd.1p.m = matrix(ncol=nwaves, nrow = ndirs)
-  Kd.10p.m = matrix(ncol=nwaves, nrow = ndirs)
-  Ed0.0p.m = matrix(ncol=nwaves, nrow = ndirs)
-  Rrs.sd = matrix(ncol=nwaves, nrow = ndirs)
-  Kd.1p.sd = matrix(ncol=nwaves, nrow = ndirs)
-  Kd.10p.sd = matrix(ncol=nwaves, nrow = ndirs)
-  Ed0.0p.sd = matrix(ncol=nwaves, nrow = ndirs)
-  Ed0.f =  matrix(0,ncol=(nwaves+1), nrow = ndirs)
+  Rrs.m = c()
+  Kd.1p.m = c()
+  Kd.10p.m = c()
+  Ed0.0p.m = c()
+  Rrs.sd = c()
+  Kd.1p.sd = c()
+  Kd.10p.sd = c()
+  Ed0.0p.sd = c()
+  Ed0.f =  c()
 
-
-  date = rep(NA, ndirs)
-  stationID = rep("ID", ndirs)
-  sunzen = rep(NA, ndirs)
-  lat = rep(NA, ndirs)
-  lon = rep(NA, ndirs)
-  shadow.cor = rep(NA, ndirs)
+  ID = c()
+  date = c()
+  stationID = c()
+  sunzen = c()
+  lat = c()
+  lon = c()
+  shadow.cor = c()
+  Lambda = c()
 
   for (i in 1:ndirs) {
     print(paste("Extracting data from :", dirs[i]))
-
+    ids <- str_extract(dirs[i], "(?<=Station).+(?=/COPS)")
     setwd(as.character(dirs[i]))
     remove.file <- "remove.cops.dat"
     remove.tab <- read.table(remove.file, header = FALSE, colClasses = "character", sep = ";")
@@ -81,10 +81,14 @@ nwaves = length(waves.DB)
       mlat = rep(NA, nf)
       mlon = rep(NA, nf)
 
+
+
       for (j in 1:nf) {
 
         load(paste(listfile[j], ".RData", sep=""))
         waves = cops$LuZ.waves
+
+
 
         # Match the wavelengths of current data to the one requested for the database
         # it removes the NA values
@@ -125,39 +129,30 @@ nwaves = length(waves.DB)
         mKd10p[j,xw.DB] = 2.3025/z10
 
       }
-
       Rrs.stat = mean.parameter(mRrs[,xw.DB])
       Kd1p.stat = mean.parameter(mKd1p[,xw.DB])
       Kd10p.stat = mean.parameter(mKd10p[,xw.DB])
       Ed0.0p.stat = mean.parameter(mEd0.0p[,xw.DB])
 
+      Rrs.sd =      append(Rrs.sd, Rrs.stat$sd)
+      Kd.1p.sd   = append(Kd.1p.sd, Kd1p.stat$sd)
+      Kd.10p.sd   = append(Kd.10p.sd, Kd10p.stat$sd)
+      Ed0.0p.sd   = append(Ed0.0p.sd, Ed0.0p.stat$sd)
+
       # store the records in the global matrix
-      Rrs.m[i,xw.DB] = Rrs.stat$mean
-      Kd.1p.m[i,xw.DB]    = Kd1p.stat$mean
-      Kd.10p.m[i,xw.DB]   = Kd10p.stat$mean
-      Ed0.0p.m[i,xw.DB]   = Ed0.0p.stat$mean
+      Rrs.m = append(Rrs.m, Rrs.stat$mean)
+      Kd.1p.m    = append(Kd.1p.m, Kd1p.stat$mean)
+      Kd.10p.m   = append(Kd.10p.m, Kd10p.stat$mean)
+      Ed0.0p.m   = append(Ed0.0p.m, Ed0.0p.stat$mean)
 
-      Rrs.sd[i,xw.DB] =      Rrs.stat$sd
-      Kd.1p.sd[i,xw.DB]    = Kd1p.stat$sd
-      Kd.10p.sd[i,xw.DB]   = Kd10p.stat$sd
-      Ed0.0p.sd[i,xw.DB]   = Ed0.0p.stat$sd
+      ID = append(ID, rep(ids,nwaves))
+      date = append(date,rep(mean(mdate),nwaves))
+      sunzen = append(sunzen, rep(mean(msunzen),nwaves))
+      lon = append(lon, rep(mean(mlon),nwaves))
+      lat = append(lat, rep(mean(mlat),nwaves))
+      Lambda = append(Lambda, rep(waves,nwaves))
 
-      date[i] = mean(mdate)
-      sunzen[i] =mean(msunzen)
-      lon[i] = mean(mlon)
-      lat[i] = mean(mlat)
-
-      mean.rec.data = c(Rrs.m[i,],
-                        Kd.1p.m[i,] ,
-                        Kd.10p.m[i,],
-                        Ed0.0p.m[i,])
-      sd.rec.data = c(Rrs.sd[i,],
-                      Kd.1p.sd[i,] ,
-                      Kd.10p.sd[i,],
-                      Ed0.0p.sd[i,])
-
-
-      rec.info = data.frame(as.POSIXct(mean(mdate),origin = "1970-01-01"),
+      rec.info = data.frame(ID = ids, as.POSIXct(mean(mdate),origin = "1970-01-01"),
                             mean(msunzen), mean(mlat), mean(mlon))
 
     } else {
@@ -209,104 +204,19 @@ nwaves = length(waves.DB)
                     Ed0.0p.m[i,])
       sd.rec.data = c(rep(NA,nwaves),rep(NA,nwaves),rep(NA,nwaves),rep(NA,nwaves))
 
-      rec.info = data.frame(cops$date.mean,cops$sunzen, cops$latitude, cops$longitude)
+      rec.info = data.frame(ID = ids, cops$date.mean,cops$sunzen, cops$latitude, cops$longitude)
 
     }
 
-    if (length(BioShadeFile) != 0) {
-      if (length(BioShadeFile) > 1) {
-        print("More than one BioShade... use the first")
-        BioShadeFile = BioShadeFile[1]
-      }
-      print(paste("Load BioShade file:", BioShadeFile))
-      load(paste(BioShadeFile, ".RData", sep=""))
 
-      Ed0.f[i,xw.DB] = cops$Ed0.f[xw]
-      Ed0.f[i,(nwaves+1)] = 1
-
-      mean.rec.data = c(mean.rec.data, Ed0.f[i,])
-
-    } else {
-
-      # No BIOSHADE
-      print ("No Bioshade measurements")
-      print ("Compute Ed0.dif/Ed0.tot using Gregg and Carder model")
-      julian.day <- as.numeric(format(cops$date.mean, format = "%j"))
-      visibility <- 25
-      egc <- GreggCarder.f(julian.day, lon[i], lat[i], sunzen[i], lam.sel = waves.DB[xw.DB], Vi=visibility)
-
-      ix.490 <- which.min(abs(waves.DB[xw.DB] - 490))
-
-      ratio = egc$Ed[ix.490]*100/cops$Ed0.0p[ix.490]
-
-      while (ratio > 1.05  & visibility > 0.5) {
-        egc <- GreggCarder.f(julian.day, lon[i], lat[i], sunzen[i],lam.sel = waves.DB[xw.DB], Vi=visibility)
-        ratio = egc$Ed[ix.490]*100/cops$Ed0.0p[ix.490]
-        visibility = visibility - 0.5
-      }
-      Ed0.f[i,xw.DB] = egc$Edif/egc$Ed
-      print("Visibility: ")
-      print(visibility)
-      mean.rec.data = c(mean.rec.data, Ed0.f[i,])
-    }
-
-    if (i == 1) {
-      all = data.frame(rec.info,t(mean.rec.data), t(sd.rec.data))
-      col.names = c(paste("Rrs_", waves.DB, "_mean",sep=""),
-                    paste("Kd1p_", waves.DB,"_mean", sep=""),
-                    paste("Kd10p_", waves.DB,"_mean", sep=""),
-                    paste("Ed0.0p_", waves.DB,"_mean", sep=""),
-                    paste("Ed0.f_", waves.DB,"_mean", sep=""), "Ed0.f.measured",
-                    paste("Rrs_", waves.DB, "_sd",sep=""),
-                    paste("Kd1p_", waves.DB,"_sd", sep=""),
-                    paste("Kd10p_", waves.DB,"_sd", sep=""),
-                    paste("Ed0.0p_", waves.DB,"_sd", sep=""))
-
-      names(all) <- c("DateTime", "sunzen", "latitude", "longitude", col.names)
-    } else
-    {
-      rec = data.frame(rec.info,t(mean.rec.data), t(sd.rec.data))
-      names(rec) <-  c("DateTime", "sunzen", "latitude", "longitude", col.names)
-      all = rbind(all,rec)
-    }
-
-    COPS.DB = list(waves = waves,
-                        Rrs.m = Rrs.m,
-                        Kd.1p.m = Kd.1p.m,
-                        Kd.10p.m = Kd.10p.m,
-                        Ed0.0p.m = Ed0.0p.m,
-                        Rrs.sd = Rrs.sd,
-                        Kd.1p.sd = Kd.1p.sd,
-                        Kd.10p.sd = Kd.10p.sd,
-                        Ed0.0p.sd = Ed0.0p.sd,
-                        Ed0.f = Ed0.f[,(1:nwaves)],
-                        Ed0.f.measured = Ed0.f[,(nwaves+1)],
-                        date = as.POSIXct(date,origin = "1970-01-01"),
-                        sunzen = sunzen,
-                        lat = lat,
-                        lon = lon)
+    COPS.DB <- data.frame(ID, DateTime = as.POSIXct(date,origin = "1970-01-01"), lat, lon, sunzen, Lambda,
+                          Rrs.m, Rrs.sd, Kd.1p.m, Kd.1p.sd, Kd.10p.m, Kd.10p.sd, Ed0.0p.m, Ed0.0p.sd)
   }
 
 
   setwd(path)
-  ### Extract the Station ID from the paths
-  for (d in 1:ndirs) {
-    res=unlist(strsplit(as.character(dirs[d]), "/"))
-    for (i in 1:length(res)){
-      xx = str_locate(res[i], "_Station")
-      if (!is.na(xx[1])) {
-        datestation=unlist(strsplit(res[i], "_Station"))
-        # Remove "_" from station name to avoid error with Latex
-        if (str_detect(datestation[2], "_")) {
-          yy = unlist(strsplit(datestation[2], "_"))
 
-          stationID[d] = paste(yy, collapse=" ")
-        }   else stationID[d] =   datestation[2]
-      }
-    }
-  }
-
-  COPS.DB$stationID <- stationID
+  #COPS.DB$stationID <- stationID
   save(COPS.DB, file = paste("COPS.DB.",mission,".RData", sep=""))
   write.table(all, file = paste("COPS.DB.",mission,".dat", sep=""), sep=",", quote=F, row.names=F)
 
