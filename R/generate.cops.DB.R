@@ -150,7 +150,7 @@ nwaves = length(waves.DB)
       sunzen = append(sunzen, rep(mean(msunzen),nwaves))
       lon = append(lon, rep(mean(mlon),nwaves))
       lat = append(lat, rep(mean(mlat),nwaves))
-      Lambda = append(Lambda, rep(waves,nwaves))
+      Lambda = append(Lambda, waves)
 
       rec.info = data.frame(ID = ids, as.POSIXct(mean(mdate),origin = "1970-01-01"),
                             mean(msunzen), mean(mlat), mean(mlon))
