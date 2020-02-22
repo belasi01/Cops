@@ -23,7 +23,7 @@ generate.cops.DB <- function(path="./",
                                      380, 412, 443, 465,
                                      490, 510, 532, 555,
                                      589, 625, 665, 683,
-                                     694, 710, 780),
+                                     694, 710, 780, 875),
                              mission="XXX") {
 
   GreggCarder.data()
