@@ -19,7 +19,7 @@
 #' and a figure showing the measured rho_w spectra of the data base is produced.
 #'
 generate.cops.DB <- function(path="./",
-                             waves.DB=c(305, 320, 330, 340,
+                             waves.DB=c(320, 330, 340,
                                      380, 412, 443, 465,
                                      490, 510, 532, 555,
                                      589, 625, 665, 683,
