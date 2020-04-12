@@ -28,7 +28,7 @@ generate.cops.DB <- function(path="./",
 
   GreggCarder.data()
   setwd(path)
-  dirs = read.table("directories.for.cops.dat")
+  dirs = read.table("directories.for.COPS.dat")
   dirs = dirs$V1
 
   ndirs = length(dirs)
