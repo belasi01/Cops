@@ -86,7 +86,7 @@ str(absorption.tab)
 	assign("dirdat", dirdat, env = .GlobalEnv)
 	assign("dirpdf", dirpdf, env = .GlobalEnv)
 	assign("info.file", info.file,  env = .GlobalEnv)
-	assign("remove.file", remove.file,  env = .GlobalEnv)
+	assign("select.file", select.file,  env = .GlobalEnv)
 	assign("info.tab", info.tab,  env = .GlobalEnv)
 	assign("remove.tab", remove.tab,  env = .GlobalEnv)
 
