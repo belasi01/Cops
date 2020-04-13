@@ -1,8 +1,8 @@
 #'
 #'    This function plot the replicates of Rrs and
 #'    the integrated Kd (K0) from surface to a given depth
-#'    for the cast retained (i.e. value of one in the remove.cops.dat)
-#'    It reads the files "remove.cops.dat" and then load the RData file
+#'    for the cast retained (i.e. value of one in the select.cops.dat)
+#'    It reads the files "select.cops.dat" and then load the RData file
 #'    that are stored in the "./BIN/" directory.
 #'
 #'    @param path is the path where raw COPS data are located.
@@ -16,8 +16,8 @@
 plot.Rrs.Kd.for.station <- function(path="./", depthEdZ = 1) {
   setwd(path)
   plot.wd = getwd()
-  remove.file <- "remove.cops.dat"
-  remove.tab <- read.table(remove.file, header = FALSE, colClasses = "character", sep = ";")
+  select.file <- "select.cops.dat"
+  remove.tab <- read.table(select.file, header = FALSE, colClasses = c("character","character",rep("NULL",2)), sep = ";")
   kept.cast <- remove.tab[[2]] == "1"
   listfile  <- remove.tab[kept.cast, 1]
   nf = length(listfile)

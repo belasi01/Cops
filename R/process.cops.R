@@ -34,13 +34,13 @@ process.cops <- function(dirdat, ASCII=FALSE) {
 		header = FALSE, fill = TRUE, sep = ";"
 	)
 
-	# removal file
-	remove.file <- paste(dirdat, "remove.cops.dat", sep = "/")
-	if(!file.exists(remove.file)) {
-		write.table(file = remove.file, cbind(info.tab[, 1], "1"), col.names = FALSE, row.names = FALSE, quote = FALSE, sep = ";")
+	# Select.file and remove.tab
+	select.file <- paste(dirdat, "select.cops.dat", sep = "/")
+	if(!file.exists(select.file)) {
+		write.table(file = select.file, cbind(info.tab[, 1], "1","Rrs.0p","Na"), col.names = FALSE, row.names = FALSE, quote = FALSE, sep = ";")
 	}
-	remove.tab <- read.table(remove.file, header = FALSE, colClasses = "character", sep = ";")
-	if(!isTRUE(all.equal(remove.tab[[1]], info.tab[[1]]))) stop("info.cops.dat remove.cops.dat non compatibles")
+	remove.tab <- read.table(select.file, header = FALSE, colClasses = c("character","character",rep("NULL",2)), sep = ";")
+	if(!isTRUE(all.equal(remove.tab[[1]], info.tab[[1]]))) stop("info.cops.dat select.cops.dat non compatibles")
 
 	# absorption file
 	absorption.file <- paste(dirdat, "absorption.cops.dat", sep = "/")

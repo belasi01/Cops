@@ -57,12 +57,15 @@ nwaves = length(waves.DB)
     print(paste("Extracting data from :", dirs[i]))
 
     setwd(as.character(dirs[i]))
-    remove.file <- "remove.cops.dat"
-    remove.tab <- read.table(remove.file, header = FALSE, colClasses = "character", sep = ";")
-    kept.cast <- remove.tab[[2]] == "1"
-    kept.bioS <- remove.tab[[2]] == "2"
-    listfile  <- remove.tab[kept.cast, 1]
-    BioShadeFile = remove.tab[kept.bioS, 1]
+    select.file <- "select.cops.dat"
+    select.tab <- read.table(select.file, header = FALSE, colClasses ="character", sep = ";")
+    kept.cast <- select.tab[[2]] == "1"
+    kept.bioS <- select.tab[[2]] == "2"
+    listfile  <- select.tab[kept.cast, 1]
+    BioShadeFile = select.tab[kept.bioS, 1]
+
+    #Select the extrapolation method to save Rrs
+    Rrs_method <- select.tab[kept.cast, 3]
 
     setwd("./BIN/")
 
@@ -102,7 +105,7 @@ nwaves = length(waves.DB)
         mlon[j] = cops$longitude
 
         # extract Rrs
-        mRrs[j,xw.DB] = cops$Rrs.0p[xw]
+        mRrs[j,xw.DB] = eval(parse(text=paste0("cops$",Rrs_method[j],"[xw]")))
 
         # extract Ed0.0p
         mEd0.0p[j, xw.DB] = cops$Ed0.0p[xw]
@@ -181,7 +184,7 @@ nwaves = length(waves.DB)
       lon[i] = cops$longitude
 
       # extract Rrs
-      Rrs.m[i,xw.DB] = cops$Rrs.0p[xw]
+      Rrs.m[i,xw.DB] = eval(parse(text=paste0("cops$",Rrs_method),"[xw]"))
 
       # extract Ed0.0p
       Ed0.0p.m[i, xw.DB] = cops$Ed0.0p[xw]
