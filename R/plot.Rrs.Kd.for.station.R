@@ -24,7 +24,7 @@ plot.Rrs.Kd.for.station <- function(path="./", depthEdZ = 1) {
 
   setwd("./BIN/")
 
-  if (nf > 1) {
+  if (TRUE) {
 
 
   load(paste(listfile[1], ".RData", sep=""))
