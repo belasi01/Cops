@@ -3,7 +3,7 @@
 #'
 #' @description The AOPs (Kd_s, Rrs) derived from valid profiles are averaged.
 #'
-#' @param path is the path where the file directories.for.cops.dat containing the data folders
+#' @param path is the path where the file directories.for.COPS.dat containing the data folders
 #' to merge in the data base.
 #' @param wave.DB is a vector of wavelengths to include un the data base. Default is
 #' waves.DB=c(305, 320, 330, 340,380, 412, 443, 465,490, 510, 532, 555,589, 625, 665, 683, 694, 710, 780)

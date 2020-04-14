@@ -100,19 +100,18 @@ derived.data <- function(lon, lat, cops.init, cops.raw) {
 			    print(gps.file)
 			    # Modified by Simon Belanger on Aug 2016 to process
 			    # GPS data obtained with uprofile 1.9.10 and after
-			    if (str_detect(gps.file, "GPS_"))
-			      {   gps.data <- fread(file=gps.file, colClasses = c("character","character","numeric","character","numeric","numeric","numeric") )
-
-                names(gps.data)[4] <- "GpsTime"
-			          names(gps.data)[1] <- "ComputerTime"
+			    if (str_detect(gps.file, "GPS_")){
+			      gps.data <- fread(file=gps.file, colClasses = c("character","character","numeric","character","numeric","numeric","numeric") )
+			      names(gps.data)[4] <- "GpsTime"
+			      names(gps.data)[1] <- "ComputerTime"
 			    }
 			    ### END
 
-				if (str_detect(gps.data$ComputerTime[1], "PM") | str_detect(gps.data$ComputerTime[1], "AM"))
-				{	gps.data$ComputerTime = convert.time.12h.to.24h.string(gps.data$ComputerTime, cops.init, 0)
+				if (str_detect(gps.data$ComputerTime[1], "PM") | str_detect(gps.data$ComputerTime[1], "AM")){
+				  gps.data$ComputerTime = convert.time.12h.to.24h.string(gps.data$ComputerTime, cops.init, 0)
      		}
-     			if (str_detect(gps.data$GpsTime[1], "PM") | str_detect(gps.data$GpsTime[1], "AM"))
-     			{  gps.data$GpsTime = convert.time.12h.to.24h.string(gps.data$GpsTime, cops.init, 0)
+     			if (str_detect(gps.data$GpsTime[1], "PM") | str_detect(gps.data$GpsTime[1], "AM")){
+     			  gps.data$GpsTime = convert.time.12h.to.24h.string(gps.data$GpsTime, cops.init, 0)
      			}
 
 			    ### Add by S Belanger in 2018 to deal with GPS having different
@@ -253,12 +252,6 @@ derived.data <- function(lon, lat, cops.init, cops.raw) {
 	    }
 	  }
 	  par(mfrow = c(1, 1))
-
 	}
-
-
-
-
-
 	ret
 }

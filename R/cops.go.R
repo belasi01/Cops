@@ -2,7 +2,7 @@
 #'
 #' @param interactive is a logical value: if TRUE, the user is prompted to
 #' selected a folder containing COPS file to process. The plots are produced in pop-up windows.
-#' If FALSE, you have to create an ASCII file named directories.for.cops.dat and put
+#' If FALSE, you have to create an ASCII file named directories.for.COPS.dat and put
 #' the full path of the folders you want to process (on by line). The plots are put in a PDF file
 #' in a sub-folder ./PDF.
 #' @param ASCII is a logical value: if TRUE the outputs are written in simple ASCII files in a ddition to
