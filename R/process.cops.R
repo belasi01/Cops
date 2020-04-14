@@ -37,7 +37,7 @@ process.cops <- function(dirdat, ASCII=FALSE) {
 	# Select.file and remove.tab
 	select.file <- paste(dirdat, "select.cops.dat", sep = "/")
 	if(!file.exists(select.file)) {
-		write.table(file = select.file, cbind(info.tab[, 1], "1","Rrs.0p","Na"), col.names = FALSE, row.names = FALSE, quote = FALSE, sep = ";")
+		write.table(file = select.file, cbind(info.tab[, 1], "1","Rrs.0p.linear","Na"), col.names = FALSE, row.names = FALSE, quote = FALSE, sep = ";")
 	}
 	remove.tab <- read.table(select.file, header = FALSE, colClasses = c("character","character",rep("NULL",2)), sep = ";")
 	if(!isTRUE(all.equal(remove.tab[[1]], info.tab[[1]]))) stop("info.cops.dat select.cops.dat non compatibles")
