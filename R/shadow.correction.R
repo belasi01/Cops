@@ -35,7 +35,7 @@ shadow.correction <- function(instr, cops, SB=NA) {
 		i.wavesUV <- wavesTMP < 350
 		aR[i.wavesUV] <- popt.f.a(350.001, chlTMP) * radius.instrument.optics[instr]
 	} else {
-	  if (! is.na(chl) && chl == 999) { #### CHL == 999 mean used Kd-derived absorption
+	  if (!is.na(chl) && chl == 999) { #### CHL == 999 mean used Kd-derived absorption
 	    Kd = cops$K.EdZ.surf
 	    Q  = pi
 	    if (!is.null(cops$LuZ.0m.linear)) {
