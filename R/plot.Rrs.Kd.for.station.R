@@ -36,7 +36,7 @@ plot.Rrs.Kd.for.station <- function(path="./", depthEdZ = 1) {
       pointsize = 14, bg = "white")
   plot(wl[1:nwl], cops$Rrs.0p[1:nwl], xlab="Wavelenght", ylab="Rrs0+",
        ylim=c(0,max(cops$Rrs.0p[6:nwl],na.rm=T)+0.001),
-       xlim=c(380, max(wl)),
+       xlim=c(310, max(wl+10)),
        lwd=2, type="l", main=getwd(), sub=cops$dates[1])
   for (i in 1:nf){
     load(paste(listfile[i], ".RData", sep=""))
