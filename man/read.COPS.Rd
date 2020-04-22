@@ -4,8 +4,11 @@
 \alias{read.COPS}
 \title{Read Compact Optical Profiling System (COPS) files in both CSV and TSV formats}
 \usage{
-read.COPS(file, number.of.fields.before.date,
-  instruments.optics = c("Ed0", "EdZ", "LuZ"))
+read.COPS(
+  file,
+  number.of.fields.before.date,
+  instruments.optics = c("Ed0", "EdZ", "LuZ")
+)
 }
 \arguments{
 \item{file}{is the file name without the full path}

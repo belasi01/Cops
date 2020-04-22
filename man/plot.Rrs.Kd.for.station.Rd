@@ -3,18 +3,22 @@
 \name{plot.Rrs.Kd.for.station}
 \alias{plot.Rrs.Kd.for.station}
 \title{This function plot the replicates of Rrs and
-the integrated Kd (K0) from surface to a given depth
-for the cast retained (i.e. value of one in the remove.cops.dat)
-It reads the files "remove.cops.dat" and then load the RData file
-that are stored in the "./BIN/" directory.}
+the integrated Kd (K0) from surface to a given depth.}
 \usage{
-\method{plot}{Rrs.Kd.for.station}(path = "./", depthEdZ = 1)
+\method{plot}{Rrs.Kd.for.station}(path = "./", depthEdZ = NA)
 }
 \description{
-@param path is the path where raw COPS data are located.
-@param depthEdZ is the depth of the ingetration of Kd. Default is 1 meter
+@descripton
+The retained casts have a value of 1 in the select.cops.dat.
+The code reads the files "select.cops.dat" and then load the RData file
+that are stored in the "./BIN/" directory.
 }
 \details{
+@param path is the path where raw COPS data are located.
+@param depthEdZ is the depth of the ingetration of Kd.
+Default is NA and the code will take the same depth used for
+the linear interpolation.
+
 @return It produces 2 plots in PNG format in the working directory.
 }
 \author{

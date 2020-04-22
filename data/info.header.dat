@@ -20,8 +20,8 @@
 #      if no peculiar value is needed for an experiment, just put a "x" in the field, the value in init.cops.dat is kept              #
 #-------------------------                                                                                                            #
 # field #5 : time.window, 2 numeric values separated by ","; no space                                                                 #
-# field #6 : sub.surface.removed.layer, N numeric separated by ","; no space (N is the nuber of optics instruments - respect order)   #
-# field #7 : tiltmax, N numeric separated by ","; no space (N is the nuber of optics instruments - respect order)                     #
+# field #6 : sub.surface.removed.layer, N numeric separated by ","; no space (N is the number of optics instruments - respect order)   #
+# field #7 : tiltmax, N numeric separated by ","; no space (N is the number of optics instruments - respect order)                     #
 # field #8 : time.interval.for.smoothing, N numeric separated by ","; no space (N is the number of optics instruments - respect order)#
 #                                                                                                                                     #
 #######################################################################################################################################

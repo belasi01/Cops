@@ -1,92 +1,152 @@
 #'
 #'    This function plot the replicates of Rrs and
-#'    the integrated Kd (K0) from surface to a given depth
-#'    for the cast retained (i.e. value of one in the remove.cops.dat)
-#'    It reads the files "remove.cops.dat" and then load the RData file
+#'    the integrated Kd (K0) from surface to a given depth.
+#'
+#'    @descripton
+#'    The retained casts have a value of 1 in the select.cops.dat.
+#'    The code reads the files "select.cops.dat" and then load the RData file
 #'    that are stored in the "./BIN/" directory.
 #'
 #'    @param path is the path where raw COPS data are located.
-#'    @param depthEdZ is the depth of the ingetration of Kd. Default is 1 meter
+#'    @param depthEdZ is the depth of the ingetration of Kd.
+#'    Default is NA and the code will take the same depth used for
+#'    the linear interpolation.
 #'
 #'  @return It produces 2 plots in PNG format in the working directory.
 #'
 #' @author  Simon Belanger, UQAR
 #' @export
 
-plot.Rrs.Kd.for.station <- function(path="./", depthEdZ = 1) {
+plot.Rrs.Kd.for.station <- function(path="./", depthEdZ = NA) {
   setwd(path)
   plot.wd = getwd()
-  remove.file <- "remove.cops.dat"
-  remove.tab <- read.table(remove.file, header = FALSE, colClasses = "character", sep = ";")
-  kept.cast <- remove.tab[[2]] == "1"
-  listfile  <- remove.tab[kept.cast, 1]
+  select.file <- "select.cops.dat"
+  select.tab <- read.table(select.file, header = FALSE, colClasses = "character", sep = ";")
+  kept.cast <- select.tab[[2]] == "1"
+  listfile  <- select.tab[kept.cast, 1]
   nf = length(listfile)
 
+  # read the first file
+  if (length(listfile) == 0) {
+    print("No Rrs to plot")
+    return(0)
+  }
+  print(paste("Plot Rrs and Kd for : ", listfile))
   setwd("./BIN/")
-
-  if (nf > 1) {
-
-
   load(paste(listfile[1], ".RData", sep=""))
-  wl = cops$LuZ.waves
-  nwl = length(wl)
+  waves = cops$LuZ.waves
+  nwaves = length(waves)
 
+  # open a file
   png(filename = "../Rrs.png",
       width = 550, height = 480, units = "px",
       pointsize = 14, bg = "white")
-  plot(wl[1:nwl], cops$Rrs.0p[1:nwl], xlab="Wavelenght", ylab="Rrs0+",
-       ylim=c(0,max(cops$Rrs.0p[6:nwl],na.rm=T)+0.001),
-       xlim=c(380, max(wl)),
-       lwd=2, type="l", main=getwd(), sub=cops$dates[1])
+
+  # select 380 to NIR bands
+  ix.waves = which(waves > 370)
+  plot(waves[ix.waves], cops$Rrs.0p[ix.waves], xlab="Wavelength",
+       ylab="Rrs0+",
+       ylim=c(0,max(cops$Rrs.0p[ix.waves],na.rm=T)+0.001),
+       xlim=c(370, max(waves)+10),
+       lwd=2, type="l", main=getwd(), sub=cops$date.mean)
   for (i in 1:nf){
     load(paste(listfile[i], ".RData", sep=""))
-    lines(wl[1:nwl], cops$Rrs.0p[1:nwl], col=i, lwd=2)
-    lines(wl[1:nwl], cops$Rrs.0p.linear[1:nwl], col=i, lwd=2, lty=2)
+    lines(waves[ix.waves], cops$Rrs.0p[ix.waves], col=i, lwd=2)
+    lines(waves[ix.waves], cops$Rrs.0p.linear[ix.waves], col=i, lwd=2, lty=2)
   }
 
-  legend("topright", listfile, lwd=rep(2,nf), col=seq(nf), bg="transparent")
+#  legend("topright", substr(listfile, regexpr("CAST", substr(listfile, 1, str_length(listfile[1])-4), fixed = T), regexpr("\\d\\d\\d", listfile)+2),
+#         lwd=rep(2,nf), col=seq(nf), bg="transparent")
+  legend("topright", substr(listfile, 1, str_length(listfile[1])-4),
+                  lwd=rep(2,nf), col=seq(nf), bg="transparent", cex=0.8)
   dev.off()
 
   load(paste(listfile[1], ".RData", sep=""))
-  plot(wl, cops$Rrs.0p, xlab="Wavelenght",
-       ylab="Rrs0+", xlim=c(380, max(wl)),
+  plot(waves[ix.waves], cops$Rrs.0p[ix.waves], xlab="Wavelenght", ylab="Rrs0+",
+       ylim=c(0,max(cops$Rrs.0p[ix.waves],na.rm=T)+0.001),
+       xlim=c(370, max(waves)+10),
        lwd=2, type="l", main=getwd(), sub=cops$dates[1])
   for (i in 1:nf){
     load(paste(listfile[i], ".RData", sep=""))
-    lines(wl, cops$Rrs.0p, col=i, lwd=2)
-    lines(wl, cops$Rrs.0p.linear, col=i, lwd=2, lty=2)
+    lines(waves[ix.waves], cops$Rrs.0p[ix.waves], col=i, lwd=2)
+    lines(waves[ix.waves], cops$Rrs.0p.linear[ix.waves], col=i, lwd=2, lty=2)
   }
 
+  ##### plot Kd
+  ix.waves = which(waves > 310)
   load(paste(listfile[1], ".RData", sep=""))
-  ix = which(cops$depth.fitted == depthEdZ)
+  ix.depth <- rep(NA,19)
+  K0.EdZ.fitted <- rep(NA, 19)
+  if (is.na(depthEdZ)) {
+    for (w in 1:19) {
+      if (!is.na(cops$EdZ.Z.interval[w])) {
+        ix.depth[w] <- which.min(abs(cops$depth.fitted - cops$EdZ.Z.interval[w]))
+        K0.EdZ.fitted[w] <- cops$K0.EdZ.fitted[ix.depth[w],w]
+      }
+    }
+  } else {
+    ix = which(cops$depth.fitted == depthEdZ)
+    ix.depth <- rep(ix,19)
+  }
+
   png(filename = "../Kd.png",
       width = 550, height = 480, units = "px",
       pointsize = 14, bg = "white")
-  plot(wl, cops$K0.EdZ.fitted[ix,],
-       xlab="Wavelenght", ylab="K0_Edz",
-       lwd=2, type="l",  main=getwd(), sub=cops$dates[1])
+
+  plot(waves[ix.waves], K0.EdZ.fitted[ix.waves],
+       xlab="Wavelenght",
+       ylab=expression(K[0]~"("*E[d]*"z) linear versus loess"),
+       lwd=2, type="l",  main=getwd(), sub=cops$date.mean)
 
   for (i in 1:nf){
     load(paste(listfile[i], ".RData", sep=""))
-    lines(wl[2:nwl], cops$K0.EdZ.fitted[ix,2:nwl], col=i, lwd=2)
-    lines(wl[2:nwl], cops$K.EdZ.surf[2:nwl], col=i, lty=2, lwd=2)
+    K0.EdZ.fitted <- rep(NA, 19)
+    for (w in 1:19) {
+      if (!is.na(cops$EdZ.Z.interval[w])) {
+        ix.depth[w] <- which.min(abs(cops$depth.fitted - cops$EdZ.Z.interval[w]))
+        K0.EdZ.fitted[w] <- cops$K0.EdZ.fitted[ix.depth[w],w]
+      }
+    }
+    lines(waves[ix.waves], K0.EdZ.fitted[ix.waves], col=i, lwd=2)
+    lines(waves[ix.waves], cops$K.EdZ.surf[ix.waves], col=i, lty=2, lwd=2)
   }
+  legend("topright", substr(listfile, 1, str_length(listfile[1])-4),
+         lwd=rep(2,nf), col=seq(nf), bg="transparent", cex=0.8)
+   dev.off()
 
-  legend("topright", listfile, lwd=rep(2,nf), col=seq(nf), bg="transparent")
-  dev.off()
-
-
+  ##### in RStudio
   load(paste(listfile[1], ".RData", sep=""))
-  plot(wl[2:nwl], cops$K0.EdZ.fitted[ix,2:nwl], xlab="Wavelenght", ylab="K0_Edz",
-       lwd=2, type="l",  main=getwd(), sub=cops$dates[1])
+  ix.depth <- rep(NA,19)
+  K0.EdZ.fitted <- rep(NA, 19)
+  if (is.na(depthEdZ)) {
+    for (w in 1:19) {
+      if (!is.na(cops$EdZ.Z.interval[w])) {
+        ix.depth[w] <- which.min(abs(cops$depth.fitted - cops$EdZ.Z.interval[w]))
+        K0.EdZ.fitted[w] <- cops$K0.EdZ.fitted[ix.depth[w],w]
+      }
+    }
+  } else {
+    ix = which(cops$depth.fitted == depthEdZ)
+    ix.depth <- rep(ix,19)
+  }
+  plot(waves[ix.waves], K0.EdZ.fitted[ix.waves],
+       xlab="Wavelenght",
+       ylab=expression(K[0]~"("*E[d]*"z) linear versus loess"),
+       lwd=2, type="l",  main=getwd(), sub=cops$date.mean)
 
   for (i in 1:nf){
     load(paste(listfile[i], ".RData", sep=""))
-    lines(wl[2:nwl], cops$K0.EdZ.fitted[ix,2:nwl], col=i, lwd=2)
-    lines(wl[2:nwl], cops$K.EdZ.surf[2:nwl], col=i, lty=2, lwd=2)
+    K0.EdZ.fitted <- rep(NA, 19)
+    for (w in 1:19) {
+      if (!is.na(cops$EdZ.Z.interval[w])) {
+        ix.depth[w] <- which.min(abs(cops$depth.fitted - cops$EdZ.Z.interval[w]))
+        K0.EdZ.fitted[w] <- cops$K0.EdZ.fitted[ix.depth[w],w]
+      }
+    }
+    lines(waves[ix.waves], K0.EdZ.fitted[ix.waves], col=i, lwd=2)
+    lines(waves[ix.waves], cops$K.EdZ.surf[ix.waves], col=i, lty=2, lwd=2)
   }
-
-}
+  legend("topright", substr(listfile, 1, str_length(listfile[1])-4),
+         lwd=rep(2,nf), col=seq(nf), bg="transparent", cex=0.8)
   setwd(plot.wd)
-
 }

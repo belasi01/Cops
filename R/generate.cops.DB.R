@@ -2,6 +2,9 @@
 #' Generate an AOPs data base derived from COPS light profiles for a list of directories
 #'
 #' @description The AOPs (Kd_s, Rrs) derived from valid profiles are averaged.
+#' IMPORTANT: the only the cast selected in select.cops.dat will be average.
+#' In addition, the extrapolation method for Rrs.0p must be specified in the
+#' third column of the select.cops.dat.
 #'
 #' @param path is the path where the file directories.for.cops.dat containing the data folders
 #' to merge in the data base.
@@ -19,11 +22,11 @@
 #' and a figure showing the measured rho_w spectra of the data base is produced.
 #'
 generate.cops.DB <- function(path="./",
-                             waves.DB=c(305, 320, 330, 340,
+                             waves.DB=c(320, 330, 340,
                                      380, 412, 443, 465,
                                      490, 510, 532, 555,
                                      589, 625, 665, 683,
-                                     694, 710, 780),
+                                     694, 710, 780, 875),
                              mission="XXX") {
 
   GreggCarder.data()
@@ -57,12 +60,23 @@ nwaves = length(waves.DB)
     print(paste("Extracting data from :", dirs[i]))
 
     setwd(as.character(dirs[i]))
-    remove.file <- "remove.cops.dat"
-    remove.tab <- read.table(remove.file, header = FALSE, colClasses = "character", sep = ";")
-    kept.cast <- remove.tab[[2]] == "1"
-    kept.bioS <- remove.tab[[2]] == "2"
-    listfile  <- remove.tab[kept.cast, 1]
-    BioShadeFile = remove.tab[kept.bioS, 1]
+    select.file <- "select.cops.dat"
+    if (!file.exists(select.file)) {
+      print("No select.cops.dat file exist")
+      print("Data was processed using Cops package version 3.6 or lower")
+      print("Data needs to be processed using Cops package version 4.0 or higher")
+      print("Can not generate the Data Base. Exiting code")
+      return(0)
+    }
+    select.tab <- read.table(select.file, header = FALSE, colClasses = "character", sep = ";")
+    kept.cast <- select.tab[[2]] == "1"
+    kept.bioS <- select.tab[[2]] == "2"
+    IcePro    <- select.tab[[2]] == "3"  ### Nothing implemented for that type of cast so far.
+    listfile  <- select.tab[kept.cast, 1]
+    BioShadeFile = select.tab[kept.bioS, 1]
+
+    #Select the extrapolation method to save Rrs
+    Rrs_method <- select.tab[kept.cast, 3]
 
     setwd("./BIN/")
 
@@ -102,7 +116,7 @@ nwaves = length(waves.DB)
         mlon[j] = cops$longitude
 
         # extract Rrs
-        mRrs[j,xw.DB] = cops$Rrs.0p[xw]
+        mRrs[j,xw.DB] = eval(parse(text=paste0("cops$",Rrs_method[j],"[xw]")))
 
         # extract Ed0.0p
         mEd0.0p[j, xw.DB] = cops$Ed0.0p[xw]
@@ -181,7 +195,7 @@ nwaves = length(waves.DB)
       lon[i] = cops$longitude
 
       # extract Rrs
-      Rrs.m[i,xw.DB] = cops$Rrs.0p[xw]
+      Rrs.m[i,xw.DB] = eval(parse(text=paste0("cops$",Rrs_method),"[xw]"))
 
       # extract Ed0.0p
       Ed0.0p.m[i, xw.DB] = cops$Ed0.0p[xw]

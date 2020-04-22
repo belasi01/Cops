@@ -8,7 +8,12 @@ read.init <- function(init.file) {
 		init.param.type <- dummy.param[2]
 		init.param.value <- unlist(strsplit(dummy.param[3], ","))
 		if(init.param.type == "numeric") {
-			if(init.param.name == "tiltmax.optics" | init.param.name == "time.interval.for.smoothing.optics" | init.param.name == "sub.surface.removed.layer.optics" | init.param.name == "delta.capteur.optics" | init.param.name == "radius.instrument.optics") {
+			if(init.param.name == "tiltmax.optics" |
+			   init.param.name == "time.interval.for.smoothing.optics" |
+			   init.param.name == "depth.interval.for.smoothing.optics" |
+			   init.param.name == "sub.surface.removed.layer.optics" |
+			   init.param.name == "delta.capteur.optics" |
+			   init.param.name == "radius.instrument.optics") {
 				pv <- as.numeric(init.param.value)
 				names(pv) <- instruments.optics
 				assign(init.param.name, pv, env = .GlobalEnv)

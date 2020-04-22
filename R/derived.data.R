@@ -13,7 +13,7 @@ derived.data <- function(lon, lat, cops.init, cops.raw) {
 
 	instruments <- c(instruments.optics)
 	d2r <- pi / 180
-# tilt from Poll and Pitch
+# tilt from Roll and Pitch
 	ret <- list()
 	for(instr in instruments) {
 		instr.anc <- paste(instr, "anc", sep = ".")
@@ -247,7 +247,7 @@ derived.data <- function(lon, lat, cops.init, cops.raw) {
 	                     depth.fitted = depth.fitted))
 	  # PLOT
 	  if(INTERACTIVE) x11(width = win.width, height = win.height)
-	  plot(dates, Depth, ylim = rev(range(Depth)), xlab = "Time (HH:MM:SS)", ylab = "Depth", main = paste(dte, "   duration =", cops.duration.secs, "s", "   lon =", round(longitude, digits = 3), "   lat =", round(latitude, digits = 3), "   sun-zenith angle =", round(sunzen, digits = 2), "deg."), cex.main = 1, axes = FALSE, frame.plot = TRUE)
+	  plot(dates, Depth, ylim = rev(range(Depth)), xlab = "UTC Time (HH:MM:SS)", ylab = "Depth (m)", main = paste(dte, "   duration =", cops.duration.secs, "s", "   lon =", round(longitude, digits = 3), "   lat =", round(latitude, digits = 3), "   sun-zenith angle =", round(sunzen, digits = 2), "deg."), cex.main = 1, axes = FALSE, frame.plot = TRUE)
 	  grid(col = 1)
 	  axis.POSIXct(1, dates, format = "%H:%M:%S")
 	  axis(2)
@@ -258,10 +258,15 @@ derived.data <- function(lon, lat, cops.init, cops.raw) {
 	  par(mfrow = c(1, length(instruments)))
 	  for(instr in instruments) {
 	    tilt <- ret[[paste(instr, "tilt", sep = ".")]]
+	    tiltmax <- tiltmax.optics[instr]
 	    if(!is.null(tilt)) {
-	      plot(tilt[Depth.good], Depth[Depth.good], ylim = rev(range(Depth)), xlab = "Tilt", ylab = "Depth", main = instr)
+	      plot(tilt[Depth.good], Depth[Depth.good],
+	           ylim = rev(range(Depth)),
+	           xlab = "Tilt (degree)", ylab = "Depth (m)", main = instr)
+	      abline(v=tiltmax.optics[instr], col=2, lwd=2)
 	      grid(col = 1)
-	      points(tilt[!Depth.good], Depth[!Depth.good], col = 2)
+	      points(tilt[!Depth.good], Depth[!Depth.good], col = 8) # grey
+	      points(tilt[tilt > tiltmax], Depth[tilt > tiltmax], col = 2) # red
 	    }
 	  }
 	  par(mfrow = c(1, 1))

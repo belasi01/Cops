@@ -1,5 +1,7 @@
 #' COPS routine launcher
 #'
+#'  This the function that should be call to run the whole COPS processing.
+#'
 #' @param interactive is a logical value: if TRUE, the user is prompted to
 #' selected a folder containing COPS file to process. The plots are produced in pop-up windows.
 #' If FALSE, you have to create an ASCII file named directories.for.cops.dat and put
@@ -7,12 +9,15 @@
 #' in a sub-folder ./PDF.
 #' @param ASCII is a logical value: if TRUE the outputs are written in simple ASCII files in a ddition to
 #' the binary files in RData format.
+#' @param CLEAN.FILES is a logical value: if TRUE, the user will be prompt
+#' to select the good part of the COPS file interactively.
+#' IMPORTANT: the input cops file will be OVERWRITE.
 #'
-#' @author Simon Belanger
+#' @author Bernard Gentili and Simon Belanger
 #' @export
 
 
-cops.go <- function(interactive = FALSE, ASCII=FALSE) {
+cops.go <- function(interactive = FALSE, ASCII=FALSE, CLEAN.FILES=FALSE) {
 	assign("INTERACTIVE", interactive, env = .GlobalEnv)
 	data("eu.hydrolight")
 	data("thuillier.completed.by.AM0AM1")
@@ -39,7 +44,7 @@ cops.go <- function(interactive = FALSE, ASCII=FALSE) {
 					stop()
 				}
 				mymessage(paste("PROCESSING DIRECTORY", dirdat), head = "@", tail = "@")
-				process.cops(dirdat, ASCII)
+				process.cops(dirdat, ASCII, CLEAN.FILES)
 				plot.Rrs.Kd.for.station(dirdat)
 			}
 		}

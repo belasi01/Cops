@@ -4,7 +4,7 @@
 \alias{cops.go}
 \title{COPS routine launcher}
 \usage{
-cops.go(interactive = FALSE, ASCII = FALSE)
+cops.go(interactive = FALSE, ASCII = FALSE, CLEAN.FILES = FALSE)
 }
 \arguments{
 \item{interactive}{is a logical value: if TRUE, the user is prompted to
@@ -15,10 +15,14 @@ in a sub-folder ./PDF.}
 
 \item{ASCII}{is a logical value: if TRUE the outputs are written in simple ASCII files in a ddition to
 the binary files in RData format.}
+
+\item{CLEAN.FILES}{is a logical value: if TRUE, the user will be prompt
+to select the good part of the COPS file interactively.
+IMPORTANT: the input cops file will be OVERWRITE.}
 }
 \description{
-COPS routine launcher
+This the function that should be call to run the whole COPS processing.
 }
 \author{
-Simon Belanger
+Bernard Gentili and Simon Belanger
 }

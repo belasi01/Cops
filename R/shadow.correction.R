@@ -10,7 +10,7 @@ shadow.correction <- function(instr, cops, SB=NA) {
 	latitude <- cops$latitude
 	waves <- cops[[paste(instr, "waves", sep = ".")]]
 	julian.day <- as.numeric(format(date.mean, format = "%j"))
-	if(! is.na(chl) && chl != 999) { #### Use Morel and Maritorena model to
+	if(!is.na(chl) && chl != 999) { #### Use Morel and Maritorena model to
 	                   #### get absorption from CHL, but if 999 then use the Kd derived absorption
 # 350-700
 		chlTMP <- chl
@@ -35,14 +35,25 @@ shadow.correction <- function(instr, cops, SB=NA) {
 		i.wavesUV <- wavesTMP < 350
 		aR[i.wavesUV] <- popt.f.a(350.001, chlTMP) * radius.instrument.optics[instr]
 	} else {
-    if (! is.na(chl) && chl == 999) { #### CHL == 999 mean used Kd-derived absorption
-	    Kd = cops$K.EdZ.surf
-	    Q  = pi
+    if (!is.na(chl) && chl == 999) { #### CHL == 999 mean used Kd-derived absorption
+	    #### Check for a valid Kd
+      ix.LuZ.0m.valid = which(!is.na(cops$LuZ.0m.linear))
+      if (anyNA(cops$K.EdZ.surf[ix.LuZ.0m.valid])) {
+        # check for the depth used for the LuZ extrapolation
+        max.depth <- max(cops$LuZ.Z.interval, na.rm = T)
+        ix.max.depth <- which.min(abs(cops$depth.fitted - max.depth))
+        Kd = cops$K0.EdZ.fitted[ix.max.depth,]
+        Ed.0m = cops$EdZ.0m
+      } else {
+        Kd = cops$K.EdZ.surf
+        Ed.0m = cops$EdZ.0m.linear
+      }
+	    Q  = 4
 	    if (!is.null(cops$LuZ.0m.linear)) {
-	      R = (cops$LuZ.0m.linear*Q)/cops$EdZ.0m.linear
+	      R = (cops$LuZ.0m.linear*Q)/Ed.0m
 	    }
 	    if (!is.null(cops$EuZ.0m.linear)) {
-	      R = cops$EuZ.0m.linear/cops$EdZ.0m.linear
+	      R = cops$EuZ.0m.linear/Ed.0m
 	    }
 
 	    # From Morel and Maritorena JGR 2001 eq 8'

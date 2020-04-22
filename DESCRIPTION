@@ -1,6 +1,6 @@
 Package: Cops
-Version: 3.5-4
-Date: 2020-02-14
+Version: 4.0
+Date: 2020-04-22
 Title: C-OPS Processing
 Author: Bernard Gentili <gentili@obs-vlfr.fr>
 Maintainer: Bernard Gentili <gentili@obs-vlfr.fr>; Simon Belanger <simon_belanger@uqar.ca>
@@ -11,5 +11,5 @@ URL: http://www.r-project.org, http://www.obs-vlfr.fr
 Packaged:
 LazyData: TRUE
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.0
 Encoding: UTF-8

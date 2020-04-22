@@ -4,9 +4,12 @@
 \alias{generate.cops.DB}
 \title{Generate an AOPs data base derived from COPS light profiles for a list of directories}
 \usage{
-generate.cops.DB(path = "./", waves.DB = c(305, 320, 330, 340, 380,
-  412, 443, 465, 490, 510, 532, 555, 589, 625, 665, 683, 694, 710, 780),
-  mission = "XXX")
+generate.cops.DB(
+  path = "./",
+  waves.DB = c(320, 330, 340, 380, 412, 443, 465, 490, 510, 532, 555, 589, 625, 665,
+    683, 694, 710, 780, 875),
+  mission = "XXX"
+)
 }
 \arguments{
 \item{path}{is the path where the file directories.for.cops.dat containing the data folders
@@ -28,4 +31,7 @@ and a figure showing the measured rho_w spectra of the data base is produced.
 }
 \description{
 The AOPs (Kd_s, Rrs) derived from valid profiles are averaged.
+IMPORTANT: the only the cast selected in select.cops.dat will be average.
+In addition, the extrapolation method for Rrs.0p must be specified in the
+third column of the select.cops.dat.
 }

@@ -19,18 +19,19 @@ win.height;numeric; 7
 # optics description #################################
 instruments.optics;character;Ed0,EdZ,LuZ
 tiltmax.optics;numeric; 10,5,5
-time.interval.for.smoothing.optics;numeric; 40, 40,40
+#time.interval.for.smoothing.optics;numeric; 40, 20,20 -> This is an obsolete parameters for field #8. It is replaced by the following
+depth.interval.for.smoothing.optics;numeric; 10, 4,4
 sub.surface.removed.layer.optics;numeric; 0, 0.1, 0
 delta.capteur.optics;numeric; 0, -0.05, 0.238
 radius.instrument.optics;numeric; 0.035, 0.035, 0.035
 
 # look INTO a data file
 format.date;character;%d/%m/%Y %H:%M:%S
-instruments.others;character;Master
+instruments.others;character;NA
 depth.is.on;character;LuZ
 
 # look at the NAME of a data file
-number.of.fields.before.date;numeric; 0
+number.of.fields.before.date;numeric; 4
 
 # time window : 2 values (unit = second) first = beginning, second = end; experiment starts at 0
 time.window;numeric;0, 10000
