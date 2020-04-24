@@ -232,6 +232,11 @@ derived.data <- function(lon, lat, cops.init, cops.raw) {
 	  maxdepth <- max(Depth[Depth.good]+ delta.capteur.optics["LuZ"])
 	  depth.fitted <- depth.fitted[depth.fitted <= maxdepth]
 
+	  change.interval <- exists("time.interval.for.smoothing.optics")
+	  if (change.interval) {
+	    depth.interval.for.smoothing.optics <- time.interval.for.smoothing.optics/cops.duration.secs* maxdepth
+	  }
+
 	  ret <- c(ret, list(change.position = change.position,
 	                     longitude = longitude,
 	                     latitude = latitude,
@@ -253,7 +258,25 @@ derived.data <- function(lon, lat, cops.init, cops.raw) {
 	  axis(2)
 	  points(dates[!Depth.good], Depth[!Depth.good], pch = 20, col = 2, cex = 2)
 	  legend("bottomleft", legend = paste(length(which(!Depth.good)), "points removed"), text.col = 2, cex = 2)
-	  if(change.position) legend("topright", legend = c("Longitude and Latitute found", "   (BioGPS column present)", "VALUES MODIFIED"), text.col = 3, cex = 1)
+	  if(change.position) {
+	    if (change.interval) {
+	      legend("topright", legend = c("Longitude and Latitute found",
+	                                  "   (BioGPS column present) and",
+	                                  " time.interval.for.smoothing",
+	                                  "VALUES MODIFIED for depth.interval in meters",
+	                                  signif(depth.interval.for.smoothing.optics,3)),
+	             text.col = 3, cex = 1)
+	    } else 	      legend("topright", legend = c("Longitude and Latitute found",
+	                                                "   (BioGPS column present)",
+	                                                "VALUES MODIFIED"),
+	                         text.col = 3, cex = 1)
+	  } else {
+	    if (change.interval) legend("topright", legend = c("time.interval.for.smoothing",
+	                                  "VALUES MODIFIED for depth.interval in meters",
+	                                  signif(depth.interval.for.smoothing.optics,3)),
+	           text.col = 3, cex = 1)
+	  }
+
 	  if(INTERACTIVE) x11(width = win.width, height = win.height)
 	  par(mfrow = c(1, length(instruments)))
 	  for(instr in instruments) {

@@ -76,6 +76,7 @@ compute.aops <- function(cops.data) {
 	  mymessage("Computing Lw.0p ...", head = "-")
 	  Lw.0p <- LuZ.0m * (1 - rau.Fresnel) / indice.water^2
 	  Lw.0p.linear <- LuZ.0m.linear * (1 - rau.Fresnel) / indice.water^2
+	  PLOT.LINEAR <- !all(is.na(LuZ.0m.linear))
 
 	  mymessage("Computing nLw.0p ...", head = "-")
 	  nLw.0p <- Lw.0p / Ed0.0p * etirr(waves.u)
@@ -98,12 +99,17 @@ compute.aops <- function(cops.data) {
 
 	  mymessage("Computing Forel-Ule Color ...", head = "-")
 	  FU <- Rrs2FU(waves.u, Rrs.0p)$FU
-	  FU.linear <- Rrs2FU(waves.u, Rrs.0p.linear)$FU
+	  if (PLOT.LINEAR) {
+	    FU.linear <- Rrs2FU(waves.u, Rrs.0p.linear)$FU
+	  } else FU.linear <- NA
 
 	  if (("LuZ" %in% instruments.optics) && ("EuZ" %in% instruments.optics)) {
 	    mymessage("Computing Q factor ...", head = "-")
 	    Q <- EuZ.0m / LuZ.0m
-	    Q.linear <- EuZ.0m.linear / LuZ.0m.linear
+	    if (PLOT.LINEAR) {
+	      Q.linear <- EuZ.0m.linear / LuZ.0m.linear
+	    } else Q.linear <- NA
+
 	    ## Set NA to unrealistic values due to noise
 	    Q[Q>10] <-NA
 	    Q.linear[Q.linear>10] <-NA
@@ -155,7 +161,7 @@ compute.aops <- function(cops.data) {
 	      shadow.correction.type <- "measured absorption"
 	    } else {
 	      if (cops.data$chl == 999) {
-	        shadow.correction.type <- "absorption estimated from Kd and R"
+	        shadow.correction.type <- paste("absorption estimated from Kd and R", shadow.coef.EuZ$SHADOW.CORRECTION.FROM.KD)
 
 	      } else {
 	        shadow.correction.type <- "absorption from chlorophyll\ncase 1 waters model"
@@ -174,13 +180,17 @@ compute.aops <- function(cops.data) {
 	      shadow.correction.type <- "measured absorption"
 	    } else 	{
 	      if (cops.data$chl == 999) {
-	        shadow.correction.type <- "absorption estimated from Kd and R"
+	        shadow.correction.type <- paste("absorption estimated from Kd and R", shadow.coef.LuZ$SHADOW.CORRECTION.FROM.KD)
 
 	      } else {
 	        shadow.correction.type <- "absorption from chlorophyll\ncase 1 waters model"
 	      }
 	    }
-	    plot(waves.u, shadow.coef.LuZ$LuZ.shad.correction, type = "b", xlim = range(waves.u), ylim = c(0.2, 1), xlab = expression(lambda ~~ nm), ylab = "shadow correction for LuZ", main = shadow.correction.type)
+	    plot(waves.u, shadow.coef.LuZ$LuZ.shad.correction, type = "b",
+	         xlim = range(waves.u), ylim = c(0.2, 1),
+	         xlab = expression(lambda ~~ nm),
+	         ylab = "shadow correction for LuZ",
+	         main = shadow.correction.type)
 	    abline(h = seq(0.2, 1, 0.1), lty = 3)
 	  } else {
 	    if("LuZ" %in% cops.data$instruments.optics) {
@@ -194,7 +204,7 @@ compute.aops <- function(cops.data) {
 	  par(mfrow = c(2, 1))
 	  plot(waves.u,Q, xlab = expression(lambda ~~ nm),
 	       ylab = "Measured Q factor", type = "l", lwd=2)
-	  lines(waves.u,Q.linear,lty=2, lwd=2)
+	  if (PLOT.LINEAR) lines(waves.u,Q.linear,lty=2, lwd=2)
 	  legend("topright", c("linear fit", "LOESS fit"), lwd=c(2,2), lty=c(2,1))
 
 	  plot(1, 1, type = "n", log = "y", xlim = range(waves.u),
@@ -205,8 +215,8 @@ compute.aops <- function(cops.data) {
 	  axis.log(2, grid = TRUE, col = 1, lwd = 0.5, lty = 2)
 	  lines(waves.u, R.0m, type = "b", lwd=2)
 	  lines(waves.u, pi*LuZ.0m/Ed0.0m, lwd=2, col=2)
-	  lines(waves.u, R.0m.linear, type = "b", lty =2, lwd=2)
-	  lines(waves.u, pi*LuZ.0m.linear/Ed0.0m, lty =2, col=2, lwd=2)
+	  if (PLOT.LINEAR) lines(waves.u, R.0m.linear, type = "b", lty =2, lwd=2)
+	  if (PLOT.LINEAR) lines(waves.u, pi*LuZ.0m.linear/Ed0.0m, lty =2, col=2, lwd=2)
 	  legend("topright", c("LOESS", "Lu0m*pi LOESS", "Linear","Lu0m*pi linear"),
 	         col=c(1,2,1,2), lty=c(1,1,2,2))
 	}

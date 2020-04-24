@@ -120,8 +120,6 @@ str(absorption.tab)
 	assign("info.tab", info.tab,  env = .GlobalEnv)
 	assign("select.tab", select.tab,  env = .GlobalEnv)
 
-
-
 	if(all(!kept)) {
 		cat("NOTHING TO DO\n")
 		stop()
@@ -354,6 +352,7 @@ str(absorption.tab)
 
 
       # COMPUTE SURFACE AOPs ---> cops.aops
+      #if (all(is.na(cops$)))
       cops.aops <- compute.aops(cops)
       if(verbose) str(cops.aops)
 

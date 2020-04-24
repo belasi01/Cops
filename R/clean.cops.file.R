@@ -71,11 +71,15 @@ clean.cops.file <- function (in.file="", out.file="cleaned.cops.csv", distance.a
   }
 
 
-  plot(df[,5], ylab = "Depth in m")
-  print("Click on starting point")
+  plot(df[,5], ylab = "Depth in m",
+       ylim = rev(range(df[,5])),
+       main = in.file)
+  print("    <-  Click on starting point and then ESC")
+  text(0,min(df[,5]), "    <-  Click on starting point and then ESC", pos=4)
   ix.min=identify(df[,5])
 
-  print("Click  when COPS hit bottom or at the end of the cast")
+  print("Click  when COPS hit bottom or at the end of the cast and ESC")
+  text(length(df[,5]),max(df[,5]), "Click on ending point and then ESC ->    ", pos=2)
   ix.max=identify(df[,5])
   depthMax=(df[ix.max,5])
   if (is.na(distance.above.bottom)) {
@@ -85,6 +89,8 @@ clean.cops.file <- function (in.file="", out.file="cleaned.cops.csv", distance.a
     ix.cut=which.min(abs(df[,5]-depthCut))
   }
 
+  print("Cut at Index:")
+  print(c(ix.min,ix.cut))
   if (ext == "tsv" || ext =="txt") {
     write.table(df[ix.min:ix.cut,],file = out.file,
                 quote = F, row.names = F, sep="\t")

@@ -6,6 +6,7 @@
 #'@param Depth is a vector of depth corresponding to the input quantity
 #'@param aop is the matrix of EdZ, EuZ or LuZ. The matrix should be clean
 #'after filtration for high instrument tilt.
+#'@param instrument is the instrument type, "EdZ", "EuZ" or "LuZ"
 #'@param r2.threshold is the minimum R^2 require to accept the fit
 #'(Default is 0.80)
 #'@param delta.depth is the depth interval toletared between the
@@ -13,7 +14,8 @@
 #'The Default is 2.5 meters. So if the very first measurement is
 #'at 0.5 m, the "surface" layer is considered as 0.5 to 3 meters depth.
 #'But this is the maximum layer considered.
-#'The minimum layer is fixed at 0.30 m.
+#'The minimum layer is fixed at 0.30 m, so in this example it would be from
+#'0.5 to 0.8 m.
 #'
 #'@details This function is called by
 #'\code{\link{process.EdZ}}

@@ -78,10 +78,16 @@ plot.Rrs.Kd.for.station <- function(path="./", depthEdZ = NA) {
   ix.depth <- rep(NA,19)
   K0.EdZ.fitted <- rep(NA, 19)
   if (is.na(depthEdZ)) {
-    for (w in 1:19) {
-      if (!is.na(cops$EdZ.Z.interval[w])) {
-        ix.depth[w] <- which.min(abs(cops$depth.fitted - cops$EdZ.Z.interval[w]))
-        K0.EdZ.fitted[w] <- cops$K0.EdZ.fitted[ix.depth[w],w]
+    if ( all(is.na(cops$EdZ.Z.interval))) {
+      print("No valid linear fit; plot Depth integrated K for the top 2.5m")
+      ix.2.5 <- which.min(abs(cops$depth.fitted - 2.5))
+      K0.EdZ.fitted = cops$K0.EdZ.fitted[ix.2.5,]
+    } else {
+      for (w in 1:19) {
+        if (!is.na(cops$EdZ.Z.interval[w])) {
+          ix.depth[w] <- which.min(abs(cops$depth.fitted - cops$EdZ.Z.interval[w]))
+          K0.EdZ.fitted[w] <- cops$K0.EdZ.fitted[ix.depth[w],w]
+        }
       }
     }
   } else {
@@ -101,14 +107,20 @@ plot.Rrs.Kd.for.station <- function(path="./", depthEdZ = NA) {
   for (i in 1:nf){
     load(paste(listfile[i], ".RData", sep=""))
     K0.EdZ.fitted <- rep(NA, 19)
-    for (w in 1:19) {
-      if (!is.na(cops$EdZ.Z.interval[w])) {
-        ix.depth[w] <- which.min(abs(cops$depth.fitted - cops$EdZ.Z.interval[w]))
-        K0.EdZ.fitted[w] <- cops$K0.EdZ.fitted[ix.depth[w],w]
+    if (all(is.na(cops$EdZ.Z.interval))) {
+      print("No valid linear fit; plot Depth integrated K for the top 2.5m")
+      ix.2.5 <- which.min(abs(cops$depth.fitted - 2.5))
+      K0.EdZ.fitted = cops$K0.EdZ.fitted[ix.2.5,]
+    } else {
+      for (w in 1:19) {
+        if (!is.na(cops$EdZ.Z.interval[w])) {
+          ix.depth[w] <- which.min(abs(cops$depth.fitted - cops$EdZ.Z.interval[w]))
+          K0.EdZ.fitted[w] <- cops$K0.EdZ.fitted[ix.depth[w],w]
+        }
       }
     }
     lines(waves[ix.waves], K0.EdZ.fitted[ix.waves], col=i, lwd=2)
-    lines(waves[ix.waves], cops$K.EdZ.surf[ix.waves], col=i, lty=2, lwd=2)
+    if (!all(is.na(cops$EdZ.Z.interval))) lines(waves[ix.waves], cops$K.EdZ.surf[ix.waves], col=i, lty=2, lwd=2)
   }
   legend("topright", substr(listfile, 1, str_length(listfile[1])-4),
          lwd=rep(2,nf), col=seq(nf), bg="transparent", cex=0.8)
@@ -116,19 +128,27 @@ plot.Rrs.Kd.for.station <- function(path="./", depthEdZ = NA) {
 
   ##### in RStudio
   load(paste(listfile[1], ".RData", sep=""))
+  load(paste(listfile[1], ".RData", sep=""))
   ix.depth <- rep(NA,19)
   K0.EdZ.fitted <- rep(NA, 19)
   if (is.na(depthEdZ)) {
-    for (w in 1:19) {
-      if (!is.na(cops$EdZ.Z.interval[w])) {
-        ix.depth[w] <- which.min(abs(cops$depth.fitted - cops$EdZ.Z.interval[w]))
-        K0.EdZ.fitted[w] <- cops$K0.EdZ.fitted[ix.depth[w],w]
+    if ( all(is.na(cops$EdZ.Z.interval))) {
+      print("No valid linear fit; plot Depth integrated K for the top 2.5m")
+      ix.2.5 <- which.min(abs(cops$depth.fitted - 2.5))
+      K0.EdZ.fitted = cops$K0.EdZ.fitted[ix.2.5,]
+    } else {
+      for (w in 1:19) {
+        if (!is.na(cops$EdZ.Z.interval[w])) {
+          ix.depth[w] <- which.min(abs(cops$depth.fitted - cops$EdZ.Z.interval[w]))
+          K0.EdZ.fitted[w] <- cops$K0.EdZ.fitted[ix.depth[w],w]
+        }
       }
     }
   } else {
     ix = which(cops$depth.fitted == depthEdZ)
     ix.depth <- rep(ix,19)
   }
+
   plot(waves[ix.waves], K0.EdZ.fitted[ix.waves],
        xlab="Wavelenght",
        ylab=expression(K[0]~"("*E[d]*"z) linear versus loess"),
@@ -137,14 +157,19 @@ plot.Rrs.Kd.for.station <- function(path="./", depthEdZ = NA) {
   for (i in 1:nf){
     load(paste(listfile[i], ".RData", sep=""))
     K0.EdZ.fitted <- rep(NA, 19)
-    for (w in 1:19) {
-      if (!is.na(cops$EdZ.Z.interval[w])) {
-        ix.depth[w] <- which.min(abs(cops$depth.fitted - cops$EdZ.Z.interval[w]))
-        K0.EdZ.fitted[w] <- cops$K0.EdZ.fitted[ix.depth[w],w]
+    if (all(is.na(cops$EdZ.Z.interval))) {
+      ix.2.5 <- which.min(abs(cops$depth.fitted - 2.5))
+      K0.EdZ.fitted = cops$K0.EdZ.fitted[ix.2.5,]
+    } else {
+      for (w in 1:19) {
+        if (!is.na(cops$EdZ.Z.interval[w])) {
+          ix.depth[w] <- which.min(abs(cops$depth.fitted - cops$EdZ.Z.interval[w]))
+          K0.EdZ.fitted[w] <- cops$K0.EdZ.fitted[ix.depth[w],w]
+        }
       }
     }
     lines(waves[ix.waves], K0.EdZ.fitted[ix.waves], col=i, lwd=2)
-    lines(waves[ix.waves], cops$K.EdZ.surf[ix.waves], col=i, lty=2, lwd=2)
+    if (!all(is.na(cops$EdZ.Z.interval))) lines(waves[ix.waves], cops$K.EdZ.surf[ix.waves], col=i, lty=2, lwd=2)
   }
   legend("topright", substr(listfile, 1, str_length(listfile[1])-4),
          lwd=rep(2,nf), col=seq(nf), bg="transparent", cex=0.8)

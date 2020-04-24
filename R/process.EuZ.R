@@ -31,6 +31,7 @@ process.EuZ <- function(cops.raw,
 
 	##### Remove radiometric measurement below the detection limit
 	aop.all <- aop
+	aop.all[aop.all < 0] <-0
 	for (w in 1:19) {
 	  aop[aop[,w] <= EuZ.detect.lim[w],w] <- NA
 	}
@@ -83,7 +84,7 @@ process.EuZ <- function(cops.raw,
 	K <- compute.Ksurf.linear(Depth, aop,
 	                          instrument = "EuZ",
 	                          delta.depth= 2.5,
-	                          r2.threshold=0.8)
+	                          r2.threshold=0.6)
 	r2 <- K$r2
 	K.surf <- K$Kx
 	Z.interval <- K$Z.interval
@@ -106,6 +107,9 @@ process.EuZ <- function(cops.raw,
 	                    f.PAR=c(0.01, 0.05))
 
 # PLOT
+	PLOT.LINEAR <- !all(is.na(EuZ.0m.linear))
+	if (!PLOT.LINEAR) Z.interval=5
+
 	aop.cols <- rainbow.modified(length(waves))
 	if(INTERACTIVE) x11(width = win.width, height = win.height)
 	matplot(aop.all, Depth, type = "p", log = "x",
@@ -117,10 +121,10 @@ process.EuZ <- function(cops.raw,
 	grid(col = 1)
 	matplot(aop.fitted, depth.fitted, type = "l",
 	        lty = 1, lwd = 2, add = TRUE, col = aop.cols)
-	matplot(EuZ.fitted, depth.fitted, type = "l",
-	        lty = 2, lwd = 2, add = TRUE, col = aop.cols)
 	points(aop.0, rep(depth.0, length(aop.0)), col = aop.cols)
-	points(diag(aop[ix.Z.interval,]), Z.interval, cex=1.5,
+	if (PLOT.LINEAR) matplot(EuZ.fitted, depth.fitted, type = "l",
+	        lty = 2, lwd = 2, add = TRUE, col = aop.cols)
+	if (PLOT.LINEAR) points(diag(aop[ix.Z.interval,]), Z.interval, cex=1.5,
 	       pch = 19,col = aop.cols)
 	par(xpd = TRUE)
 	legend(10^par("usr")[1], par("usr")[4], legend = waves, xjust = 0, yjust = 0, lty = 1, lwd = 2, col = aop.cols, ncol = ceiling(length(waves) / 2), cex = 0.75)
@@ -175,9 +179,9 @@ process.EuZ <- function(cops.raw,
 	    grid(col = 1)
 	    lines(aop.fitted[, i], depth.fitted, col = "red")
 	    points(aop.0[i], depth.0, pch = 1, cex=1.5, col = "red")
-	    lines(EuZ.fitted[, i], depth.fitted, col = "blue")
-	    points(EuZ.0m.linear[i],depth.0, pch = 1, cex=1.5, col = "blue")
-	    points(aop[ix.Z.interval[i],i], Z.interval[i], cex=1.5,
+	    if (PLOT.LINEAR) lines(EuZ.fitted[, i], depth.fitted, col = "blue")
+	    if (PLOT.LINEAR) points(EuZ.0m.linear[i],depth.0, pch = 1, cex=1.5, col = "blue")
+	    if (PLOT.LINEAR) points(aop[ix.Z.interval[i],i], Z.interval[i], cex=1.5,
 	           pch = 19,col ="blue")
 	    abline(v=EuZ.detect.lim[i], col="orange", lwd=2)
 	    abline(h=sub.surface.removed.layer.optics["EuZ"], col="green", lwd=1)
@@ -200,7 +204,9 @@ process.EuZ <- function(cops.raw,
 	mai.old2 <- par("mai")
 	mgp.old2 <- par("mgp")
 	#### Select 4 wavelengths
-	ix.w = which(!is.na(r2))
+	if (PLOT.LINEAR) {
+	  ix.w = which(!is.na(r2))
+	} else ix.w <- 1:19
 	for(i in floor(seq(ix.w[1], ix.w[length(ix.w)], length.out = 4))) {
 	  if (length(which(!is.na(aop[,i]))) > 0) {
 	    plot(aop.all[, i], Depth, type = "p", log = "x",
@@ -212,9 +218,9 @@ process.EuZ <- function(cops.raw,
 	    grid(col = 1)
 	    lines(aop.fitted[, i], depth.fitted, col = 2, lwd=2)
 	    points(aop.0[i], depth.0, pch = 1, cex=1.8, col = "red")
-	    lines(EuZ.fitted[, i], depth.fitted, col = "blue")
-	    points(EuZ.0m.linear[i],depth.0, pch = 1, cex=1.8, col = "blue")
-	    points(aop[ix.Z.interval[i],i], Z.interval[i], cex=1.8,
+	    if (PLOT.LINEAR) lines(EuZ.fitted[, i], depth.fitted, col = "blue")
+	    if (PLOT.LINEAR) points(EuZ.0m.linear[i],depth.0, pch = 1, cex=1.8, col = "blue")
+	    if (PLOT.LINEAR) points(aop[ix.Z.interval[i],i], Z.interval[i], cex=1.8,
 	           pch = 19,col ="blue")
 	    abline(v=EuZ.detect.lim[i], col="orange", lwd=3)
 	    abline(h=sub.surface.removed.layer.optics["EuZ"], col="green", lwd=2)
@@ -252,6 +258,7 @@ process.EuZ <- function(cops.raw,
 	legend(par("usr")[1], par("usr")[4], legend = waves, xjust = 0, yjust = 0, lty = 1, lwd = 2, col = aop.cols, ncol = ceiling(length(waves) / 2), cex = 0.75)
 	par(xpd = FALSE)
 
+	if (!PLOT.LINEAR) Z.interval <-NA
 	return(list(
 		EuZ.fitted = aop.fitted,
 		KZ.EuZ.fitted = KZ.fitted,

@@ -195,7 +195,7 @@ nwaves = length(waves.DB)
       lon[i] = cops$longitude
 
       # extract Rrs
-      Rrs.m[i,xw.DB] = eval(parse(text=paste0("cops$",Rrs_method),"[xw]"))
+      Rrs.m[i,xw.DB] = eval(parse(text=paste0("cops$",Rrs_method,"[xw]")))
 
       # extract Ed0.0p
       Ed0.0p.m[i, xw.DB] = cops$Ed0.0p[xw]

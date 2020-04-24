@@ -31,6 +31,7 @@ process.EdZ <- function(cops.raw,
 
 	##### Remove radiometric measurement below the detection limit
 	aop.all <- aop  # make a backup
+	aop.all[aop.all < 0] <-0
 	for (w in 1:19) {
 	  aop[aop[,w] <= EdZ.detect.lim[w],w] <- NA
 	}
@@ -83,7 +84,7 @@ process.EdZ <- function(cops.raw,
 	K <- compute.Ksurf.linear(Depth, aop,
 	                          instrument = "EdZ",
 	                          delta.depth= 3.0,
-	                          r2.threshold=0.6)
+	                          r2.threshold=0.5)
 	r2 <- K$r2
 	K.surf <- K$Kx
 	Z.interval <- K$Z.interval
@@ -104,6 +105,9 @@ process.EdZ <- function(cops.raw,
 	# Compute PAR at depth
 	PAR <- compute.PARz(depth.fitted, waves, aop.fitted, aop.0,
 	                    f.PAR=c(0.001, 0.01, 0.05, 0.1,0.5))
+
+	PLOT.LINEAR <- !all(is.na(EdZ.0m.linear))
+	if (!PLOT.LINEAR) Z.interval=5
 
 # PLOT
 	aop.cols <- rainbow.modified(length(waves))
@@ -138,7 +142,6 @@ process.EdZ <- function(cops.raw,
 	         main = substitute(E[d]*z~x~"("*mu*W.*cm^{-2}*.nm^{-1}*")",list(x = waves[i])))
 	    grid(col = 1)
 	    lines(aop.fitted[, i], depth.fitted, col = 2)
-	    ##points(aop.0[i], 0, pch = 20, col = 4)
 	    points(aop.0[i], depth.0, pch = 20, col = 4)
 	    abline(v=EdZ.detect.lim[i], col="orange", lwd=3)
 	    abline(h=sub.surface.removed.layer.optics["EdZ"], col="green", lwd=3)
@@ -171,9 +174,9 @@ process.EdZ <- function(cops.raw,
 	    grid(col = 1)
 	    lines(aop.fitted[, i], depth.fitted, col = "red")
 	    points(aop.0[i], depth.0, pch = 1, cex=1.5, col = "red")
-	    lines(EdZ.fitted[, i], depth.fitted, col = "blue")
-	    points(EdZ.0m.linear[i],depth.0, pch = 1, cex=1.5, col = "blue")
-	    points(aop[ix.Z.interval[i],i], Z.interval[i], cex=1.5,
+	    if (PLOT.LINEAR) lines(EdZ.fitted[, i], depth.fitted, col = "blue")
+	    if (PLOT.LINEAR) points(EdZ.0m.linear[i],depth.0, pch = 1, cex=1.5, col = "blue")
+	    if (PLOT.LINEAR) points(aop[ix.Z.interval[i],i], Z.interval[i], cex=1.5,
 	           pch = 19,col ="blue")
 	    abline(v=EdZ.detect.lim[i], col="orange", lwd=2)
 	    abline(h=sub.surface.removed.layer.optics["EdZ"], col="green", lwd=1)
@@ -196,7 +199,9 @@ process.EdZ <- function(cops.raw,
 	mai.old2 <- par("mai")
 	mgp.old2 <- par("mgp")
 	#### Select 4 wavelengths
-	ix.w = which(!is.na(r2))
+	if (PLOT.LINEAR) {
+	  ix.w = which(!is.na(r2))
+	} else ix.w <- 1:19
 	for(i in floor(seq(ix.w[1], ix.w[length(ix.w)], length.out = 4))) {
 	  if (length(which(!is.na(aop[,i]))) > 0) {
 	    plot(aop.all[, i], Depth, type = "p", log = "x",
@@ -208,9 +213,9 @@ process.EdZ <- function(cops.raw,
 	    grid(col = 1)
 	    lines(aop.fitted[, i], depth.fitted, col = "red")
 	    points(aop.0[i], depth.0, pch = 1, cex=1.5, col = "red")
-	    lines(EdZ.fitted[, i], depth.fitted, col = "blue")
-	    points(EdZ.0m.linear[i],depth.0, pch = 1, cex=1.8, col = "blue")
-	    points(aop[ix.Z.interval[i],i], Z.interval[i], cex=1.8,
+	    if (PLOT.LINEAR) lines(EdZ.fitted[, i], depth.fitted, col = "blue")
+	    if (PLOT.LINEAR) points(EdZ.0m.linear[i],depth.0, pch = 1, cex=1.8, col = "blue")
+	    if (PLOT.LINEAR) points(aop[ix.Z.interval[i],i], Z.interval[i], cex=1.8,
 	           pch = 19,col ="blue")
 	    abline(v=EdZ.detect.lim[i], col="orange", lwd=3)
 	    abline(h=sub.surface.removed.layer.optics["EdZ"], col="green", lwd=2)
@@ -256,39 +261,39 @@ process.EdZ <- function(cops.raw,
     #############################
     par(mfrow = c(2, 1))
     Ed0.0p.m = cops.Ed0$Ed0.0p*0.957
-    plot(Ed0.0p.m, EdZ.0m.linear,
+    plot(Ed0.0p.m, aop.0,
          xlab = "Calculated Ed(0-) from Ed(0+)",
          ylab = "Extrapolated Ed(0-) from EdZ",
-         xlim=c(0,max(EdZ.0m.linear+30, na.rm=T)),
-         ylim=c(0,max(EdZ.0m.linear+30, na.rm=T)),
+         xlim=c(0,max(aop.0+30, na.rm=T)),
+         ylim=c(0,max(aop.0+30, na.rm=T)),
          pch=19,col="black",
          main =cops.raw$file)
-    points(Ed0.0p.m, aop.0,pch=19,col="blue")
+    if (PLOT.LINEAR) points(Ed0.0p.m, EdZ.0m.linear,pch=19,col="blue")
     lines(c(0,200), c(0,200), col=2)
     legend("bottomright",legend=c("Ed(0-)linear","Ed(0-)LOESS"),
-           text.col=c("black","blue"),pch=c(19,19),col=c("black","blue"))
+           text.col=c("blue", "black"),pch=c(19,19),
+           col=c("blue", "black"))
 
     #Ed(0-)Ratio
     #############################
+
     Ed0.ratio.linear = EdZ.0m.linear/Ed0.0p.m
     Ed0.ratio = aop.0/Ed0.0p.m
-    plot(cops.raw$Ed0.waves,Ed0.ratio.linear,
+    plot(cops.raw$Ed0.waves,Ed0.ratio,
          xlab = "Wavelength(nm)",
          ylab = "Ratio of extrapolated to calculated Ed(0-)",
          pch=19,col="black",
-         ylim= c(min(Ed0.ratio.linear, na.rm=T)-0.05,
-                 max(Ed0.ratio.linear, na.rm=T)+0.05))
+         ylim= c(min(c(Ed0.ratio,Ed0.ratio.linear), na.rm=T)-0.05,
+                 max(c(Ed0.ratio,Ed0.ratio.linear), na.rm=T)+0.05))
     abline(h=1.0, col="black")
     abline(h=c(0.9,1.1), col="black")
     abline(h=c(0.95,1.05), col="red")
-    points(cops.raw$Ed0.waves,Ed0.ratio,
+    if (PLOT.LINEAR) points(cops.raw$Ed0.waves,Ed0.ratio.linear,
            xlab = NA, ylab = NA,pch=19,col="blue")
-    #rect(xleft=380,xright = 740,ybottom=par("usr")[3],
-    #     ytop=par("usr")[4], density=10, col = "purple")
     legend("topright",c("linear","LOESS"),
-           text.col=c("black","blue"),
+           text.col=c("blue", "black"),
            pch=c(19,19),
-           col=c("black","blue"))
+           col=c("blue", "black"))
 
     ### Plot PAR
     ### The last depth is remove be cause it is often bad
@@ -319,6 +324,7 @@ process.EdZ <- function(cops.raw,
 
   }
 
+	if (!PLOT.LINEAR) Z.interval <-NA
 	return(list(
 		EdZ.fitted = aop.fitted,
 		KZ.EdZ.fitted = KZ.fitted,
