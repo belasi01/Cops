@@ -161,11 +161,11 @@ Now if you look into the working directory, you will find a file named **info.co
 
 * The fields number 2 and 3 are the **longitude** and **latitude** in decimal degree, respectively. You have to provide them to allow the code to compute the sun position in the sky. This is mandatory. If your system was fitted with a BioGPS, you have to copy the GPS file in the working directory and put NA in fields 2 and 3. The code will retreive the position of the profile automatically. **IMPORTANT NOTE: Sometime you may get an error when reading the GPS file. This is because a header line may be found in the middle of the file. This is because only one GPS file is created per day. If the file exists when restarting the COPS, it will happen the data at the end of the existing file. You have to clean the GPS file by removing header lines manually (except the first line of the file).**  
 
-* The field number 4 is for the **shadow correction** method to use for calculating the water-leaving radiance and the reflectance (999, NA, 0 or a decimal value). The instrument shadow effect has been described in @Gordon1992b and @Zibordi1995. The correction they proposed requires the total spectral absorption coefficients of the surface water. There is four options: 
+* The field number 4 is for the **shadow correction** method to use for calculating the water-leaving radiance and the reflectance (999, NA, 0 or a decimal value). The instrument shadow effect has been described in @Gordon1992b and @Zibordi1995. The correction they proposed requires the total spectral absorption coefficients of the surface water. There are four options: 
     * NA -> no correction is applied; 
     * 0 ->  you have to provide the absorption coefficients for all wavelengths in a file called **absorption.cops.dat**; 
     * if a decimal value is provided ->  the code will assume it as the chlorophyll-a concentration and estimate empirically the absorption value using a Case-1 water bio-optical model [@Morel2001]; 
-    * 999 -> the total absorption coefficient is estimated from the diffuse attenuation coefficient, *K_d*, and the sub-surface irradiance refletance, *R*, which are estimated using the downwelling irradiance profile, *E_d*. The equation 8' of @Morel2001 is used to estimate the absorption coefficient. The diffuse attenation is calulated using a linear for the log-transformed data near the sea surface (or the loess fit is used if the linear fit failed).
+    * 999 -> the total absorption coefficient is estimated from the diffuse attenuation coefficient, *K_d*, and the sub-surface irradiance refletance, *R*, which are estimated using the downwelling irradiance profile, *E_d*. The equation 8' of @Morel2001 is used to estimate the absorption coefficient. The diffuse attenuation is calculated using a linear for the log-transformed data near the sea surface (or the loess fit is used if the linear fit failed).
     
 * The field number 5 is the **time window**, which is the number of seconds after the start of the recording corresponding to the actual begining and the end of the cast, respectively. This is eventually avoid if the file have been cleaned prior the processing. This can be achieve using the CLEAN.FILES option. 
 
@@ -238,6 +238,226 @@ The next example (Fig. 8) shows a drastic drop in Ed0 during a profile. This kin
 ```{r Ed0_2, echo=FALSE, fig.cap="Figure 8. Example of an unstable Ed0 conditions during a vertical profile", out.width = '70%'}
 knitr::include_graphics("./extfigures/Ed0_2.png")
 ```
+
+
+### Step 2.3 : Check the quality of the extrapolation of the radiometric quantity to the air-water interface
+
+One of the most important thing to check when processing C-OPS data is the quality of the extrapolation of the upwelling radiance (LuZ) or irradiance (EuZ) at the air-water interface. This will determine the quality the remote sensing reflectance, Rrs, which is one of the most important apparent optical property (AOP) we want to extract from the C-OPS data. 
+
+In the current `Cops` package version (4.0), there is two methods implemented to extrapolate to the air-water interface: a non-linear method call LOESS and a linear fit on the log-transformed radiance or irradiance profiles. The LOESS is applied to the whole profile, while the linear fit is limited to a thin layer near the surface. Several plots are available in the PDF to diagnose the quality of the fit. **Note that all data points below the instrument detection limit are eliminated in the fitting process**. This is feature has been implemented in the version 4.0 of the `Cops`package. One can visualized the default values implemented in the package by accessing the variable detection.limit, which is a Global Environment Variable (shown below). To obtain more information about the instrument detection limit or update these threshold, the user can refer to the help page of the function `cops.detection.limit()`.  
+
+```{r detection.limit}
+detection.limit
+```
+
+
+The following plots allow you to evaluate the quality of the LuZ extrapolation to the surface (x = 0-). The figure 9 is a zoom on the surface layer of the water column. It presents all 19 wavelenghts and the 2 fitting methods on the same plot. Note that no fit was performed for the 305 nm and 320 nm channels due to the lack of measurements above the instrument detection limit (here set at 5e-5), which is wavelength-specific and sensor-specific.   
+
+```{r LuzExtrap1, echo=FALSE, fig.cap="Figure 9. Example of LuZ extrapolation to the surface (z=0-) using non-linear fitting with LOESS method (solid line) and the linear method (dashed line) described in Bélanger et al (2017). C-OPS measurements are the small dots while the big solid circles indicate the maximum depth used to make the linear extrapolation of LuZ to 0- depth. ", out.width = '100%'}
+knitr::include_graphics("./extfigures/LuZ_extrapol_Overall.png")
+```
+
+The next plot (Fig. 10) is good to appreciate the overall quality of the LOESS fit for each 19 wavelenghts. In this optically shallow water example, the increase in LuZ near the bottom is NOT an artefact. In these type of environnement, LuZ and EuZ field are highly non-linear. It is due to the bottom reflectance which reflect a large fraction of the EdZ that reached the bottom. So the LuZ or EuZ at the bottom is then being attenuated upward above th bottom. For an insightful discussion, please refer to @Maritorena1994. 
+
+Overall the fit is pretty good but not perfect. It can be improved by using a slightly smaller depth windows for the LuZ smoothing. This is again given by the parameter **depth.interval.for.smoothing.optics**, which set by default at 4 meters. Figure 11 is the same as Fig. 10 but for a depth interval set at 3 meters for LuZ. This reduction improve the fit for some wavelenghts near the bottom (i.e., 465 to 560 nm). Note that two additional lines appear on these plots. The vertical orange lines are the detection limits (e.g. for 340 and 380 nm). So every measurements at the left of them are not considered in the fit. The green horizontal lines are the threshold specified by the parameter **sub.surface.removed.layer.optics**, which was set to 0 in this example.  
+
+```{r LuzFit1, echo=FALSE, fig.cap="Figure 10. Example of LuZ fitted with the LOESS method for each individual channels.", out.width = '100%'}
+knitr::include_graphics("./extfigures/LuZ_extrapol_individual_all_depths.png")
+```
+
+```{r LuzFit2, echo=FALSE, fig.cap="Figure 11. Same as 10, but for a depth interval for smoothing reduced at 3 meters", out.width = '100%'}
+knitr::include_graphics("./extfigures/LuZ_extrapol_individual_all_depths_interval_3m.png")
+```
+
+To compare the linear versus the LOESS fit near the air-water interface, two additional plots focusing on the surface are available in the PDF. Figure 12 is similar to Figures 10 and 11, but for the surface. The red curves are the LOESS fit while the blue lines are the linear fits. **Note the absence of linear fit at 532 nm**. This is due to a low R-squared value of the fit, as shown at the top of each plot. In the `Cops` package version 4.0, a threshold of 0.6 is hard-coded for LuZ and EuZ for the R-squared value. In other words, the linear fit is considered to fail if the R-squared value is below 0.6. So here the R-squared value at 532 was set to NA because it was below 0.6. This profile looks particularly noisy near the surface due to clear sky condition and wave focussing effect [@Zaneveld2001]. 
+
+Figure 13 is similar to Fig 12, but for four selected wavelengths to better appreciate the fitting methods comparison. 
+
+Overall, for this profile, we would consider the LOESS fit more appropriate because of the strong non-linearity of the light profile. For further data exploitation, we will edit the **select.cops.dat** to indicate the use of the LOESS for the remote sensing refletance as: 
+
+WISE_MAN_F5_CAST_003_190818_181835_URC.tsv;1;**Rrs.0p**;NA
+
+```{r LuzFit3, echo=FALSE, fig.cap="Figure 12. Same as 11, but for the surface layer.", out.width = '100%'}
+knitr::include_graphics("./extfigures/LuZ_extrapol_individual_surface_interval_3m.png")
+```
+
+```{r LuzFit4, echo=FALSE, fig.cap="Figure 13. Same as 12, but for selected wavelenghts across the spectrum.", out.width = '100%'}
+knitr::include_graphics("./extfigures/LuZ_extrapol_4waves_surface_interval_3m.png")
+```
+
+
+### Step 2.4 : Quality check of the EdZ fit 
+
+As for LuZ or EuZ, we check whether the LOESS parameters need adjustment to fit the measurements of EdZ.  As shown in figures 14 and 15, the default **depth.interval.for.smoothing.optics** of 4 meters works well for our profile, except at 305 and 320 nm where a strange behavior of the LOESS fit is observed. This is often observed when a small number of valid observations are available near the surface. In addition, we can see that the EdZ are even more noisy compare to LuZ due to wave focusing effect, as expected under clear sky and wavy surface [@Zaneveld2001]. One way to remove this noise is to use the parameter **sub.surface.removed.layer.optics**, which was set to 0.1 meter in this example. Befor adjusting this parameters, we need to make sure the surface waters are optically homogenous, which is not the case in our example. We can observed a change in the slope at around 1.5 meters, which particulary evidentin the UV wavelenghts (340, 380, 395 nm). This suggest the presence of a CDOM-rich surface layer of a 1.5 meters depth. So to keep this feature, we could have increased the **sub.surface.removed.layer.optics** to 0.5 meter and decreased the **depth.interval.for.smoothing.optics** to 3 meters, but here these changes did not improved the results significantly (not shown). As for LuZ, other plots focusing on the surface layer can be used to compare the LOESS with the linear extrapolation are available (Fig. 17).  
+
+```{r EdzExtrap1, echo=FALSE, fig.cap="Figure 14. Example of EdZ fit with the LOESS using a depth interval of 4 meters.", out.width = '100%'}
+knitr::include_graphics("./extfigures/EdZ.Fit1.png")
+```
+
+```{r EdzExtrap1_bywaves, echo=FALSE, fig.cap="Figure 15. Example of EdZ fit with the LOESS using a depth interval of 4 meters for each wavelength.", out.width = '100%'}
+knitr::include_graphics("./extfigures/EdZ.Fit2.png")
+```
+
+```{r EdzExtrap1_4waves, echo=FALSE, fig.cap="Figure 16. Example of EdZ fit with the LOESS and linear at the surface for 4 selected wavelenghts.", out.width = '100%'}
+knitr::include_graphics("./extfigures/EdZ.Fit3.png")
+```
+
+
+Figure 17 shows two extra plots to assess the quality of the EdZ extrapolation to the air-water interface. Here the extrapolated values of Ed at 0- are compared to the irradiance spectrum measured in the air by the reference sensor, multiply by a factor of 0.957 to account for the specular reflexion at the interface. In this example, the LOESS extrapolation tend to overestimate Ed0- (by about 20% in the visible), while the linear extrapolation underestimate Ed0- in the UV/blue and overestimate in the NIR. These results can be explained when examining in more details Figure 16 that compares the extrapolation methods at selected wavelenghts. This example demonstrate the difficulty to extrapolate EdZ to 0- under clear sky and vertically inhomogenous water column.  This is the reason why multiple C-OPS cast are required in such conditions to end up with good AOPs.  
+
+
+```{r Ed0mvsEd0p, echo=FALSE, fig.cap="Figure 17. Top: relationship between extrapolated irradiance at 0- and the estimated irradiance based on the reference, Ed0*0.957. Bottom: the ratio of extrapolated to estimated Ed at 0- from EdZ and Ed0 respectively.", out.width = '100%'}
+knitr::include_graphics("./extfigures/Ed0m_vs_0.97Ed0p.png")
+```
+
+
+### Step 3 : Compare replicates
+
+Once each profile was processed with appropriate values for the **tiltmax.optics**, **depth.interval.for.smoothing.optics** and **sub.surface.removed.layer.optics**  fields, then we compare all the C-OPS profiles of a given station (remember that we have **one folder per station!!!**). 
+
+Two plots are generated for Rrs and Kd (from the surface layer) with every file set to 1 in the file **select.cops.dat**. These plots are generated by the function `plot.Rrs.Kd.for.station()` after the processing of all cast to process found in each directory. The solid lines are for the LOESS method, while the dashed lines is for the linear extrapolation method. 
+
+For both Kd and Rrs, the difference between the casts are quite significant (Figs. 18 and 19). The variability in Rrs observed at station MAN-F05 presented here is mainly due to the water depth. In fact, the actual depth of the cast 1, 2, 3 and 4 was 6.37, 5.48, 5.08 and 7.5 m. The differenc in depth is consistent with the Rrs values, with higher green reflectance for shallower profiles.  The cast number 4, however, is clearly an outlier in terms of Kd (higher values across the spectrum). It is also lower in term of Rrs (deeper waters). This cast should be discarded for the data base.    
+
+```{r Kd, echo=FALSE, fig.cap="Figure 18. Example of 4 replicates for Kd for the WISE-Man station MAN-F05 visited on 18th Aug. 2019.", out.width = '70%'}
+knitr::include_graphics("./extfigures/Kd_all.png")
+```
+
+
+```{r Rrs, echo=FALSE, fig.cap="Figure 19. Same as 18, but for the remote sensing reflectance.", out.width = '70%'}
+knitr::include_graphics("./extfigures/Rrs_all.png")
+```
+
+In general, there are always more differences in Rrs due to the extrapolation method. In this example, the linear extrapolation yield slightly lower Rrs values at all wavelengths. This is often the case in very absorbing waters as the one observed here. 
+
+For this station we should eliminate the cast number 4 and use the LOESS exprapolation for Rrs to avoid missing values. 
+
+### Step 4: Remove outlier and document the data processing
+
+In the above example, the cast number 4 must be remove for further data processing. Again, we do that by editing the file **select.cops.dat** such as:   
+
+**WISE_MAN_F5_CAST_001_190818_181648_URC.tsv;1;Rrs.0p;NA**
+
+**WISE_MAN_F5_CAST_002_190818_181748_URC.tsv;1;Rrs.0p;NA**
+
+**WISE_MAN_F5_CAST_003_190818_181835_URC.tsv;1;Rrs.0p;NA**
+
+**WISE_MAN_F5_CAST_004_190818_182147_URC.tsv;0;Rrs.0p;NA**
+
+You can also check again the comments logged by the operators on the field. It usually helps to identify the casts that may be better than the others. 
+
+It is also important to document the data processing in a log file. I usualy fill an EXCEL file with the following columns: COPS File name;	Station;	kept;	Processing comments. In the later column I would explain why I did not kept the profile (here the Kd near the surface was very different than the other cast). A note should be taken about the Rrs variability, which can be explain by significant variability in terms of water depth. 
+
+### Step 5 : Instrument self-shading correction 
+
+To complete the data processing, you should consider to correct for the instrument self-shading. This is done by choosing one of the **shadow.correction** method (field number 4 in the **info.cops.dat** file) to use for calculating the water-leaving radiance and the reflectance. As most of our work are in coastal or in-land or Arctic waters, I strongly recommand to set the *shadow.correction* to 0 and provide the total absorption coefficients for all wavelengths in the **absorption.cops.dat** file. The default value is 999, which uses estimations of sub-surface irradiance reflectacce (R) and diffuse attenuation (Kd) to estimate the total absorption [@Morel2001]. Exceptionnaly, if you don't have absorption measurement and you work in oceanic water, you can provided the chlorophyll-a concentration and the Case-1 water bio-optical model of @Morel2001 will be employed. 
+
+Absorption coefficients can be measured using in-water instruments, such as AC-s or a-sphere, or from discrete samples for CDOM and particulate matter using filter pad thecnique.  If in-water coefficients are available, it will be relatively strait forward to edit the  **absorption.cops.dat** file using `compute.aTOT.for.COPS()` function from the `Riops` package. 
+
+If only discrete samples is available, the **absorption.cops.dat** file may be edited using `compute.discrete.aTOT.for.COPS()` function from the `RspectroAbs` package.
+
+The importance of this correction can be visualised in the PDF document in the page showing the various water-leaving radiances and reflectances spectra. The Figure 20 shows a typical Case-2 water case. The correction is relatively important in the NIR and UV bands.    
+
+```{r RrsShadowCorrection, echo=FALSE, fig.cap="Figure 20. Example of Rrs and shadow correction coefficient", out.width = '80%'}
+knitr::include_graphics("./extfigures/Rrs_with_ShadowCorrection.png")
+```
+
+
+### Step 6 : Generate the data base 
+
+Once you have processed all stations individually and discarded the casts you consider of lower quality, then you can easily generate a database. You have to create an ASCII file named **directories.for.cops.dat** in the parent folder of the stations folder, i.e. for example 
+
+**/data/ProjetX/L2/**
+
+and put all the station paths you want to include in the data base. Next you can run the `generate.cops.DB()`. This function compute mean and standard deviation of selected parameters using the profiles that passed the QC (as found in **select.cops.dat** file).  The folowing parameters are computed :
+
+* *Kd1p*:  is the mean spectral diffuse attenuation from the surface to the 1% light level for each wavelength (2 matrices for mean and s.d.)    
+* *Kd10p*:  is the mean spectral diffuse attenuation from the surface to the 10% light level for each wavelength (2 matrices for mean and s.d.) 
+* *Rrs*:  is the mean spectral Remote sensing reflectance (2 matrices for mean and s.d.) 
+* *Ed0.0p*:  is the mean spectral incident irradiance at surface (2 matrices for mean and s.d.) 
+* *Ed0.f*:  is the modeled or measured (with Bioshade) fraction of diffuse skylight to the total downwelling irradiance (matrix) 
+* *Ed0.f.measured*:  is a flag indicating whether *Ed0.f* was measured using the BioShade (=1) or modelled using the Gregg and Carder (1990) model (=0)
+* *date*: is a vector of date in POSIXCT format
+* *lat*: is a vector of latitude 
+* *lon*: is a vector of longitude 
+* *sunzen*: is a vector of solar zenith angle
+* *waves*: is a vector of wavelenghts
+
+
+The object COPS.DB is saved in RData format. The data are also saved in ASCII (.dat with comma separator) and a figure showing the measured Rrs spectra of the data base is produced. 
+
+```{r generatedatabase, eval=FALSE}
+COPS.DB <- generate.cops.DB(path="/data/ProjetX/L2/", 
+                            waves.DB = c(412,443,490,555), 
+                            mission = "MISSION_IMPOSSIBLE")
+```
+
+Note here that the user can select the actual wavelengths to include in the database. In the example above only 4 channels were selected. The default wavelenths are: 320, 330, 340, 380, 412, 443, 465, 490, 510, 532, 555, 589, 625, 665, 683, 694, 710, 780, 865 nm.
+
+## Data format
+
+The /BIN folders contain the binary data stored in the RData format.  These files contain list of variables named *cops*. All the information for a given cast, including the raw data, is stored in this data structure (i.e. an R `list`). This is very easy in R to deal with this type of data. The example below contains as much as 112 variables, including processing parameters, raw data, fitted data and so on.   
+
+```{r}
+load("~/OneDrive - UQAR/data/WISEMan/L2/20190818_StationMAN-F05/COPS_BU/BIN/WISE_MAN_F5_CAST_003_190818_181835_URC.tsv.RData")
+str(cops)
+```
+
+
+## Bioshade processing
+
+C-OPS system can include a so called **Bioshade**. Bioshade allows the estimation the fraction of diffuse skylight to the total downwelling irradiance, as explain in @Belanger2017.  The BioSHADE system is fitted to the reference Ed0 radiometer. Briefly, the BioSHADE is a motor that moves a black aluminum band (shadowband) 1.5 mm thick and  2.5 cm wide back and forth above the Ed0 sensor. Under clear sky conditions, when the shadowband completely blocks direct sun at time t_shadow}, the radiometer measures the diffuse skylight (minus a part of the sky that is also blocked by the shadowband), Ed0_diff. When the shadowband is horizontal, the sensor measures the global solar irradiance. So to assess the global solar irradiance at the time t_shadow, we interpolate Ed0 just before and after the shadowband started to shade the sensor. This allows to approximate the fraction of diffuse skylight to the total downwelling irradiance as : 
+
+*f = Ed0_diff/Ed0+*
+
+Because part of the sky is also blocked by the shadowband at t_shadow, f will be slightly underestimated. This underestimation will have negligible impact on the calculations of the shading error when the sun zenith angle is around 35 degrees, which is close to most conditions encountered.   
+
+To activate the Bioshade processing, we have to edit **select.cops.dat** file and change the integer to 2. For example: 
+
+IML4_150630_1339_C_data_005.csv;**2**;Rrs.0p.linear;NA
+
+As for the other files, the *time.window* field must be edited in the **info.cops.dat** but the other parameters will be ignored during the processing. Here is an example of the PDF file produced by a bioshade processing. The figure 21 shows that the BioShade was activated during the recovering of the profiler. In fact, the profiler was at 30 meters depth when the acquisition was started. 
+
+
+```{r BioShadeTime, echo=FALSE, fig.cap="Figure 21. Example of depth versus time for a BioShade measurements", out.width = '80%'}
+knitr::include_graphics("./extfigures/BioShade_time.png")
+```
+
+The figure 22 shows the Bioshade position as a function of time, which a relative unit. The shadowband is horizontal, i.e. not shading the sensor, when it is <5000 or >25000. So here the shadowband a round-trip, passing twice above the sensor. The red points will be used to interpolate Ed0 just before and after the shadowband started to shade the sensor.
+
+```{r BioShadePos, echo=FALSE, fig.cap="Figure 22. Example of Bioshade position versus time", out.width = '80%'}
+knitr::include_graphics("./extfigures/BioShadePos.png")
+```
+
+The figure 23 shows the Ed0 as a function of time. The solid lines are the interpolated data use to assess the global irradiance when the shadowband passed in front the sun, which occured at about 68 and 110 seconds atfer the begining of the data acquisition.   
+
+```{r BioShadeEdvsTime, echo=FALSE, fig.cap="Figure 23. Example of downwelling irradiance measured during a Bioshade measurement", out.width = '80%'}
+knitr::include_graphics("./extfigures/BioShade_Ed_vs_time.png")
+```
+
+In this example is was a clear sky. The fraction of diffuse skylight to the total downwelling irradiance (green curve) increases exponentially from the NIR (<10%) to the UV (~50%) (Fig. 24). 
+
+```{r BioShadeEdf, echo=FALSE, fig.cap="Figure 24. Example of total (black), direct (red) and diffuse (blue) downwelling irradiance assessed using the Bioshade measurements", out.width = '80%'}
+knitr::include_graphics("./extfigures/BioShade_Ed0.png")
+```
+
+
+The RData structure saved for a Bioshade file is shown below.  
+
+```{r, eval=TRUE}
+load("./extdata/IML4_150630_1339_C_data_005.csv.RData")
+str(cops)
+```
+
+## IcePro processing or under-ice data processing
+
+C-OPS have been deployed under-ice in the Arctic using a special configuration name IcePro. In these conditions, the extrapolation of the radiometric quantity to the air-water interface does not make sense. We can disable the surface extrapolation in the **select.cops.dat** file, by putting a value of 3 in the second column, after the file name. No extrapolation to the air-sea interface is performed and sub-surface AOP (nLw, Lw, Rrs, etc) are not calculated.
+
+## Contact point
+
+I also encourage any user to watch of the package update and report bugs or requests on github. For more information or to report any bugs, please contact Simon Bélanger at simon_belanger@uqar.ca.  
+
+
 
 
 

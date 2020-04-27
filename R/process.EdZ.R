@@ -10,7 +10,7 @@ process.EdZ <- function(cops.raw,
 	correction <- cops.Ed0$Ed0.correction
 	aop <- aop * correction
 	waves <- as.numeric(cops.raw$EdZ.waves)
-	Depth <- cops.dd$Depth
+	Depth <- cops.dd$Depth + delta.capteur.optics["EdZ"]
 	depth.fitted <- cops.dd$depth.fitted
 	if(!is.null(cops.dd[["EdZ.tilt"]])) {
 		tilt <- cops.dd[["EdZ.tilt"]]
@@ -24,13 +24,14 @@ process.EdZ <- function(cops.raw,
 
 # tilt limitation
 	valid.tilt <- tilt < tiltmax.optics["EdZ"]
+	aop.all <- aop[cops.dd$Depth.good & valid.tilt,] # make a backup
+	Depth.all <- Depth[cops.dd$Depth.good & valid.tilt]
 	Depth.kept <- cops.dd$Depth.good & valid.tilt & Depth > sub.surface.removed.layer.optics["EdZ"]
-	Depth <- Depth[Depth.kept] + delta.capteur.optics["EdZ"]
+	Depth <- Depth[Depth.kept]
 	tilt <- tilt[Depth.kept]
 	aop <- aop[Depth.kept, ]
 
 	##### Remove radiometric measurement below the detection limit
-	aop.all <- aop  # make a backup
 	aop.all[aop.all < 0] <-0
 	for (w in 1:19) {
 	  aop[aop[,w] <= EdZ.detect.lim[w],w] <- NA
@@ -61,8 +62,8 @@ process.EdZ <- function(cops.raw,
 	  print(paste("Clean AOP for EdZ ", waves[w]))
 	  if (!all(is.na(aop.fitted[,w]))) { # if all NA, then the AOPs allready equal to NA
 	    # Apply a spline on raw data for further flaging on the AOP
-	    tmp = smooth.spline(Depth, aop.all[,w])$y
-	    aop.spline = spline(Depth, tmp,
+	    tmp = smooth.spline(Depth.all, aop.all[,w])$y
+	    aop.spline = spline(Depth.all, tmp,
 	                        xout = depth.fitted, method = 'natural')$y
 	    # remove bad data
 	    KZ.fitted[(aop.fitted[(2:n.fitted),w] <= EdZ.detect.lim[w] |
@@ -112,7 +113,7 @@ process.EdZ <- function(cops.raw,
 # PLOT
 	aop.cols <- rainbow.modified(length(waves))
 	if(INTERACTIVE) x11(width = win.width, height = win.height)
-  matplot(aop.all, Depth, type = "p", log = "x",
+  matplot(aop.all, Depth.all, type = "p", log = "x",
           ylim = rev(range(c(0, Depth))),
           xlim=c(min(EdZ.detect.lim),max(aop, na.rm=T)), pch = ".", cex = 1,
           ylab="Depth (m)",
@@ -134,7 +135,7 @@ process.EdZ <- function(cops.raw,
 	mgp.old2 <- par("mgp")
 	for(i in 1:length(waves)) {
 	  if (length(which(!is.na(aop[,i]))) > 0) {
-	    plot(aop.all[, i], Depth, type = "p", log = "x",
+	    plot(aop.all[, i], Depth.all, type = "p", log = "x",
 	         xlim = range(aop[aop[, i] > 0, i], na.rm = TRUE),
 	         ylim = rev(range(Depth, depth.fitted)),
 	         pch = ".",
@@ -165,12 +166,12 @@ process.EdZ <- function(cops.raw,
 	mgp.old2 <- par("mgp")
 	for(i in 1:length(waves)) {
 	  if (length(which(!is.na(aop[,i]))) > 0) {
-	    plot(aop.all[, i], Depth, type = "p", log = "x",
+	    plot(aop.all[, i], Depth.all, type = "p", log = "x",
 	         xlim = range(aop[, i], aop.0[i], na.rm = TRUE),
 	         ylim = c(max(Z.interval,na.rm = T)+0.5,0),
 	         pch = ".", xlab = "", ylab = "",
 	         axes = FALSE, frame.plot = TRUE,
-	         main = substitute(E[d]*z~x~"("*mu*W.*cm^{-2}*.nm^{-1}*")"~r^2==r.2,list(x = waves[i], r.2=signif(r2[i],3))))
+	         main = substitute(E[d]*z~x~r^2==r.2,list(x = waves[i], r.2=signif(r2[i],3))))
 	    grid(col = 1)
 	    lines(aop.fitted[, i], depth.fitted, col = "red")
 	    points(aop.0[i], depth.0, pch = 1, cex=1.5, col = "red")
@@ -204,7 +205,7 @@ process.EdZ <- function(cops.raw,
 	} else ix.w <- 1:19
 	for(i in floor(seq(ix.w[1], ix.w[length(ix.w)], length.out = 4))) {
 	  if (length(which(!is.na(aop[,i]))) > 0) {
-	    plot(aop.all[, i], Depth, type = "p", log = "x",
+	    plot(aop.all[, i], Depth.all, type = "p", log = "x",
 	         xlim = range(aop[, i], aop.0[i], na.rm = TRUE),
 	         ylim = c(max(Z.interval,na.rm = T)+0.5,0),
 	         pch = 19, xlab = "", ylab = "",
@@ -283,8 +284,7 @@ process.EdZ <- function(cops.raw,
          xlab = "Wavelength(nm)",
          ylab = "Ratio of extrapolated to calculated Ed(0-)",
          pch=19,col="black",
-         ylim= c(min(c(Ed0.ratio,Ed0.ratio.linear), na.rm=T)-0.05,
-                 max(c(Ed0.ratio,Ed0.ratio.linear), na.rm=T)+0.05))
+         ylim= c(0.6,1.4))
     abline(h=1.0, col="black")
     abline(h=c(0.9,1.1), col="black")
     abline(h=c(0.95,1.05), col="red")

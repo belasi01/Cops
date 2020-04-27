@@ -10,7 +10,7 @@ process.LuZ <- function(cops.raw,
 	correction <- cops.Ed0$Ed0.correction
 	aop <- aop * correction
 	waves <- as.numeric(cops.raw$LuZ.waves)
-	Depth <- cops.dd$Depth
+	Depth <- cops.dd$Depth + delta.capteur.optics["LuZ"]
 	depth.fitted <- cops.dd$depth.fitted
 	if(!is.null(cops.dd[["LuZ.tilt"]]) && is.null(cops.dd[["EdZ.tilt"]])) {
 		tilt <- cops.dd[["LuZ.tilt"]]
@@ -30,7 +30,7 @@ process.LuZ <- function(cops.raw,
 	valid.tilt <- tilt < tiltmax.optics["LuZ"]
 	Depth.kept <- cops.dd$Depth.good & valid.tilt & Depth > sub.surface.removed.layer.optics["LuZ"]
 	aop <- aop[Depth.kept, ]
-	Depth <- Depth[Depth.kept] + delta.capteur.optics["LuZ"]
+	Depth <- Depth[Depth.kept]
 	tilt <- tilt[Depth.kept]
 
 	##### Remove radiometric measurement below the detection limit
@@ -177,7 +177,7 @@ process.LuZ <- function(cops.raw,
 	         ylim = c(max(Z.interval,na.rm = T)+0.5,0),
 	         pch = ".", xlab = "", ylab = "",
 	         axes = FALSE, frame.plot = TRUE,
-	         main = substitute(L[u]*z~x~"("*mu*W.*cm^{-2}*.nm^{-1}*.sr^{-1}*")"~r^2==r.2,list(x = waves[i], r.2=signif(r2[i],3))))
+	         main = substitute(L[u]*z~x~r^2==r.2,list(x = waves[i], r.2=signif(r2[i],3))))
 	    grid(col = 1)
 	    lines(aop.fitted[, i], depth.fitted, col = "red")
 	    points(aop.0[i], depth.0, pch = 1, cex=1.5, col = "red")

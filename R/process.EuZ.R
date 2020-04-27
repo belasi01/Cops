@@ -10,7 +10,7 @@ process.EuZ <- function(cops.raw,
 	correction <- cops.Ed0$Ed0.correction
 	aop <- aop * correction
 	waves <- as.numeric(cops.raw$EuZ.waves)
-	Depth <- cops.dd$Depth
+	Depth <- cops.dd$Depth + delta.capteur.optics["EuZ"]
 	depth.fitted <- cops.dd$depth.fitted
 	if(!is.null(cops.dd[["EuZ.tilt"]]) && is.null(cops.dd[["EdZ.tilt"]])) {
 		tilt <- cops.dd[["EuZ.tilt"]]
@@ -25,7 +25,7 @@ process.EuZ <- function(cops.raw,
 # tilt limitation
 	valid.tilt <- tilt < tiltmax.optics["EuZ"]
 	Depth.kept <- cops.dd$Depth.good & valid.tilt & Depth > sub.surface.removed.layer.optics["EuZ"]
-	Depth <- Depth[Depth.kept] + delta.capteur.optics["EuZ"]
+	Depth <- Depth[Depth.kept]
 	tilt <- tilt[Depth.kept]
 	aop <- aop[Depth.kept, ]
 
@@ -175,7 +175,7 @@ process.EuZ <- function(cops.raw,
 	         ylim = c(max(Z.interval,na.rm = T)+0.5,0),
 	         pch = ".", xlab = "", ylab = "",
 	         axes = FALSE, frame.plot = TRUE,
-	         main = substitute(E[u]*z~x~"("*mu*W.*cm^{-2}*.nm^{-1}*")"~r^2==r.2,list(x = waves[i], r.2=signif(r2[i],3))))
+	         main = substitute(E[u]*z~x~r^2==r.2,list(x = waves[i], r.2=signif(r2[i],3))))
 	    grid(col = 1)
 	    lines(aop.fitted[, i], depth.fitted, col = "red")
 	    points(aop.0[i], depth.0, pch = 1, cex=1.5, col = "red")

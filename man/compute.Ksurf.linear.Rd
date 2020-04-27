@@ -23,12 +23,15 @@ after filtration for high instrument tilt.}
 \item{r2.threshold}{is the minimum R^2 require to accept the fit
 (Default is 0.80)}
 
+\item{instrument}{is the instrument type, "EdZ", "EuZ" or "LuZ"}
+
 \item{delta.depth}{is the depth interval toletared between the
 first and the last depth condidered for the surface.
 The Default is 2.5 meters. So if the very first measurement is
 at 0.5 m, the "surface" layer is considered as 0.5 to 3 meters depth.
 But this is the maximum layer considered.
-The minimum layer is fixed at 0.30 m.}
+The minimum layer is fixed at 0.30 m, so in this example it would be from
+0.5 to 0.8 m.}
 }
 \value{
 A list of list of 5 vectors of 19 values (one per wavelenght):
