@@ -78,8 +78,7 @@ plot.Rrs.Kd.for.station <- function(path="./", depthEdZ = NA) {
   ix.depth <- rep(NA,19)
   K0.EdZ.fitted <- rep(NA, 19)
   if (is.na(depthEdZ)) {
-    if ( all(is.na(cops$EdZ.Z.interval))) {
-      print("No valid linear fit; plot Depth integrated K for the top 2.5m")
+    if (anyNA(cops$EdZ.Z.interval[ix.waves])) {
       ix.2.5 <- which.min(abs(cops$depth.fitted - 2.5))
       K0.EdZ.fitted = cops$K0.EdZ.fitted[ix.2.5,]
     } else {
@@ -107,8 +106,8 @@ plot.Rrs.Kd.for.station <- function(path="./", depthEdZ = NA) {
   for (i in 1:nf){
     load(paste(listfile[i], ".RData", sep=""))
     K0.EdZ.fitted <- rep(NA, 19)
-    if (all(is.na(cops$EdZ.Z.interval))) {
-      print("No valid linear fit; plot Depth integrated K for the top 2.5m")
+    if (anyNA(cops$EdZ.Z.interval[ix.waves])) {
+      print("Some invalid linear fit; plot Depth integrated K for the top 2.5m")
       ix.2.5 <- which.min(abs(cops$depth.fitted - 2.5))
       K0.EdZ.fitted = cops$K0.EdZ.fitted[ix.2.5,]
     } else {
@@ -132,8 +131,7 @@ plot.Rrs.Kd.for.station <- function(path="./", depthEdZ = NA) {
   ix.depth <- rep(NA,19)
   K0.EdZ.fitted <- rep(NA, 19)
   if (is.na(depthEdZ)) {
-    if ( all(is.na(cops$EdZ.Z.interval))) {
-      print("No valid linear fit; plot Depth integrated K for the top 2.5m")
+    if (anyNA(cops$EdZ.Z.interval[ix.waves])) {
       ix.2.5 <- which.min(abs(cops$depth.fitted - 2.5))
       K0.EdZ.fitted = cops$K0.EdZ.fitted[ix.2.5,]
     } else {
@@ -157,7 +155,7 @@ plot.Rrs.Kd.for.station <- function(path="./", depthEdZ = NA) {
   for (i in 1:nf){
     load(paste(listfile[i], ".RData", sep=""))
     K0.EdZ.fitted <- rep(NA, 19)
-    if (all(is.na(cops$EdZ.Z.interval))) {
+    if (anyNA(cops$EdZ.Z.interval[ix.waves])) {
       ix.2.5 <- which.min(abs(cops$depth.fitted - 2.5))
       K0.EdZ.fitted = cops$K0.EdZ.fitted[ix.2.5,]
     } else {

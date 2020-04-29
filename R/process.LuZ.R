@@ -28,13 +28,14 @@ process.LuZ <- function(cops.raw,
 
 # tilt limitation
 	valid.tilt <- tilt < tiltmax.optics["LuZ"]
+	aop.all <- aop[cops.dd$Depth.good & valid.tilt,] # make a backup
+	Depth.all <- Depth[cops.dd$Depth.good & valid.tilt]
 	Depth.kept <- cops.dd$Depth.good & valid.tilt & Depth > sub.surface.removed.layer.optics["LuZ"]
-	aop <- aop[Depth.kept, ]
 	Depth <- Depth[Depth.kept]
 	tilt <- tilt[Depth.kept]
+	aop <- aop[Depth.kept, ]
 
 	##### Remove radiometric measurement below the detection limit
-	aop.all <- aop
 	aop.all[aop.all < 0] <-0
 	for (w in 1:19) {
 	  aop[aop[,w] <= LuZ.detect.lim[w],w] <- NA
@@ -65,9 +66,8 @@ process.LuZ <- function(cops.raw,
 	  print(paste("Clean AOP for LuZ ", waves[w]))
 	  if (!all(is.na(aop.fitted[,w]))) { # if all NA, then the AOPs all ready equal to NA
 	    # Apply a spline on raw data for further flaging on the AOP
-	    tmp = smooth.spline(Depth, aop.all[,w])$y
-	    aop.spline = spline(Depth, tmp,
-	                        xout = depth.fitted, method = 'natural')$y
+	    tmp = smooth.spline(Depth.all, aop.all[,w])
+	    aop.spline = spline(tmp, xout = depth.fitted, method = 'natural')$y
 	    # remove bad data
 	    KZ.fitted[(aop.fitted[(2:n.fitted),w] <= LuZ.detect.lim[w] |
 	               aop.spline[2:n.fitted]     <= LuZ.detect.lim[w]&
@@ -113,7 +113,7 @@ process.LuZ <- function(cops.raw,
 
 	aop.cols <- rainbow.modified(length(waves))
 	if(INTERACTIVE) x11(width = win.width, height = win.height)
-	matplot(aop.all, Depth, type = "p", log = "x",
+	matplot(aop.all, Depth.all, type = "p", log = "x",
           ylim = c(max(Z.interval,na.rm = T)+1,0),
 	        xlim=c(min(LuZ.detect.lim),max(aop, na.rm=T)), pch = ".", cex = 1,
 	        ylab="Depth (m)",
@@ -141,7 +141,7 @@ process.LuZ <- function(cops.raw,
 	mgp.old2 <- par("mgp")
 	for(i in 1:length(waves)) {
 	  if (length(which(!is.na(aop[,i]))) > 0) {
-	    plot(aop.all[, i], Depth, type = "p", log = "x",
+	    plot(aop.all[, i], Depth.all, type = "p", log = "x",
 	         xlim = range(aop[aop[, i] > 0, i], na.rm = TRUE),
 	         ylim = rev(range(Depth, depth.fitted)),
 	         pch = ".",
@@ -172,7 +172,7 @@ process.LuZ <- function(cops.raw,
 	mgp.old2 <- par("mgp")
 	for(i in 1:length(waves)) {
 	  if (length(which(!is.na(aop[,i]))) > 0) {
-	    plot(aop.all[, i], Depth, type = "p", log = "x",
+	    plot(aop.all[, i], Depth.all, type = "p", log = "x",
 	         xlim = range(aop[, i], aop.0[i], na.rm = TRUE),
 	         ylim = c(max(Z.interval,na.rm = T)+0.5,0),
 	         pch = ".", xlab = "", ylab = "",
@@ -211,7 +211,7 @@ process.LuZ <- function(cops.raw,
 	} else ix.w <- 1:19
 	for(i in floor(seq(ix.w[1], ix.w[length(ix.w)], length.out = 4))) {
 	  if (length(which(!is.na(aop[,i]))) > 0) {
-	    plot(aop.all[, i], Depth, type = "p", log = "x",
+	    plot(aop.all[, i], Depth.all, type = "p", log = "x",
 	         xlim = range(aop[, i], aop.0[i], na.rm = TRUE),
 	         ylim = c(max(Z.interval,na.rm = T)+0.5,0),
 	         pch = 19, xlab = "", ylab = "",
