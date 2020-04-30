@@ -4,8 +4,10 @@ fit.with.loess <- function(waves, Depth, aop, span, depth.fitted,
                            DEPTH.SPAN = FALSE,
                            minimum.obs = 3) {
 	#browser()
-  aop.fitted <- array(NA, dim = c(length(depth.fitted), ncol(aop)), dimnames = list(depth.fitted, colnames(aop)))
-	aop.0 <- vector(mode = "numeric", length = ncol(aop))
+  aop.fitted <- array(NA, dim = c(length(depth.fitted), ncol(aop)),
+                             dimnames = list(depth.fitted, colnames(aop)))
+  aop.0 <- vector(mode = "numeric", length = ncol(aop))
+
 	for (i in 1:length(waves)) {
 		if(span.wave.correction) {
 			span.w.corr <- min(650 / waves[i], 1)
