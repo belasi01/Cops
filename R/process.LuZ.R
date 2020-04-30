@@ -6,6 +6,9 @@ process.LuZ <- function(cops.raw,
 
 	mymessage(paste("Processing LuZ", " ..."), head = "+")
 
+  temperature <-cops.raw$LuZ.anc$Temp
+  temperature.depth <-cops.raw$LuZ.anc$Depth
+
 	aop <- cops.raw$LuZ
 	correction <- cops.Ed0$Ed0.correction
 	aop <- aop * correction
@@ -106,6 +109,12 @@ process.LuZ <- function(cops.raw,
 	      LuZ.fitted[idx.depth.0:n.fitted,i] <- K$X.0m[i] * exp(-depth.fitted[idx.depth.0:n.fitted]*K.surf[i])
 	    }
 	  }
+
+# Fit temperature profile
+  actual.span=min(1,1/diff(range(temperature.depth)))
+	fit.func <- loess(temperature ~ temperature.depth, span = actual.span,
+	                    control = loess.control(surface = "direct"))
+	temperature.fitted <- predict(fit.func, depth.fitted[idx.depth.0:n.fitted])
 
 # PLOT
 	PLOT.LINEAR <- !all(is.na(LuZ.0m.linear))
@@ -258,7 +267,16 @@ process.LuZ <- function(cops.raw,
 	legend(par("usr")[1], par("usr")[4], legend = waves, xjust = 0, yjust = 0, lty = 1, lwd = 2, col = aop.cols, ncol = ceiling(length(waves) / 2), cex = 0.75)
 	par(xpd = FALSE)
 
+	if(INTERACTIVE) x11(width = win.width, height = win.height)
+	plot(temperature, temperature.depth, type = "p", pch=19, cex=0.8,
+	        lty = 1, ylim = rev(range(temperature.depth)),
+	        xlab = "Temperature (Degree)",
+	        ylab = "Depth (m)",
+	     main="Water Temperature profile from LuZ sensor")
+	lines(temperature.fitted, depth.fitted, col = 2, lwd=2)
+
 	if (!PLOT.LINEAR) Z.interval <-NA
+
 	return(list(
 		LuZ.fitted = aop.fitted,
 		KZ.LuZ.fitted = KZ.fitted,
@@ -270,6 +288,7 @@ process.LuZ <- function(cops.raw,
 		LuZ.0m.linear = LuZ.0m.linear,
 		LuZ.linear.r2 = r2,
 		LuZ.KolmolSmirnov.p.value = KolmolSmirnov.p.value,
-		LuZ.detection.limit = LuZ.detect.lim
+		LuZ.detection.limit = LuZ.detect.lim,
+		LuZ.temperature.fitted = temperature.fitted
 	))
 }

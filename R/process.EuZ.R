@@ -6,6 +6,9 @@ process.EuZ <- function(cops.raw,
 
 	mymessage(paste("Processing EuZ", " ..."), head = "+")
 
+  temperature <-cops.raw$EuZ.anc$Temp
+  temperature.depth <-cops.raw$EuZ.anc$Depth
+
 	aop <- cops.raw$EuZ
 	correction <- cops.Ed0$Ed0.correction
 	aop <- aop * correction
@@ -105,6 +108,12 @@ process.EuZ <- function(cops.raw,
 	# Compute PAR at depth
 	PAR <- compute.PARz(depth.fitted, waves, aop.fitted, aop.0,
 	                    f.PAR=c(0.01, 0.05))
+
+	# Fit temperature profile
+	actual.span=min(1,1/diff(range(temperature.depth)))
+	fit.func <- loess(temperature ~ temperature.depth, span = actual.span,
+	                  control = loess.control(surface = "direct"))
+	temperature.fitted <- predict(fit.func, depth.fitted[idx.depth.0:n.fitted])
 
 # PLOT
 	PLOT.LINEAR <- !all(is.na(EuZ.0m.linear))
@@ -258,7 +267,16 @@ process.EuZ <- function(cops.raw,
 	legend(par("usr")[1], par("usr")[4], legend = waves, xjust = 0, yjust = 0, lty = 1, lwd = 2, col = aop.cols, ncol = ceiling(length(waves) / 2), cex = 0.75)
 	par(xpd = FALSE)
 
+	if(INTERACTIVE) x11(width = win.width, height = win.height)
+	plot(temperature, temperature.depth, type = "p", pch=19, cex=0.8,
+	     lty = 1, ylim = rev(range(temperature.depth)),
+	     xlab = "Temperature (Degree)",
+	     ylab = "Depth (m)",
+	     main="Water Temperature profile from EuZ sensor")
+	lines(temperature.fitted, depth.fitted, col = 2, lwd=2)
+
 	if (!PLOT.LINEAR) Z.interval <-NA
+
 	return(list(
 		EuZ.fitted = aop.fitted,
 		KZ.EuZ.fitted = KZ.fitted,
@@ -273,7 +291,8 @@ process.EuZ <- function(cops.raw,
 		EuZ.detection.limit = EuZ.detect.lim,
 		z.f.PARu       = PAR$z.f.PAR,
 		PARu.z         = PAR$PAR.z,
-		PARu.at.z      = PAR$PAR.at.z
+		PARu.at.z      = PAR$PAR.at.z,
+		EuZ.temperature.fitted = temperature.fitted
 
 	))
 }
