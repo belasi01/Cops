@@ -138,6 +138,13 @@ str(absorption.tab)
         EXTRAPOLATION.0m = TRUE
       }
 
+      if (select.tab[experiment,4] == "1" ) {
+        print("Shallow water. Profile finished just above the bottom")
+        SHALLOW = TRUE
+      } else {
+        SHALLOW = FALSE
+      }
+
       # initialization
       cops.init <- cops.init00
       # line of info.file.dat
@@ -234,6 +241,7 @@ str(absorption.tab)
       cops.info <- list(file = cops.file,
                         chl = chl,
                         EXTRAPOLATION.0m = EXTRAPOLATION.0m,
+                        SHALLOW = SHALLOW,
                         SHADOW.CORRECTION = SHADOW.CORRECTION,
                         absorption.waves = absorption.waves,
                         absorption.values = absorption.values,
@@ -356,8 +364,16 @@ str(absorption.tab)
       cops.aops <- compute.aops(cops)
       if(verbose) str(cops.aops)
 
-      # ADD cops.aops TO THE FINAL list
+      # ADD cops.aops to the list
       cops <- c(cops, cops.aops)
+
+      #  Compute bottom properties if SHALLOW
+      if (SHALLOW) {
+          cops.shallow <- compute.bottom(cops)
+          cops <- c(cops, cops.shallow)
+      }
+
+
       cops$absorption.values <- cops.aops$absorption.values
       #if(verbose) str(cops)
 

@@ -4,12 +4,7 @@
 \alias{generate.cops.DB}
 \title{Generate an AOPs data base derived from COPS light profiles for a list of directories}
 \usage{
-generate.cops.DB(
-  path = "./",
-  waves.DB = c(320, 330, 340, 380, 412, 443, 465, 490, 510, 532, 555, 589, 625, 665,
-    683, 694, 710, 780, 875),
-  mission = "XXX"
-)
+generate.cops.DB(path = "./", mission = "XXX")
 }
 \arguments{
 \item{path}{is the path where the file directories.for.cops.dat containing the data folders
@@ -23,8 +18,9 @@ waves.DB=c(305, 320, 330, 340,380, 412, 443, 465,490, 510, 532, 555,589, 625, 66
 \value{
 It returns a list object named COPS.DB containing matrices of
 mean and standard deviation
-of Kd1p, Kd10p, Rrs, Ed0.0p,  Ed0.f and vectors for
-date, lat, lon sunzen and waves
+of Kd1p, Kd10p, Kdpd, Rrs, Ed0.0p,  Ed0.f.diff
+and vectors for
+stationID, date, lat, lon sunzen and waves
 
 The object COPS.DB is saved in RData format. The data are also saved in ASCII (.dat with comma separator)
 and a figure showing the measured rho_w spectra of the data base is produced.
