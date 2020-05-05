@@ -32,7 +32,7 @@ process.cops <- function(dirdat, ASCII=FALSE, CLEAN.FILES=FALSE) {
 	info.file <- paste(dirdat, "info.cops.dat", sep = "/")
 	if(!file.exists(info.file)) {
 		file.copy(from = header.info.file, to = info.file)
-		files.in.dirdat <- list.files(dirdat)
+		files.in.dirdat <- list.files(dirdat, pattern = "URC")
 		files.in.dirdat <- files.in.dirdat[! files.in.dirdat %in% c("init.cops.dat", "info.cops.dat")]
 		lines.in.info.file <- paste(files.in.dirdat, "NA", "NA", "999", "x", "x", "x","x", sep = ";")
 		write(file = info.file, lines.in.info.file, append = TRUE, ncolumns = 1)
