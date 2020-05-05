@@ -27,8 +27,11 @@ process.Ed0 <- function(cops.raw, cops.dd, cops.black) {
 	tilt <- tilt[Depth.kept]
 
 # METHOD loess to fit this aop
-	span <- time.interval.for.smoothing.optics["Ed0"] / cops.dd$cops.duration.secs
-	fitted <- fit.with.loess(waves, Depth, aop, span, depth.fitted, span.wave.correction = FALSE)
+	span <- depth.interval.for.smoothing.optics["Ed0"]
+	fitted <- fit.with.loess(waves, Depth, aop, span,
+	                         depth.fitted,
+	                         span.wave.correction = FALSE,
+	                         DEPTH.SPAN=TRUE)
 	aop.fitted <- fitted$aop.fitted
 	aop.0 <- fitted$aop.0
 	E0d.correction <- t(aop.0 / t(aop.raw))
@@ -45,7 +48,10 @@ process.Ed0 <- function(cops.raw, cops.dd, cops.black) {
 
 	aop.cols <- rainbow.modified(length(waves))
 	if(INTERACTIVE) x11(width = win.width, height = win.height)
-	matplot(aop, Depth, type = "p", ylim = rev(range(Depth)), pch = ".", cex = 1, xlab = "Ed0", col = aop.cols)
+	matplot(aop, Depth, type = "p", ylim = rev(range(Depth)),
+	        pch = ".", cex = 1,
+	        ylab="Depth (m)",
+	        xlab = expression(E[surface]* ~~ "("*mu*W.*cm^{-2}*.nm^{-1}*")"), col = aop.cols)
 	grid(col = 1)
 	matplot(aop.fitted, depth.fitted, type = "l", lty = 1, lwd = 2, add = TRUE, col = aop.cols)
 	points(aop.0, rep(0, length(aop.0)), col = aop.cols, pch = 20, cex = 2)

@@ -5,29 +5,43 @@
 \title{Compute PAR at depth from surface irradiance (Ed0+) and profile of
 downwelling irradiance (EdZ)}
 \usage{
-compute.PARz(Depth, waves, Edz, Ed.0, f.PAR = c(0.001, 0.01, 0.1, 0.5),
-  z.fixed = c(5, 10, 20, 30, 40))
+compute.PARz(
+  Depth,
+  waves,
+  Edz,
+  Ed.0,
+  f.PAR = c(0.001, 0.01, 0.1, 0.5),
+  z.fixed = c(5, 10, 20, 30, 40)
+)
 }
-\description{
-@param Depth is a vector of depth corresponding to the EdZ measurements
-@param waves is a vector of wavelength of EdZ and Ed0+
-@param Edz is a matrix of EdZ (col=waves; row=Depth) after nomalization to Ed.0 variation
-@param Ed.0 is a is a vector surface irradiance
-@param f.PAR is a vector of numeric values corresponting to light fraction.
+\arguments{
+\item{Depth}{is a vector of depth corresponding to the EdZ measurements}
+
+\item{waves}{is a vector of wavelength of EdZ and Ed0+}
+
+\item{Edz}{is a matrix of EdZ (col=waves; row=Depth) after nomalization to Ed.0 variation}
+
+\item{Ed.0}{is a is a vector surface irradiance}
+
+\item{f.PAR}{is a vector of numeric values corresponting to light fraction.
 The depth (in m) of each light fraction will be computed.
-Default is f.PAR=c(0.001, 0.01, 0.1,0.5)
-@param z.fixed  is a vector of numeric values corresponting to depth at which light fraction will be calculated.
-Default is z.fixed=c(5,10,20,30,40)
+Default is f.PAR=c(0.001, 0.01, 0.1,0.5)}
+
+\item{z.fixed}{is a vector of numeric values corresponting to depth at which light fraction will be calculated.
+Default is z.fixed=c(5,10,20,30,40)}
 }
-\details{
-@return The program will return three vectors for
+\value{
+The program will return three vectors for
 \enumerate{
 \item the depth of each PAR fraction requested (z.f.PAR);
 \item the fraction of PAR at the depth requested (PAR.at.z);
-\item the vector of PAR at all depth Z (PAR.z)
+\item the vector of PAR at all depth Z (PAR.z) in micro mol photon / m^2
 }
-
-@author Simon Bélanger
-
-@export
+}
+\description{
+Compute PAR at depth from surface irradiance (Ed0+) and profile of
+downwelling irradiance (EdZ)
+}
+\author{
+Simon Belanger
 }

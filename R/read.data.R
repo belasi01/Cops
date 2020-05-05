@@ -5,6 +5,16 @@ file.parts <- unlist(strsplit(file, "_"))
 		cat(file, "does not exists\n")
 		stop()
 	}
+
+	if (str_detect(file, "_SB_")) {
+	  print("Shadow band file format detected")
+	  print("Change the init parameters")
+	  number.of.fields.before.date.tmp <- number.of.fields.before.date
+	  number.of.fields.before.date <- number.of.fields.before.date - 1
+	  instruments.optics.tmp <- instruments.optics
+	  instruments.optics <- "Ed0"
+	}
+
 	dte <- file.parts[number.of.fields.before.date + 1]
 	tim <- file.parts[number.of.fields.before.date + 2]
 
@@ -17,7 +27,7 @@ file.parts <- unlist(strsplit(file, "_"))
 	dte <- as.POSIXct(strptime(paste(y, m, d, H, M, sep = ""), format = "%y%m%d%H%M"))
 	tim <- as.numeric(H) + as.numeric(M) / 60
 
-	# Modified by Simon Bélanger on Aug 2016 to process COPS data obtained with uprofile 1.9.10 and after
+	# Modified by Simon Belanger on Aug 2016 to process COPS data obtained with uprofile 1.9.10 and after
 	# These files end by URC.csv or URC.tsv"
 	if (str_detect(file, "URC.")) {
 	  print("COPS data acquisition using uProfile 1.9.10 or later")
@@ -36,9 +46,40 @@ file.parts <- unlist(strsplit(file, "_"))
 	# Added by Simon
 	index_ext = length(unlist(strsplit(file.c, "[.]")))	# for station names with periods, ex. G604.5
 	ext = unlist(strsplit(file.c, "[.]"))[index_ext]
+
 	if (ext == "tsv" || ext =="txt") {
-	  x = read.table(file = file.c, header = TRUE, as.is = TRUE, sep = "\t", check.names = FALSE)
-	} else{ x = read.table(file = file.c, header = TRUE, as.is = TRUE, sep = ",", check.names = FALSE)}
+	  # Added by Simon Bélanger in 2019 to check if the file begin with a Header
+	  id = file(file.c, "r")
+	  line = readLines(con=id, n =1) # Reads the first header line
+	  if (line== "Start of Header") {
+	    print("The File contains a header. Counting the number of header lines...")
+	    nhead = 1
+	    while (line != "End of Header"){
+	      line = readLines(con=id, n =1)
+	      nhead = nhead +1
+	    }
+	  } else {nhead=0}
+	  close(id)
+
+	  x = read.table(file = file.c, header = TRUE, as.is = TRUE, sep = "\t", check.names = FALSE, skip = nhead)
+	} else {
+	  # Added by Simon Bélanger in 2019 to check if the file begin with a Header
+	  id = file(file.c, "r")
+	  line = readLines(con=id, n =1) # Reads the first header line
+	  if (is.na(line)) line = 0
+	  if (line == "Start of Header") {
+	    print("The File contains a header. Counting the number of header lines...")
+	    nhead = 1
+	    while (line != "End of Header"){
+	      line = readLines(con=id, n =1)
+	      if (is.na(line)) line = 0
+	      nhead = nhead +1
+	    }
+	  } else {nhead=0}
+	  close(id)
+    print(paste("Number of header line to skip is", nhead))
+	  x = read.table(file = file.c, header = TRUE, as.is = TRUE, sep = ",", check.names = FALSE, skip = nhead)
+	  }
 	# END
 
   ns <- names(x)

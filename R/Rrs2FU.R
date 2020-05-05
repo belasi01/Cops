@@ -2,9 +2,6 @@
 #
 
 Rrs2FU <-function(Waves, Rrs){
-  #CIE = read.table("~/Copy/R/Tables/CIE/lin2012xyz2e_1_7sf.csv", sep=",")
-  #CIE = read.table("~/MEGA/R/Tables/CIE/ciexyz31.csv", sep=",")
-  #names(CIE) <- c("waves", "x", "y", "z")
 
   # interpolate Rrs to CIE wavelength
   Rrs.int = spline(Waves, Rrs, xout=CIE$waves, method = "natural")$y

@@ -6,7 +6,7 @@
 #'@return Returns a factor that multiply F0 to account for Sun-Earth distance variation at any given date.
 #' This factor can change the irradiance up to 3.3\%.
 #'
-#'@author Bernard Gentilly
+#'@author Bernard Gentili
 #'
 orbex <- function(month,day) {
 	ndays <- as.numeric(julian(
