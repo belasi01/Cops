@@ -79,8 +79,8 @@ plot.Rrs.Kd.for.station <- function(path="./", depthEdZ = NA) {
   K0.EdZ.fitted <- rep(NA, 19)
   if (is.na(depthEdZ)) {
     if (anyNA(cops$EdZ.Z.interval[ix.waves])) {
-      ix.2.5 <- which.min(abs(cops$depth.fitted - 2.5))
-      K0.EdZ.fitted = cops$K0.EdZ.fitted[ix.2.5,]
+      ix.2 <- which.min(abs(cops$depth.fitted - 2))
+      K0.EdZ.fitted = cops$K0.EdZ.fitted[ix.2,]
     } else {
       for (w in 1:19) {
         if (!is.na(cops$EdZ.Z.interval[w])) {
@@ -107,9 +107,9 @@ plot.Rrs.Kd.for.station <- function(path="./", depthEdZ = NA) {
     load(paste(listfile[i], ".RData", sep=""))
     K0.EdZ.fitted <- rep(NA, 19)
     if (anyNA(cops$EdZ.Z.interval[ix.waves])) {
-      print("Some invalid linear fit; plot Depth integrated K for the top 2.5m")
-      ix.2.5 <- which.min(abs(cops$depth.fitted - 2.5))
-      K0.EdZ.fitted = cops$K0.EdZ.fitted[ix.2.5,]
+      print("Some invalid linear fit; plot Depth integrated K for the top 2m")
+      ix.2 <- which.min(abs(cops$depth.fitted - 2))
+      K0.EdZ.fitted = cops$K0.EdZ.fitted[ix.2,]
     } else {
       for (w in 1:19) {
         if (!is.na(cops$EdZ.Z.interval[w])) {
@@ -132,8 +132,8 @@ plot.Rrs.Kd.for.station <- function(path="./", depthEdZ = NA) {
   K0.EdZ.fitted <- rep(NA, 19)
   if (is.na(depthEdZ)) {
     if (anyNA(cops$EdZ.Z.interval[ix.waves])) {
-      ix.2.5 <- which.min(abs(cops$depth.fitted - 2.5))
-      K0.EdZ.fitted = cops$K0.EdZ.fitted[ix.2.5,]
+      ix.2 <- which.min(abs(cops$depth.fitted - 2))
+      K0.EdZ.fitted = cops$K0.EdZ.fitted[ix.2,]
     } else {
       for (w in 1:19) {
         if (!is.na(cops$EdZ.Z.interval[w])) {
@@ -156,8 +156,8 @@ plot.Rrs.Kd.for.station <- function(path="./", depthEdZ = NA) {
     load(paste(listfile[i], ".RData", sep=""))
     K0.EdZ.fitted <- rep(NA, 19)
     if (anyNA(cops$EdZ.Z.interval[ix.waves])) {
-      ix.2.5 <- which.min(abs(cops$depth.fitted - 2.5))
-      K0.EdZ.fitted = cops$K0.EdZ.fitted[ix.2.5,]
+      ix.2 <- which.min(abs(cops$depth.fitted - 2.0))
+      K0.EdZ.fitted = cops$K0.EdZ.fitted[ix.2,]
     } else {
       for (w in 1:19) {
         if (!is.na(cops$EdZ.Z.interval[w])) {
