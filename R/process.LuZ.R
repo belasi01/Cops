@@ -6,8 +6,8 @@ process.LuZ <- function(cops.raw,
 
 	mymessage(paste("Processing LuZ", " ..."), head = "+")
 
-  temperature <-cops.raw$LuZ.anc$Temp
-  temperature.depth <-cops.raw$LuZ.anc$Depth
+  temperature <-cops.raw$LuZ.anc$Temp[cops.dd$Depth.good]
+  temperature.depth <-cops.raw$LuZ.anc$Depth[cops.dd$Depth.good]
 
 	aop <- cops.raw$LuZ
 	correction <- cops.Ed0$Ed0.correction
