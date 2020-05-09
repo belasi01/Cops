@@ -346,8 +346,8 @@ generate.cops.DB <- function(path="./",
 
       if (is.na(cops$chl)) shadow.cor[i] <- "No correction"
       if (!is.na(cops$chl))shadow.cor[i] <- "abs.Case1.model"
-      if (cops$chl == 999) shadow.cor[i] <- "abs.Kd.method"
-      if (cops$chl == 0) shadow.cor[i] <- "abs.measured"
+      if (!is.na(cops$chl) & cops$chl == 999) shadow.cor[i] <- "abs.Kd.method"
+      if (!is.na(cops$chl) & cops$chl == 0) shadow.cor[i] <- "abs.measured"
 
       rec.info = data.frame(date[i],sunzen[i], lat[i],
                             lon[i], shadow.cor[i], FU[i], bottom.depth[i])
