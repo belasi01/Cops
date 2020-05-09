@@ -282,7 +282,7 @@ generate.cops.DB <- function(path="./",
         FU[i]  = cops$FU.linear
         Rrs.m[i,xw.DB] = cops$Rrs.0p.linear[xw]
         nLw.m[i,xw.DB] = cops$nLw.0p.linear[xw]
-        if (!is.null(cops$Q.linear)) Q.Factor.m[i,xw.DB] = cops$Q.factor[xw]
+        if (!is.null(cops$Q.linear)) Q.Factor.m[i,xw.DB] = cops$Q.linear[xw]
       } else {
         FU[i]  = cops$FU
         Rrs.m[i,xw.DB] = cops$Rrs.0p[xw]
