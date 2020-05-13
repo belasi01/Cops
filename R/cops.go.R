@@ -38,6 +38,7 @@ cops.go <- function(interactive = FALSE, ASCII=FALSE, CLEAN.FILES=FALSE) {
 			stop()
 		} else {
 			dirdats <- scan(file = "directories.for.cops.dat", "", sep = "\n", comment.char = "#")
+			starting.dir <- getwd()
 			for(dirdat in dirdats) {
 				if(!file.exists(dirdat)) {
 					cat(dirdat, "does not exist")
@@ -47,6 +48,7 @@ cops.go <- function(interactive = FALSE, ASCII=FALSE, CLEAN.FILES=FALSE) {
 				process.cops(dirdat, ASCII, CLEAN.FILES)
 				plot.Rrs.Kd.for.station(dirdat)
 			}
+			setwd(starting.dir)
 		}
 	}
 }

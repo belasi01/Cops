@@ -6,8 +6,8 @@ process.EuZ <- function(cops.raw,
 
 	mymessage(paste("Processing EuZ", " ..."), head = "+")
 
-  temperature <-cops.raw$EuZ.anc$Temp
-  temperature.depth <-cops.raw$EuZ.anc$Depth
+  temperature <-cops.raw$EuZ.anc$Temp[cops.dd$Depth.good]
+  temperature.depth <-cops.raw$EuZ.anc$Depth[cops.dd$Depth.good]
 
 	aop <- cops.raw$EuZ
 	correction <- cops.Ed0$Ed0.correction

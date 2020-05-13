@@ -5,13 +5,13 @@ April 23, 2020
 
 The Cops package was initially developped by Bernard Gentili at the
 Laboratoire d’Océanologie de Villefranche (LOV). It gathers several
-routines to process ras data collected using a C-OPS instrument. The
+routines to process raw data collected using a C-OPS instrument. The
 C-OPS is a Compact Optical Profilling System commercialized by
 Biospherical instruments.
 
-We have updated the package and implement new functions over time. This
-is an ongoing work that requires collaborations. For that purpose, the
-code was uploaded to GitHub by Simon Bélanger in November 2016.
+We have updated the package and implemented new functions over time.
+This is an ongoing work that requires collaborations. For that purpose,
+the code was uploaded to GitHub by Simon Bélanger in November 2016.
 
 Here I present some recommendations about data collection and
 preparation at first, and then I will further explain how to use
@@ -22,16 +22,16 @@ the`Cops` package.
 ### Data collection and log book
 
 In the field, we always document the deployement operations in a log
-book Make sure you have this log book in hand before starting. This will
-save you a lot a time. In fact, it is common that a bad profile was
+book. Make sure you have this log book in hand before starting. This
+will save you a lot a time. In fact, it is common that a bad profile was
 recorded in the field for any reason. For example:
 
   - The reference sensor (Ed0) was shaded during the profile or the
     profiler went below the boat;
   - The profile was started too late and the top layer were missed;
-  - The operator start a profile but the boat start to move, draggind
-    the instrument at the surface while recording;
-  - The acquisition was stated accidentally during the upcast;
+  - The operator started a profile but the boat started to move,
+    draggind the instrument at the surface while recording;
+  - The acquisition was started accidentally during the upcast;
   - etc.
 
 Normally this kind of problem should be logged and the data can be
@@ -47,11 +47,11 @@ We, at UQAR, have adopted a systematic way to store our raw data
 collected in the field. Most of the time, field data are store in
 different folders, often one folder per instrument or one folder for a
 given date, etc. We store the raw data in a folder named **./L1/**. This
-folder will be write protected to preserve your raw data. Processed data
-will be then store in a folder name **./L2/**, where data are ornanized
-in a more systematic way.
+folder will be write-protected to preserve raw data. Processed data will
+then be stored in a folder named **./L2/**, where data are organized in
+a more systematic way.
 
-We stongly recommend to create **one folder per station**. The
+We strongly recommend to create **one folder per station**. The
 recommended folder name contains the date and the Station ID such as:
 
 **./L2/YYYYMMDD\_StationID/**
@@ -85,13 +85,13 @@ devtools::install_github("belasi01/Cops")
 ```
 
 This will install the binaries and all the dependencies, which can take
-some times.
+some time.
 
 To install the full code sources, you can also “clone” the package in a
 local folder. You have to create a “New project…” from the file menu and
 choose the “Version Control” project type, and then choose “Git” option.
 Next you have to indicate the full path of the R package repository on
-GitHub, as illustrate
+GitHub, as illustrated
 below.
 
 <div class="figure">
@@ -107,9 +107,9 @@ code.
 
 </div>
 
-## Step 0 : Get stated with Cops processing and configuration of the INIT file
+## Step 0 : Get started with Cops processing and configuration of the INIT file
 
-Unfortunately, most function of the `Cops` package does not have a help
+Unfortunately, most functions of the `Cops` package do not have a help
 page. This is because the user **only need to know one single function**
 to launch the processing, i.e. the `cops.go()`. So let’s get
     started.
@@ -139,9 +139,9 @@ As you can see, when you load the package with the `library()` function,
 you got a message explaining how to launch the processing with the
 different options proposed by `cops.go()`. By default, the options
 **interactive, ASCII and CLEAN.FILES** are set to FALSE. I strongly
-recommanded to first set the working directory (i.e. a folder where you
+recommand to first set the working directory (i.e., a folder where you
 put the COPS data for a given station) using `setwd()` and than type
-`cops.go()`. See what happen.
+`cops.go()`. See what happens.
 
 ``` r
 setwd("/data/ProjetX/L2/20500619_StationY1/cops")
@@ -204,16 +204,16 @@ You have to edit the following lines:
     instead of LuZ. The `Cops` package version 3.2-5 and greater can
     process COPS systems having both LuZ and EuZ. In that case, all
     other fields must have 4 parameters instead of 3.
-  - **tiltmax.optics;numeric; 10,5,5** : the *tiltmax.optics* is a
-    numeric vector of three threshold values used to filter the data for
-    the three sensors available in *instruments.optics*. Here the
-    default (10,5,5) will eliminate every data collected when the Ed0
-    instrument tilt was greater than 10 degrees and when EdZ or LuZ tilt
-    were greater than 5 degrees, as recommended by NASA protocols. Note:
-    in shallow waters or in case-2 water type having strong light
-    attenuation, the tilt threshold ofter need to be relaxed in order to
-    have enough measurements near the sea surface for a reliable
-    extrapolation to the air-sea interface.  
+  - **tiltmax.optics;numeric; 10,5,5** : is a numeric vector of three
+    numeric threshold values used to filter the data for the three
+    sensors available in *instruments.optics*. Here the default (10,5,5)
+    will eliminate every data collected when the Ed0 instrument tilt was
+    greater than 10 degrees and when EdZ or LuZ tilt were greater than 5
+    degrees, as recommended by NASA protocols. Note: in shallow waters
+    or in case-2 water type having strong light attenuation, the tilt
+    threshold ofter need to be relaxed in order to have enough
+    measurements near the sea surface for a reliable extrapolation to
+    the air-sea interface.  
   - **depth.interval.for.smoothing.optics;numeric; 10,4,4**: This
     parameter is used to smooth the data on a regular depth interval
     grid using a method known as LOESS (local polynomial regression
@@ -232,27 +232,27 @@ You have to edit the following lines:
     (time.interval.for.smoothing.optics/profile.duration\*maximum depth
     of the profile).
   - **sub.surface.removed.layer.optics;numeric; 0, 0.1, 0** : This
-    variable is use to exclude the data very close the air-sea
+    variable is used to exclude the data very close the air-sea
     interface. In fact, near-surface data may be very noisy due to wave
     focusing effect under clear sky. It is mostly important for EdZ. By
     default, we eliminate the first 10 cm (0.1 m) of the water column
-    for EdZ, also because the sensor may exits the water a fraction of
-    second when the profiler it at the surface.
-  - **delta.capteur.optics;numeric; 0, -0.05, 0.238** : This variable a
-    numeric vector of values indicating the physical distance between
+    for EdZ, also because the sensor may have exit the water a fraction
+    of second when the profiler it at the surface.
+  - **delta.capteur.optics;numeric; 0, -0.05, 0.238** : This variable is
+    a numeric vector of values indicating the physical distance between
     the pressure sensor and the actual radiometers. By default, we
     assume that the EdZ sensor is 5 cm above the pressure sensor (so
     minus 5 cm relative to the measured pressure), which is normally on
     the back of the LuZ sensor. The LuZ sensor length is about 23.8 cm
     below the pressure sensor (so we have to add 23.8 cm to get the
     depth of the LuZ measurement). This setup is quite standard and will
-    not change unless you physically change the setup (e.g. depth
+    not change unless you physically change the setup (e.g., depth
     pressure on EuZ is used instead of LuZ).
   - **radius.instrument.optics;numeric; 0.035, 0.035, 0.035** : This
     variable is a numeric vector of three values of instrument radius
     that will be used in the shadow correction. All sensor are 3.5 cm
     radius. (Note that this variable could be hard coded as it never
-    change).
+    changes).
 
 The next parameters are important for reading the data correctly. You
 need to look into one CSV or TSV file to see how the data have been
@@ -266,25 +266,24 @@ recorded.
     may need to read the help about `POSIXct` representing calendar
     dates and times format in R.  
   - **instruments.others;character;NA** : The *instruments.others*
-    variable is single string indicating whether or not an other
+    variable is single string indicating whether or not another
     intrument is included in the COPS files. In the old COPS data
     acquisition (before 2014 or so), the data file included diagnostic
     information on the system (input voltage to instrument, temperature,
     etc.) in columns that were named Master+VariableName. So this
-    variable was set to Master. Now these data are now stored in a
-    separate file. So YOU WILL LIKELY have to keep NA (in capital
-    letters) instead of Master if you’re working with recent COPS
-    data.  
-  - **depth.is.on;character;LuZ** : The *depth.is.on* variable inditace
+    variable was set to Master. Now these data are stored in a separate
+    file. So YOU WILL LIKELY have to keep NA (in capital letters)
+    instead of Master if you’re working with recent COPS data.  
+  - **depth.is.on;character;LuZ** : The *depth.is.on* variable indicates
     on which radiometer the pressure sensor is located. Default is LuZ
-    but may be EuZ if you are using another set up (see above comments
+    but may be EuZ if you are using another setup (see above comments
     about *delta.capteur.optics*).  
   - **number.of.fields.before.date;numeric; 0** : The
     *number.of.fields.before.date* variable is a numeric value
-    indicating the number of field present in the file name before the
-    date. In fact, every COPS file are automatically named continaing
-    the date and time of the acquisition (computer date/time when the
-    file was created). Suppose you have a file named
+    indicating the number of field(s) present in the file name before
+    the date. In fact, every COPS file are automatically contains the
+    date and time of the acquisition (computer date/time when the file
+    was created). Suppose you have a file named
     *06-261\_CAST\_004\_180813\_150418\_URC*, there are 3 fields
     separated by "\_" before the date. So here we would put 3 instead of
     0 (default value).
@@ -319,14 +318,14 @@ instructions to fill this file**
 Now if you look into the working directory, you will find a file named
 **info.cops.dat**. This is another ASCII file you need to edit. As
 mentioned above, the header of that file provides instruction on how to
-arrange the information to process each C-OPS profiles you have in your
+arrange the informations to process each C-OPS profile you have in your
 working directory. The header lines start with a “\#”. After the header,
 you have to provide a line for each profile you want to process. Each
 line will need to have 8 mandatory fields separated by “;”. The created
 file already contains one line per file found in the working disrectory.
 The first field is the file name. **IMPORTANT: you have to remove the
-lines that are not corresponding to calibrated light profile file
-(e.g. the init.cops.dat or the GPS file)**. Then you have to set the
+lines that are not corresponding to calibrated light profile file (e.g.,
+the init.cops.dat or the GPS file)**. Then you have to set the
 processing parameters for each line.
 
   - The fields number 2 and 3 are the **longitude** and **latitude** in
@@ -334,11 +333,11 @@ processing parameters for each line.
     code to compute the sun position in the sky. This is mandatory. If
     your system was fitted with a BioGPS, you have to copy the GPS file
     in the working directory and put NA in fields 2 and 3. The code will
-    retreive the position of the profile automatically. **IMPORTANT
+    retrieve the position of the profile automatically. **IMPORTANT
     NOTE: Sometime you may get an error when reading the GPS file. This
     is because a header line may be found in the middle of the file.
     This is because only one GPS file is created per day. If the file
-    exists when restarting the COPS, it will happen the data at the end
+    exists when restarting the COPS, it will append the data at the end
     of the existing file. You have to clean the GPS file by removing
     header lines manually (except the first line of the file).**
 
@@ -368,11 +367,12 @@ processing parameters for each line.
   - The field number 5 is the **time window**, which is the number of
     seconds after the start of the recording corresponding to the actual
     begining and the end of the cast, respectively. This is eventually
-    avoid if the file have been cleaned prior the processing. This can
-    be achieve using the CLEAN.FILES option.
+    avoided if the file have been cleaned prior the processing. This can
+    be achieved using the CLEAN.FILES option or to use the Shiny
+    application developed by Guislain Bécu.
 
 When you process the data for the first time, the fields 4 to 8 can be
-leave as is. The processing will take the default values found in
+left as is. The processing will take the default values found in
 **init.cops.dat** for fields 6, 7 and 8. The later fields were described
 above and they stand for *sub.surface.removed.layer*, *tiltmax.optics*,
 and *depth.interval.for.smoothing*. All of them contains 3 (or 4) values
@@ -386,8 +386,8 @@ cops.go()
 
 Normally the code will run without errors, except if the data is not
 good (a very bad profile that was recorded by error on the field) or if
-you have made a mistake in the **init.cops.dat** file (e.g. often you
-did not changed Master to NA for field *instruments.others*, or you made
+you have made a mistake in the **init.cops.dat** file (e.g., often you
+did not change Master to NA for field *instruments.others*, or you made
 a mistake in the date/time format, etc.) or if the data file was
 recorded specifically for the Bioshade
 measurements.
@@ -395,27 +395,28 @@ measurements.
 ## Step 2: Preliminary analysis of the results output and processing parameters adjustment
 
 First of all, when the code is run without error, it creates two (or
-three) new directories (BIN/, PDF/, and optionnaly ASC/) in the working
-directory as well as two ASCII files names **absorption.cops.dat** and
+three) new directories (BIN/, PDF/, and optionally ASC/) in the working
+directory as well as two ASCII files named **absorption.cops.dat** and
 **select.cops.dat** (version prior 4.0 generated a file named
 **remove.cops.dat**). The former is the file you have to edit if you
-want to correct for instrument self-shaddow effect (see above) using
+want to correct for instrument self-shadow effect (see above) using
 measured absorption coefficients (one line per profile).
 
 ### The **select.cops.dat** file
 
 The **select.cops.dat** file lists the same file names found in
-**info.cops.dat** follow by three parameters separated by semi-columns.
+**info.cops.dat** followed by three parameters separated by semi-colons.
 The second column is an integer (0,1,2 or 3) indicating the type of
-C-OPS cast. By default, all file are set to 1, which consider a normal
+C-OPS cast. By default, all files are set to 1, which consider a normal
 light profile. To remove profile, we change the integer to 0. Other
-C-OPS cast are Bioshade (2) or under-ice profile (3). In case of an
+C-OPS casts are Bioshade (2) or under-ice profile (3). In case of an
 under-ice profile, no extrapolation to the air-sea interface is
 performed and sub-surface AOP (nLw, Lw, Rrs, etc) are not calculated.
 The columns 3 and 4 are specifying the best extrapolation methods for
 the remote sensing reflectance (Rrs) calculation and for Kd (not
-implement yet). Therefore the third column will accept **Rrs.0p.linear**
-or **Rrs.0p** for linear and loess extrapolation, respectively.
+implemented yet). Therefore the third column will accept
+**Rrs.0p.linear** or **Rrs.0p** for linear and loess extrapolation,
+respectively.
 
 Let’s focus now on the PDF/ directory in which one PDF per profile was
 generated. You will have to open each PDF and analyse the results to
@@ -430,10 +431,10 @@ the position and the sun zenith angle. Check this information if it is
 correct and in particular the sun zenith angle, which has been
 calculated from the position and the UTC time. In that example the cast
 duration was 26 seconds. The profiler was at 1 m from the surface right
-at the begining, then reach the surface after 3 seconds, and drop the
-bottom at 18:18:58 UTC, i.e. about 22 seconds from the begining. **Such
-a profile MUST be clean**. In fact, the profiler should in free-fall to
-pass the linear fit
+at the begining, then reached the surface after 3 seconds, and dropped
+tp the bottom at 18:18:58 UTC, i.e. about 22 seconds from the begining.
+**Such a profile MUST be cleaned**. In fact, the profiler should be in
+free-fall to pass the linear fit
 conditions.  
 
 <div class="figure">
@@ -451,7 +452,7 @@ second since the begining of the recording
 
 With the version 4.0, you can clean the file by runing the code again,
 but with the **CLEAN.FILES** option set to **TRUE**. Note that this step
-can be avoid if the data were already cleaned using the Shiny App
+can be avoided if the data were already cleaned using the Shiny App
 developped by Guislain Bécu. This application can be downloaded from
 <https://github.com/GuislainBecu/01.COPS.CLEAN.INPUT.FILES>
 
@@ -459,7 +460,7 @@ developped by Guislain Bécu. This application can be downloaded from
 cops.go(CLEAN.FILES = TRUE)
 ```
 
-The user will be prompt to click on plot of depth versus index to
+The user will be prompted to click on the plot of depth versus index to
 determine the begining of the cast and the end of the cast (Figure
 3).
 
@@ -476,24 +477,24 @@ Figure 3. Example of depth of the profiler versus the number of records
 
 </div>
 
-Here the user click on the index 46 for the starting point and the index
-352 for the ending point. In this example, the profiler hit the bottom,
-as the depth become constant to 5.5 m from the index 352 to the end of
-the cast. **IMPORTANT NOTE: To avoid bad data near the bottom, the
-profile will be cut 15 cm abobe the ending point set by the user.** This
-procesing greatly improve the results in shallow waters, allowing easier
-extraction of the bottom reflectance property.
+Here the user clicked on the index 46 for the starting point and the
+index 352 for the ending point. In this example, the profiler hit the
+bottom, as the depth became constant to 5.5 m from the index 352 to the
+end of the cast. **IMPORTANT NOTE: To avoid bad data near the bottom,
+the profile will be cut 15 cm above the ending point set by the user.**
+This processing greatly improves the results in shallow waters, allowing
+easier extraction of the bottom reflectance property.
 
 Figures 4 and 5 show the depth vs duration and the instrument tilt
 during the cast, respectively. Here the tilt of both Ed0 and EdZ
-instruments was below the threshold, exept for a few points near the
-surface. In difficult conditions, i.e. due to strong current or wind,
+instruments were below the thresholds, except for a few points near the
+surface. In difficult conditions, i.e., due to strong current or wind,
 too much tension in the cable, the C-OPS tilt may be high. The Figure 6
 shows an extreme case we encountered in the Labrador Sea in 2014.
-Keeping the tilt threshold at 5 degrees the for the in-water sensors
-would have removed nearly all the data\! In such case we need to
-increased the threshold to 10 degrees to get AOPs, which acceptable in
-the open ocean when the profiler is far from the
+Keeping the tilt threshold at 5 degrees for the in-water sensors would
+have removed nearly all the data\! In such case we need to increased the
+threshold to 10 degrees to get AOPs, which is acceptable in the open
+ocean when the profiler is far from the
 ship.
 
 <div class="figure">
@@ -512,13 +513,13 @@ file.
 
 <div class="figure">
 
-<img src="./extfigures/tilt2.png" alt="Figure 5. Example of instrument tilt for Ed0 and EdZ (i.e. the profiler) during the cast. Red points have been discarded for the rest of the analysis using the tiltmax.optics parameter." width="70%" />
+<img src="./extfigures/tilt2.png" alt="Figure 5. Example of instrument tilt for Ed0 and EdZ (i.e., the profiler) during the cast. Red points have been discarded for the rest of the analysis using the tiltmax.optics parameter." width="70%" />
 
 <p class="caption">
 
-Figure 5. Example of instrument tilt for Ed0 and EdZ (i.e. the profiler)
-during the cast. Red points have been discarded for the rest of the
-analysis using the tiltmax.optics
+Figure 5. Example of instrument tilt for Ed0 and EdZ (i.e., the
+profiler) during the cast. Red points have been discarded for the rest
+of the analysis using the tiltmax.optics
 parameter.
 
 </p>
@@ -527,13 +528,13 @@ parameter.
 
 <div class="figure">
 
-<img src="./extfigures/tilt3.png" alt="Figure 6. Example of instrument tilt for Ed0 and EdZ (i.e. the profiler) during the VITALS cruise in 2014 onboard the Hudson. Note that the figure was generated by the version 3 of the Cops package." width="70%" />
+<img src="./extfigures/tilt3.png" alt="Figure 6. Example of instrument tilt for Ed0 and EdZ (i.e., the profiler) during the VITALS cruise in 2014 onboard the Hudson. Note that the figure was generated by the version 3 of the Cops package." width="70%" />
 
 <p class="caption">
 
-Figure 6. Example of instrument tilt for Ed0 and EdZ (i.e. the profiler)
-during the VITALS cruise in 2014 onboard the Hudson. Note that the
-figure was generated by the version 3 of the Cops
+Figure 6. Example of instrument tilt for Ed0 and EdZ (i.e., the
+profiler) during the VITALS cruise in 2014 onboard the Hudson. Note that
+the figure was generated by the version 3 of the Cops
 package.
 
 </p>
@@ -545,8 +546,8 @@ package.
 Downwelling irradiance above water (Ed0) must be stable during the C-OPS
 vertical profile. Cloudy sky can make it highly variable. Some shadow on
 the instrument from the ship structure a person near by (on small boat
-sometime) can be a problem as well. Big change in Ed0 will likely
-results in a bad light profile because LuZ and EdZ are normalized by the
+sometimes) can be a problem as well. Big change in Ed0 will likely
+result in a bad light profile because LuZ and EdZ are normalized by the
 Ed0 variability (see NASA protocols). In the example shown in Figure 7,
 Ed0 was very stable. The variability was due to tilt of the instrument
 probably resulting from a moving boat by waves. The LOESS smoothing
@@ -589,7 +590,7 @@ profile
 One of the most important thing to check when processing C-OPS data is
 the quality of the extrapolation of the upwelling radiance (LuZ) or
 irradiance (EuZ) at the air-water interface. This will determine the
-quality the remote sensing reflectance, Rrs, which is one of the most
+quality of the remote sensing reflectance, Rrs, which is one of the most
 important apparent optical property (AOP) we want to extract from the
 C-OPS data.
 
@@ -600,9 +601,9 @@ irradiance profiles. The LOESS is applied to the whole profile, while
 the linear fit is limited to a thin layer near the surface. Several
 plots are available in the PDF to diagnose the quality of the fit.
 **Note that all data points below the instrument detection limit are
-eliminated in the fitting process**. This is feature has been
-implemented in the version 4.0 of the `Cops`package. One can visualized
-the default values implemented in the package by accessing the variable
+eliminated in the fitting process**. This feature has been implemented
+in the version 4.0 of the `Cops`package. One can visualize the default
+values implemented in the package by accessing the variable
 detection.limit, which is a Global Environment Variable (shown below).
 To obtain more information about the instrument detection limit or
 update these threshold, the user can refer to the help page of the
@@ -1053,7 +1054,7 @@ load("~/OneDrive - UQAR/data/WISEMan/L2/20190818_StationMAN-F05/COPS_BU/BIN/WISE
 str(cops)
 ```
 
-    ## List of 112
+    ## List of 119
     ##  $ verbose                            : logi TRUE
     ##  $ indice.water                       : num 1.34
     ##  $ rau.Fresnel                        : num 0.043
@@ -1079,6 +1080,7 @@ str(cops)
     ##  $ file                               : chr "WISE_MAN_F5_CAST_003_190818_181835_URC.tsv"
     ##  $ chl                                : num 999
     ##  $ EXTRAPOLATION.0m                   : logi TRUE
+    ##  $ SHALLOW                            : logi TRUE
     ##  $ SHADOW.CORRECTION                  : logi TRUE
     ##  $ absorption.waves                   : logi NA
     ##  $ absorption.values                  : Named num [1:19] NA NA NA 2.26 1.8 ...
@@ -1166,6 +1168,7 @@ str(cops)
     ##  $ LuZ.linear.r2                      : num [1:19] NA NA 0.882 0.991 0.994 ...
     ##  $ LuZ.KolmolSmirnov.p.value          : num [1:19] NA NA 0.994 0.969 0.969 ...
     ##  $ LuZ.detection.limit                : num [1:19] 5e-05 5e-05 5e-05 2e-04 5e-05 5e-05 4e-05 1e-04 2e-05 3e-05 ...
+    ##  $ LuZ.temperature.fitted             : num [1:214] 10.1 10.1 10.1 10 10 ...
     ##  $ EdZ.fitted                         : num [1:214, 1:19] 0.142 0.146 0.149 0.153 0.156 ...
     ##   ..- attr(*, "dimnames")=List of 2
     ##   .. ..$ : chr [1:214] "0" "0.01" "0.02" "0.03" ...
@@ -1217,10 +1220,6 @@ str(cops)
     ##   ..- attr(*, "names")= chr [1:19] "305" "320" "340" "380" ...
     ##  $ absorption.waves                   : num [1:19] 305 320 340 380 395 412 443 465 490 510 ...
     ##  $ SHADOW.CORRECTION.FROM.KD          : chr "LOESS"
-    ##  $ Lw.0p                              : Named num [1:19] NA NA NA 0.00364 0.00615 ...
-    ##   ..- attr(*, "names")= chr [1:19] "305" "320" "340" "380" ...
-    ##  $ nLw.0p                             : Named num [1:19] NA NA NA 0.00731 0.01122 ...
-    ##   ..- attr(*, "names")= chr [1:19] "305" "320" "340" "380" ...
     ##   [list output truncated]
 
 ## Bioshade processing
