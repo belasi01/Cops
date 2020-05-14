@@ -84,7 +84,7 @@ compute.Ksurf.linear <- function (Depth, aop,
       ix.z[i] = which.min(abs(Depth - depth.intervals[i]))
 
       # Get indices of measurement above detection limits within the layer
-      ix.depth.interval = which(aop[1:ix.z[i],w] > detect.lim)
+      ix.depth.interval = which(aop[1:ix.z[i],w] > detect.lim[w])
       n.good <- length(ix.depth.interval)
       if (n.good > 10) {
         df          = data.frame(z=Depth[ix.depth.interval],
