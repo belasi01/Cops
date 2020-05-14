@@ -230,8 +230,8 @@ generate.cops.DB <- function(path="./",
 
       if (is.na(cops$chl)) shadow.cor[i] <- "No correction"
       if (!is.na(cops$chl))shadow.cor[i] <- "abs.Case1.model"
-      if (cops$chl == 999) shadow.cor[i] <- "abs.Kd.method"
-      if (cops$chl == 0) shadow.cor[i] <- "abs.measured"
+      if (!is.na(cops$chl) & cops$chl == 999) shadow.cor[i] <- "abs.Kd.method"
+      if (!is.na(cops$chl) & cops$chl == 0) shadow.cor[i] <- "abs.measured"
 
 
       mean.rec.data = c(Rrs.m[i,],
@@ -253,7 +253,7 @@ generate.cops.DB <- function(path="./",
                       Kd.pd.m[i,],
                       Ed0.0p.sd[i,])
 
-      rec.info = data.frame(date[i],sunzen[i], lat[i], lon[i], shadow.cor[i], FU[i], bottom.depth)
+      rec.info = data.frame(date[i],sunzen[i], lat[i], lon[i], shadow.cor[i], FU[i], bottom.depth[i])
 
     } else {
 
@@ -282,7 +282,7 @@ generate.cops.DB <- function(path="./",
         FU[i]  = cops$FU.linear
         Rrs.m[i,xw.DB] = cops$Rrs.0p.linear[xw]
         nLw.m[i,xw.DB] = cops$nLw.0p.linear[xw]
-        if (!is.null(cops$Q.linear)) Q.Factor.m[i,xw.DB] = cops$Q.factor[xw]
+        if (!is.null(cops$Q.linear)) Q.Factor.m[i,xw.DB] = cops$Q.linear[xw]
       } else {
         FU[i]  = cops$FU
         Rrs.m[i,xw.DB] = cops$Rrs.0p[xw]
@@ -346,8 +346,8 @@ generate.cops.DB <- function(path="./",
 
       if (is.na(cops$chl)) shadow.cor[i] <- "No correction"
       if (!is.na(cops$chl))shadow.cor[i] <- "abs.Case1.model"
-      if (cops$chl == 999) shadow.cor[i] <- "abs.Kd.method"
-      if (cops$chl == 0) shadow.cor[i] <- "abs.measured"
+      if (!is.na(cops$chl) & cops$chl == 999) shadow.cor[i] <- "abs.Kd.method"
+      if (!is.na(cops$chl) & cops$chl == 0) shadow.cor[i] <- "abs.measured"
 
       rec.info = data.frame(date[i],sunzen[i], lat[i],
                             lon[i], shadow.cor[i], FU[i], bottom.depth[i])

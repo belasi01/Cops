@@ -138,7 +138,7 @@ str(absorption.tab)
         EXTRAPOLATION.0m = TRUE
       }
 
-      if (select.tab[experiment,4] == "1" ) {
+      if (!is.na(select.tab[experiment,4]) & select.tab[experiment,4] == "1" ) {
         print("Shallow water. Profile finished just above the bottom")
         SHALLOW = TRUE
       } else {
