@@ -253,7 +253,7 @@ generate.cops.DB <- function(path="./",
                       Kd.pd.m[i,],
                       Ed0.0p.sd[i,])
 
-      rec.info = data.frame(date[i],sunzen[i], lat[i], lon[i], shadow.cor[i], FU[i], bottom.depth)
+      rec.info = data.frame(date[i],sunzen[i], lat[i], lon[i], shadow.cor[i], FU[i], bottom.depth[i])
 
     } else {
 
