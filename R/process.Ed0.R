@@ -44,7 +44,7 @@ process.Ed0 <- function(cops.raw, cops.dd, cops.black) {
 		0.5 * tau.r(waves) +
 		tau.oz(waves, du = 350) +
 		(1 - om.aer * F.aer) * tau.a) / cos(sunzen *pi/180))
-	Ed0.th <- cos(sunzen * pi / 180) * t * etirr(waves) * orbex(month,day)
+	Ed0.th <- cos(sunzen * pi / 180) * t * etirrwindow(waves.u, bandwidth) * orbex(month,day)
 
 	aop.cols <- rainbow.modified(length(waves))
 	if(INTERACTIVE) x11(width = win.width, height = win.height)

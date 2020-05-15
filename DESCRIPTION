@@ -2,13 +2,12 @@ Package: Cops
 Version: 4.2-3
 Date: 2020-05-14
 Title: C-OPS Processing
-Author: Bernard Gentili <gentili@obs-vlfr.fr>
+Author: Bernard Gentili <bernard.gentili@orange.fr>
 Maintainer: Simon Belanger <simon_belanger@uqar.ca>
-Depends: R (>= 2.0), tcltk, e1071, stringr
+Depends: R (>= 2.0), tcltk, e1071, stringr, ncdf4
 Description: COPS Processing
 License: GPL version 2 or newer
-URL: http://www.r-project.org, http://www.obs-vlfr.fr
-Packaged:
+URL: http://www.obs-vlfr.fr
 LazyData: TRUE
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.0

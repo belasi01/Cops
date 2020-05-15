@@ -79,8 +79,8 @@ compute.aops <- function(cops.data) {
 	  PLOT.LINEAR <- !all(is.na(LuZ.0m.linear))
 
 	  mymessage("Computing nLw.0p ...", head = "-")
-	  nLw.0p <- Lw.0p / Ed0.0p * etirr(waves.u)
-	  nLw.0p.linear <- Lw.0p.linear / Ed0.0p * etirr(waves.u)
+	  nLw.0p <- Lw.0p / Ed0.0p * etirrwindow(waves.u, bandwidth)
+	  nLw.0p.linear <- Lw.0p.linear / Ed0.0p * etirrwindow(waves.u, bandwidth)
 
 	  mymessage("Computing Rrs.0p ...", head = "-")
 	  Rrs.0p <- Lw.0p / Ed0.0p

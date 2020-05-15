@@ -37,3 +37,7 @@ number.of.fields.before.date;numeric; 4
 time.window;numeric;0, 10000
 # for smoothing purpose
 depth.discretization;numeric; 0, 0.01, 1, 0.02, 2, 0.05, 5, 0.1, 10, 0.2, 20, 0.5, 50, 1, 100, 2, 200, 5, 500
+
+# bandwidth : the size of the window (nanometers) around each wavelength
+# (for the calculation of extraterrestrial irradiance)
+bandwidth;numeric;10
