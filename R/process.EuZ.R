@@ -138,6 +138,7 @@ process.EuZ <- function(cops.raw,
 	par(xpd = TRUE)
 	legend(10^par("usr")[1], par("usr")[4], legend = waves, xjust = 0, yjust = 0, lty = 1, lwd = 2, col = aop.cols, ncol = ceiling(length(waves) / 2), cex = 0.75)
 	par(xpd = FALSE)
+	if (!PLOT.LINEAR) text(aop.0[8], 0, "LINEAR INTERPOLATION FAILED, SHOULD YOU RELAX THE TILT THRESOLD?", pos=4)
 
 	if(INTERACTIVE) x11(width = win.width, height = win.height)
 	mai.old1 <- par("mai")
@@ -149,7 +150,7 @@ process.EuZ <- function(cops.raw,
 	for(i in 1:length(waves)) {
 	  if (length(which(!is.na(aop[,i]))) > 0) {
 	    plot(aop.all[, i], Depth.all, type = "p", log = "x",
-	         xlim = range(aop.all[aop.all[, i] > 0, i], na.rm = TRUE),
+	         xlim = range(aop.all[aop.all[, i] > 0, i], aop.0[i], na.rm = TRUE),
 	         ylim = rev(range(Depth, depth.fitted)),
 	         pch = ".",
 	         xlab = "", ylab = "", axes = FALSE, frame.plot = TRUE,
@@ -169,7 +170,7 @@ process.EuZ <- function(cops.raw,
 	par(mai = mai.old1)
 	par(mgp = mgp.old1)
 
-	##### check surface interpolation
+	##### check surface extrapolation
 	if(INTERACTIVE) x11(width = win.width, height = win.height)
 	mai.old1 <- par("mai")
 	mgp.old1 <- par("mgp")
@@ -179,8 +180,13 @@ process.EuZ <- function(cops.raw,
 	mgp.old2 <- par("mgp")
 	for(i in 1:length(waves)) {
 	  if (length(which(!is.na(aop[,i]))) > 0) {
+	    if (PLOT.LINEAR) {
+	      my.xlim = range(aop[, i], aop.0[i], EuZ.0m.linear[i], na.rm = TRUE)
+	    } else {
+	      my.xlim = range(aop[, i], aop.0[i], na.rm = TRUE)
+	    }
 	    plot(aop.all[, i], Depth.all, type = "p", log = "x",
-	         xlim = range(aop[, i], aop.0[i], na.rm = TRUE),
+	         xlim = my.xlim,
 	         ylim = c(max(Z.interval,na.rm = T)+0.5,0),
 	         pch = ".", xlab = "", ylab = "",
 	         axes = FALSE, frame.plot = TRUE,
@@ -204,7 +210,7 @@ process.EuZ <- function(cops.raw,
 	par(mai = mai.old1)
 	par(mgp = mgp.old1)
 
-	##### check surface interpolation at selected wavelengths
+	##### check surface extrapolation at selected wavelengths
 	if(INTERACTIVE) x11(width = win.width, height = win.height)
 	mai.old1 <- par("mai")
 	mgp.old1 <- par("mgp")
@@ -218,8 +224,13 @@ process.EuZ <- function(cops.raw,
 	} else ix.w <- 1:19
 	for(i in floor(seq(ix.w[1], ix.w[length(ix.w)], length.out = 4))) {
 	  if (length(which(!is.na(aop[,i]))) > 0) {
+	    if (PLOT.LINEAR) {
+	      my.xlim = range(aop[, i], aop.0[i], EuZ.0m.linear[i], na.rm = TRUE)
+	    } else {
+	      my.xlim = range(aop[, i], aop.0[i], na.rm = TRUE)
+	    }
 	    plot(aop.all[, i], Depth.all, type = "p", log = "x",
-	         xlim = range(aop[, i], aop.0[i], na.rm = TRUE),
+	         xlim = my.xlim,
 	         ylim = c(max(Z.interval,na.rm = T)+0.5,0),
 	         pch = 19, xlab = "", ylab = "",
 	         axes = FALSE, frame.plot = TRUE,

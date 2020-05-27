@@ -113,17 +113,24 @@ process.EdZ <- function(cops.raw,
 	aop.cols <- rainbow.modified(length(waves))
 	if(INTERACTIVE) x11(width = win.width, height = win.height)
   matplot(aop.all, Depth.all, type = "p", log = "x",
-          ylim = rev(range(c(0, Depth))),
+          ylim = c(max(Z.interval,na.rm = T)+1,0),
+          #ylim = rev(range(c(0, Depth))),
           xlim=c(min(EdZ.detect.lim),max(aop, na.rm=T)), pch = ".", cex = 1,
           ylab="Depth (m)",
           xlab = expression(E[d]*z* ~~ "("*mu*W.*cm^{-2}*.nm^{-1}*")"),
           col = aop.cols)
   grid(col = 1)
-	matplot(aop.fitted, depth.fitted, type = "l", lty = 1, lwd = 2, add = TRUE, col = aop.cols)
+	matplot(aop.fitted, depth.fitted, type = "l",
+	        lty = 1, lwd = 2, add = TRUE, col = aop.cols)
 	points(aop.0, rep(depth.0, length(aop.0)), col = aop.cols)
+	if (PLOT.LINEAR) matplot(EdZ.fitted, depth.fitted, type = "l",
+	                         lty = 2, lwd = 2, add = TRUE, col = aop.cols)
+	if (PLOT.LINEAR) points(diag(aop[ix.Z.interval,]), Z.interval, cex=1.5,
+	                        pch = 19,col = aop.cols)
 	par(xpd = TRUE)
 	legend(10^par("usr")[1], par("usr")[4], legend = waves, xjust = 0, yjust = 0, lty = 1, lwd = 2, col = aop.cols, ncol = ceiling(length(waves) / 2), cex = 0.75)
 	par(xpd = FALSE)
+	if (!PLOT.LINEAR) text(aop.0[8], 0, "LINEAR INTERPOLATION FAILED, SHOULD YOU RELAX THE TILT THRESOLD?", pos=4)
 
 	if(INTERACTIVE) x11(width = win.width, height = win.height)
 	mai.old1 <- par("mai")
@@ -135,7 +142,7 @@ process.EdZ <- function(cops.raw,
 	for(i in 1:length(waves)) {
 	  if (length(which(!is.na(aop[,i]))) > 0) {
 	    plot(aop.all[, i], Depth.all, type = "p", log = "x",
-	         xlim = range(aop[aop[, i] > 0, i], na.rm = TRUE),
+	         xlim = range(aop[aop[, i] > 0, i], aop.0[i], na.rm = TRUE),
 	         ylim = rev(range(Depth, depth.fitted)),
 	         pch = ".",
 	         xlab = "", ylab = "", axes = FALSE, frame.plot = TRUE,
@@ -155,7 +162,7 @@ process.EdZ <- function(cops.raw,
 	par(mai = mai.old1)
 	par(mgp = mgp.old1)
 
-	##### check surface interpolation
+	##### check surface extrapolation
 	if(INTERACTIVE) x11(width = win.width, height = win.height)
 	mai.old1 <- par("mai")
 	mgp.old1 <- par("mgp")
@@ -165,8 +172,13 @@ process.EdZ <- function(cops.raw,
 	mgp.old2 <- par("mgp")
 	for(i in 1:length(waves)) {
 	  if (length(which(!is.na(aop[,i]))) > 0) {
+	    if (PLOT.LINEAR) {
+	      my.xlim = range(aop[, i], aop.0[i], EdZ.0m.linear[i], na.rm = TRUE)
+	    } else {
+	      my.xlim = range(aop[, i], aop.0[i], na.rm = TRUE)
+	    }
 	    plot(aop.all[, i], Depth.all, type = "p", log = "x",
-	         xlim = range(aop[, i], aop.0[i], na.rm = TRUE),
+	         xlim = my.xlim,
 	         ylim = c(max(Z.interval,na.rm = T)+0.5,0),
 	         pch = ".", xlab = "", ylab = "",
 	         axes = FALSE, frame.plot = TRUE,
@@ -204,8 +216,13 @@ process.EdZ <- function(cops.raw,
 	} else ix.w <- 1:19
 	for(i in floor(seq(ix.w[1], ix.w[length(ix.w)], length.out = 4))) {
 	  if (length(which(!is.na(aop[,i]))) > 0) {
+	    if (PLOT.LINEAR) {
+	      my.xlim = range(aop[, i], aop.0[i], EdZ.0m.linear[i], na.rm = TRUE)
+	    } else {
+	      my.xlim = range(aop[, i], aop.0[i], na.rm = TRUE)
+	    }
 	    plot(aop.all[, i], Depth.all, type = "p", log = "x",
-	         xlim = range(aop[, i], aop.0[i], na.rm = TRUE),
+	         xlim = my.xlim,
 	         ylim = c(max(Z.interval,na.rm = T)+0.5,0),
 	         pch = 19, xlab = "", ylab = "",
 	         axes = FALSE, frame.plot = TRUE,
