@@ -1,1 +1,3 @@
 exportPattern("^[[:alpha:]]+")
+useDynLib("Cops", "qaa")
+#export(cops.go,cops.shift)

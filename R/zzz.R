@@ -1,5 +1,5 @@
 .onLoad <- function(lib, pkg) {
-	Sys.setenv(TZ = "GMT")
+	Sys.setenv(TZ = "UTC")
 	Sys.setenv(R_COPS_DATA_DIR=paste(lib, pkg, "data", sep="/"))
 	cat("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n")
 	cat("TO BEGIN A PROCESSING AND PRODUCE WINDOWS PLOTS,\n")
@@ -10,5 +10,13 @@
 	cat("    TYPE : cops.go(ASCII=TRUE)\n")
 	cat("TO BEGIN A PROCESSING AND PRODUCE   PDF   PLOTS, AND CLEAN THE PROFILE INTERACTIVELY\n")
 	cat("    TYPE : cops.go(CLEAN.FILES=TRUE)\n")
+	cat("TO SHIFT Rrs TO NEW BANDS- MELIN-SCLEP algorithm using QAA, TYPE : cops.shift()\n")
+	cat("N.B. : if you want to *** use *** cops.shift() *** and ***\n")
+	cat("         you have allready processed data - cops.go() function -\n")
+	cat("         with an older version of this package :\n")
+	cat("         (older means whithout cops.shift() function) :\n")
+	cat("       1) add a parameter called bandwidth in file init.cops.dat\n")
+	cat("       2) use cops.go() again\n")
+	cat("       3) use cops.shift()\n")
 	cat("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n")
 }
