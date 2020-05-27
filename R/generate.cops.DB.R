@@ -150,7 +150,7 @@ generate.cops.DB <- function(path="./",
           if (!is.null(cops$Q)) mQ.Factor[j,xw.DB] = cops$Q[xw]
         }
 
-        if (!is.na(SHALLOW[j])) {
+        if (SHALLOW[j]=='1') {
           mbottom.depth[j] <- cops$bottom.depth
           if (!is.null(cops$Rb.Q)) {
             mRb[j,xw.DB] = cops$Rb.EuZ[xw]
@@ -229,9 +229,15 @@ generate.cops.DB <- function(path="./",
       bottom.depth[i] = mean(mbottom.depth)
 
       if (is.na(cops$chl)) shadow.cor[i] <- "No correction"
-      if (!is.na(cops$chl))shadow.cor[i] <- "abs.Case1.model"
-      if (cops$chl == 999) shadow.cor[i] <- "abs.Kd.method"
-      if (cops$chl == 0) shadow.cor[i] <- "abs.measured"
+      else{
+
+        #if (!is.na(cops$chl))shadow.cor[i] <- "abs.Case1.model"
+        if (cops$chl == 999) shadow.cor[i] <- "abs.Kd.method"
+        else if (cops$chl == 0) shadow.cor[i] <- "abs.measured"
+        else {
+          shadow.cor[i] <- "abs.Case1.model"
+        }
+      }
 
 
       mean.rec.data = c(Rrs.m[i,],
@@ -253,9 +259,10 @@ generate.cops.DB <- function(path="./",
                       Kd.pd.m[i,],
                       Ed0.0p.sd[i,])
 
-      rec.info = data.frame(date[i],sunzen[i], lat[i], lon[i], shadow.cor[i], FU[i], bottom.depth)
+      rec.info = data.frame(date[i],sunzen[i], lat[i], lon[i], shadow.cor[i], FU[i], bottom.depth[i])
 
     } else {
+      j <- 1
 
       if (Rrs_method == "Rrs.0p.linear") LINEAR=TRUE else LINEAR=FALSE
 
@@ -282,7 +289,7 @@ generate.cops.DB <- function(path="./",
         FU[i]  = cops$FU.linear
         Rrs.m[i,xw.DB] = cops$Rrs.0p.linear[xw]
         nLw.m[i,xw.DB] = cops$nLw.0p.linear[xw]
-        if (!is.null(cops$Q.linear)) Q.Factor.m[i,xw.DB] = cops$Q.factor[xw]
+        if (!is.null(cops$Q.linear)) Q.Factor.m[i,xw.DB] = cops$Q.linear[xw]
       } else {
         FU[i]  = cops$FU
         Rrs.m[i,xw.DB] = cops$Rrs.0p[xw]
@@ -290,12 +297,12 @@ generate.cops.DB <- function(path="./",
         if (!is.null(cops$Q)) Q.Factor.m[i,xw.DB] = cops$Q[xw]
       }
 
-      if (!is.na(SHALLOW[j])) {
+      if (SHALLOW[j]=='1') {
         bottom.depth[i] <- cops$bottom.depth
         if (!is.null(cops$Rb.Q)) {
-          Rb[i,xw.DB] = cops$Rb.EuZ[xw]
-          Rb.Q[i,xw.DB] = cops$Rb.Q[xw]
-        } else Rb[i,xw.DB] = cops$Rb.LuZ[xw]
+          Rb.m[i,xw.DB] = cops$Rb.EuZ[xw]
+          Rb.Q.m[i,xw.DB] = cops$Rb.Q[xw]
+        } else Rb.m[i,xw.DB] = cops$Rb.LuZ[xw]
       }
 
       # extract Ed0.0p
@@ -311,19 +318,19 @@ generate.cops.DB <- function(path="./",
       z1 = unlist(z1)[ix.pair]
       z1[z1<0] = NA
       z1[z1 > max(cops$depth.fitted)] = NA
-      mKd1p[j,xw.DB] = 4.605/z1
+      Kd.1p.m[i,xw.DB] = 4.605/z1
 
       z10 = apply(percentEdZ, 2, spline,y=cops$depth.fitted , xout=0.1)
       z10 = unlist(z10)[ix.pair]
       z10[z10<0] = NA
       z10[z10 > max(cops$depth.fitted)] = NA
-      mKd10p[j,xw.DB] = 2.3025/z10
+      Kd.10p.m[i,xw.DB] = 2.3025/z10
 
       zpd = apply(percentEdZ, 2, spline,y=cops$depth.fitted , xout=0.3678)
       zpd = unlist(zpd)[ix.pair]
       zpd[zpd<0] = NA
       zpd[zpd > max(cops$depth.fitted)] = NA
-      mKdpd[j,xw.DB] = 1/zpd
+      Kd.pd.m[i,xw.DB] = 1/zpd
 
       mean.rec.data = c(Rrs.m[i,],
                         nLw.m[i,],
@@ -344,10 +351,21 @@ generate.cops.DB <- function(path="./",
                       rep(NA,nwaves),
                       rep(NA,nwaves))
 
+      # if (is.na(cops$chl)) shadow.cor[i] <- "No correction"
+      # if (!is.na(cops$chl))shadow.cor[i] <- "abs.Case1.model"
+      # if (cops$chl == 999) shadow.cor[i] <- "abs.Kd.method"
+      # if (cops$chl == 0) shadow.cor[i] <- "abs.measured"
+
       if (is.na(cops$chl)) shadow.cor[i] <- "No correction"
-      if (!is.na(cops$chl))shadow.cor[i] <- "abs.Case1.model"
-      if (cops$chl == 999) shadow.cor[i] <- "abs.Kd.method"
-      if (cops$chl == 0) shadow.cor[i] <- "abs.measured"
+      else{
+
+        #if (!is.na(cops$chl))shadow.cor[i] <- "abs.Case1.model"
+        if (cops$chl == 999) shadow.cor[i] <- "abs.Kd.method"
+        else if (cops$chl == 0) shadow.cor[i] <- "abs.measured"
+        else {
+          shadow.cor[i] <- "abs.Case1.model"
+        }
+      }
 
       rec.info = data.frame(date[i],sunzen[i], lat[i],
                             lon[i], shadow.cor[i], FU[i], bottom.depth[i])
