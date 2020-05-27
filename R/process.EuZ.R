@@ -123,7 +123,7 @@ process.EuZ <- function(cops.raw,
 	if(INTERACTIVE) x11(width = win.width, height = win.height)
 	matplot(aop.all, Depth.all, type = "p", log = "x",
 	        ylim = c(max(Z.interval,na.rm = T)+1,0),
-	        xlim=c(min(EuZ.detect.lim),max(aop, na.rm=T)), pch = ".", cex = 1,
+	        xlim=c(1e-4,max(aop, na.rm=T)), pch = ".", cex = 1,
 	        ylab="Depth (m)",
 	        xlab = expression(E[u]*z* ~~ "("*mu*W.*cm^{-2}*.nm^{-1}*")"),
 	        col = aop.cols)
@@ -149,7 +149,7 @@ process.EuZ <- function(cops.raw,
 	for(i in 1:length(waves)) {
 	  if (length(which(!is.na(aop[,i]))) > 0) {
 	    plot(aop.all[, i], Depth.all, type = "p", log = "x",
-	         xlim = range(aop[aop[, i] > 0, i], na.rm = TRUE),
+	         xlim = range(aop.all[aop.all[, i] > 0, i], na.rm = TRUE),
 	         ylim = rev(range(Depth, depth.fitted)),
 	         pch = ".",
 	         xlab = "", ylab = "", axes = FALSE, frame.plot = TRUE,
