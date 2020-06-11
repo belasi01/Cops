@@ -3,6 +3,24 @@ The Cops Package
 Simon Bélanger
 April 23, 2020
 
+  - [Preliminaries](#preliminaries)
+  - [The C-OPS data processing](#the-c-ops-data-processing)
+  - [Step 0 : Get started with Cops processing and configuration of the
+    INIT
+    file](#step-0-get-started-with-cops-processing-and-configuration-of-the-init-file)
+  - [Step 1 : Configure the **info.cops.dat** file and run the code for
+    the first time to generate
+    results](#step-1-configure-the-info.cops.dat-file-and-run-the-code-for-the-first-time-to-generate-results)
+  - [Step 2: Preliminary analysis of the results output and processing
+    parameters
+    adjustment](#step-2-preliminary-analysis-of-the-results-output-and-processing-parameters-adjustment)
+  - [Data format](#data-format)
+  - [Bioshade processing](#bioshade-processing)
+  - [IcePro processing or under-ice data
+    processing](#icepro-processing-or-under-ice-data-processing)
+  - [Contact point](#contact-point)
+  - [References](#references)
+
 The Cops package was initially developped by Bernard Gentili at the
 Laboratoire d’Océanologie de Villefranche (LOV). It gathers several
 routines to process raw data collected using a C-OPS instrument. The
@@ -91,28 +109,15 @@ To install the full code sources, you can also “clone” the package in a
 local folder. You have to create a “New project…” from the file menu and
 choose the “Version Control” project type, and then choose “Git” option.
 Next you have to indicate the full path of the R package repository on
-GitHub, as illustrated
-below.
+GitHub, as illustrated below.
 
-<div class="figure">
-
-<img src="./extfigures/git.pdf" alt="Figure 1. Clone the package from GitHub to have a full access to source code." width="50%" />
-
-<p class="caption">
-
-Figure 1. Clone the package from GitHub to have a full access to source
-code.
-
-</p>
-
-</div>
+<embed src="./extfigures/git.pdf" title="Figure 1. Clone the package from GitHub to have a full access to source code." alt="Figure 1. Clone the package from GitHub to have a full access to source code." width="50%" type="application/pdf" />
 
 ## Step 0 : Get started with Cops processing and configuration of the INIT file
 
 Unfortunately, most functions of the `Cops` package do not have a help
 page. This is because the user **only need to know one single function**
-to launch the processing, i.e. the `cops.go()`. So let’s get
-    started.
+to launch the processing, i.e. the `cops.go()`. So let’s get started.
 
 ``` r
 library(Cops)
@@ -124,6 +129,8 @@ library(Cops)
 
     ## Loading required package: stringr
 
+    ## Loading required package: ncdf4
+
     ## @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     ## TO BEGIN A PROCESSING AND PRODUCE WINDOWS PLOTS,
     ##     TYPE : cops.go(interactive = TRUE)
@@ -133,6 +140,14 @@ library(Cops)
     ##     TYPE : cops.go(ASCII=TRUE)
     ## TO BEGIN A PROCESSING AND PRODUCE   PDF   PLOTS, AND CLEAN THE PROFILE INTERACTIVELY
     ##     TYPE : cops.go(CLEAN.FILES=TRUE)
+    ## TO SHIFT Rrs TO NEW BANDS- MELIN-SCLEP algorithm using QAA, TYPE : cops.shift()
+    ## N.B. : if you want to *** use *** cops.shift() *** and ***
+    ##          you have allready processed data - cops.go() function -
+    ##          with an older version of this package :
+    ##          (older means whithout cops.shift() function) :
+    ##        1) add a parameter called bandwidth in file init.cops.dat
+    ##        2) use cops.go() again
+    ##        3) use cops.shift()
     ## @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 As you can see, when you load the package with the `library()` function,
@@ -290,8 +305,7 @@ recorded.
 
 As mentioned above, the **init.cops.dat** file should not change much
 from one station to another and can be copy/paste to every folder you
-want to
-process.
+want to process.
 
 ## Step 1 : Configure the **info.cops.dat** file and run the code for the first time to generate results
 
@@ -389,8 +403,7 @@ good (a very bad profile that was recorded by error on the field) or if
 you have made a mistake in the **init.cops.dat** file (e.g., often you
 did not change Master to NA for field *instruments.others*, or you made
 a mistake in the date/time format, etc.) or if the data file was
-recorded specifically for the Bioshade
-measurements.
+recorded specifically for the Bioshade measurements.
 
 ## Step 2: Preliminary analysis of the results output and processing parameters adjustment
 
@@ -412,11 +425,12 @@ light profile. To remove profile, we change the integer to 0. Other
 C-OPS casts are Bioshade (2) or under-ice profile (3). In case of an
 under-ice profile, no extrapolation to the air-sea interface is
 performed and sub-surface AOP (nLw, Lw, Rrs, etc) are not calculated.
-The columns 3 and 4 are specifying the best extrapolation methods for
-the remote sensing reflectance (Rrs) calculation and for Kd (not
-implemented yet). Therefore the third column will accept
-**Rrs.0p.linear** or **Rrs.0p** for linear and loess extrapolation,
-respectively.
+The column 3 indicates the best extrapolation methods for the remote
+sensing reflectance (Rrs). Column 4 indicates whether or not the COPS
+profile was made in shallow waters (1 = shallow). In that case, the
+bottom reflectnace is extracted from the light profile. Therefore the
+third column will accept **Rrs.0p.linear** or **Rrs.0p** for linear and
+loess extrapolation, respectively.
 
 Let’s focus now on the PDF/ directory in which one PDF per profile was
 generated. You will have to open each PDF and analyse the results to
@@ -434,21 +448,8 @@ duration was 26 seconds. The profiler was at 1 m from the surface right
 at the begining, then reached the surface after 3 seconds, and dropped
 tp the bottom at 18:18:58 UTC, i.e. about 22 seconds from the begining.
 **Such a profile MUST be cleaned**. In fact, the profiler should be in
-free-fall to pass the linear fit
-conditions.  
-
-<div class="figure">
-
-<img src="./extfigures/time.window1.png" alt="Figure 2. Example of pressure or depth of the profiler versus time in second since the begining of the recording" width="80%" />
-
-<p class="caption">
-
-Figure 2. Example of pressure or depth of the profiler versus time in
-second since the begining of the recording
-
-</p>
-
-</div>
+free-fall to pass the linear fit conditions.  
+<img src="./extfigures/time.window1.png" title="Figure 2. Example of pressure or depth of the profiler versus time in second since the begining of the recording" alt="Figure 2. Example of pressure or depth of the profiler versus time in second since the begining of the recording" width="80%" />
 
 With the version 4.0, you can clean the file by runing the code again,
 but with the **CLEAN.FILES** option set to **TRUE**. Note that this step
@@ -461,21 +462,9 @@ cops.go(CLEAN.FILES = TRUE)
 ```
 
 The user will be prompted to click on the plot of depth versus index to
-determine the begining of the cast and the end of the cast (Figure
-3).
+determine the begining of the cast and the end of the cast (Figure 3).
 
-<div class="figure">
-
-<img src="./extfigures/clean.file.png" alt="Figure 3. Example of depth of the profiler versus the number of records (index) available in the file" width="90%" />
-
-<p class="caption">
-
-Figure 3. Example of depth of the profiler versus the number of records
-(index) available in the file
-
-</p>
-
-</div>
+<img src="./extfigures/clean.file.png" title="Figure 3. Example of depth of the profiler versus the number of records (index) available in the file" alt="Figure 3. Example of depth of the profiler versus the number of records (index) available in the file" width="90%" />
 
 Here the user clicked on the index 46 for the starting point and the
 index 352 for the ending point. In this example, the profiler hit the
@@ -494,52 +483,13 @@ shows an extreme case we encountered in the Labrador Sea in 2014.
 Keeping the tilt threshold at 5 degrees for the in-water sensors would
 have removed nearly all the data\! In such case we need to increased the
 threshold to 10 degrees to get AOPs, which is acceptable in the open
-ocean when the profiler is far from the
-ship.
+ocean when the profiler is far from the ship.
 
-<div class="figure">
+<img src="./extfigures/time.window2.png" title="Figure 4. Example of pressure or depth of the profiler versus time in second since the begining of the recording after cleaning the file." alt="Figure 4. Example of pressure or depth of the profiler versus time in second since the begining of the recording after cleaning the file." width="90%" />
 
-<img src="./extfigures/time.window2.png" alt="Figure 4. Example of pressure or depth of the profiler versus time in second since the begining of the recording after cleaning the file." width="90%" />
+<img src="./extfigures/tilt2.png" title="Figure 5. Example of instrument tilt for Ed0 and EdZ (i.e., the profiler) during the cast. Red points have been discarded for the rest of the analysis using the tiltmax.optics parameter." alt="Figure 5. Example of instrument tilt for Ed0 and EdZ (i.e., the profiler) during the cast. Red points have been discarded for the rest of the analysis using the tiltmax.optics parameter." width="70%" />
 
-<p class="caption">
-
-Figure 4. Example of pressure or depth of the profiler versus time in
-second since the begining of the recording after cleaning the
-file.
-
-</p>
-
-</div>
-
-<div class="figure">
-
-<img src="./extfigures/tilt2.png" alt="Figure 5. Example of instrument tilt for Ed0 and EdZ (i.e., the profiler) during the cast. Red points have been discarded for the rest of the analysis using the tiltmax.optics parameter." width="70%" />
-
-<p class="caption">
-
-Figure 5. Example of instrument tilt for Ed0 and EdZ (i.e., the
-profiler) during the cast. Red points have been discarded for the rest
-of the analysis using the tiltmax.optics
-parameter.
-
-</p>
-
-</div>
-
-<div class="figure">
-
-<img src="./extfigures/tilt3.png" alt="Figure 6. Example of instrument tilt for Ed0 and EdZ (i.e., the profiler) during the VITALS cruise in 2014 onboard the Hudson. Note that the figure was generated by the version 3 of the Cops package." width="70%" />
-
-<p class="caption">
-
-Figure 6. Example of instrument tilt for Ed0 and EdZ (i.e., the
-profiler) during the VITALS cruise in 2014 onboard the Hudson. Note that
-the figure was generated by the version 3 of the Cops
-package.
-
-</p>
-
-</div>
+<img src="./extfigures/tilt3.png" title="Figure 6. Example of instrument tilt for Ed0 and EdZ (i.e., the profiler) during the VITALS cruise in 2014 onboard the Hudson. Note that the figure was generated by the version 3 of the Cops package." alt="Figure 6. Example of instrument tilt for Ed0 and EdZ (i.e., the profiler) during the VITALS cruise in 2014 onboard the Hudson. Note that the figure was generated by the version 3 of the Cops package." width="70%" />
 
 ### Step 2.2 : Check the dowelling irradiance conditions during the cast.
 
@@ -554,36 +504,14 @@ probably resulting from a moving boat by waves. The LOESS smoothing
 completely remove these artefacts. In this example, the conditions were
 perfect.
 
-<div class="figure">
-
-<img src="./extfigures/Ed0_stable.png" alt="Figure 7. Example of stable Ed0 conditions during a vertical profile" width="70%" />
-
-<p class="caption">
-
-Figure 7. Example of stable Ed0 conditions during a vertical profile
-
-</p>
-
-</div>
+<img src="./extfigures/Ed0_stable.png" title="Figure 7. Example of stable Ed0 conditions during a vertical profile" alt="Figure 7. Example of stable Ed0 conditions during a vertical profile" width="70%" />
 
 The next example (Fig. 8) shows a drastic drop in Ed0 during a profile.
 This kind of unstable conditions is bad for the rest of the data
 processing. This profile should be discarded by changing the value of 1
-to 0 in the file
-**select.cops.dat**.
+to 0 in the file **select.cops.dat**.
 
-<div class="figure">
-
-<img src="./extfigures/Ed0_2.png" alt="Figure 8. Example of an unstable Ed0 conditions during a vertical profile" width="70%" />
-
-<p class="caption">
-
-Figure 8. Example of an unstable Ed0 conditions during a vertical
-profile
-
-</p>
-
-</div>
+<img src="./extfigures/Ed0_2.png" title="Figure 8. Example of an unstable Ed0 conditions during a vertical profile" alt="Figure 8. Example of an unstable Ed0 conditions during a vertical profile" width="70%" />
 
 ### Step 2.3 : Check the quality of the extrapolation of the radiometric quantity to the air-water interface
 
@@ -643,24 +571,9 @@ surface layer of the water column. It presents all 19 wavelenghts and
 the 2 fitting methods on the same plot. Note that no fit was performed
 for the 305 nm and 320 nm channels due to the lack of measurements above
 the instrument detection limit (here set at 5e-5), which is
-wavelength-specific and
-sensor-specific.
+wavelength-specific and sensor-specific.
 
-<div class="figure">
-
-<img src="./extfigures/LuZ_extrapol_Overall.png" alt="Figure 9. Example of LuZ extrapolation to the surface (z=0-) using non-linear fitting with LOESS method (solid line) and the linear method (dashed line) described in Bélanger et al (2017). C-OPS measurements are the small dots while the big solid circles indicate the maximum depth used to make the linear extrapolation of LuZ to 0- depth. " width="100%" />
-
-<p class="caption">
-
-Figure 9. Example of LuZ extrapolation to the surface (z=0-) using
-non-linear fitting with LOESS method (solid line) and the linear method
-(dashed line) described in Bélanger et al (2017). C-OPS measurements are
-the small dots while the big solid circles indicate the maximum depth
-used to make the linear extrapolation of LuZ to 0- depth.
-
-</p>
-
-</div>
+<img src="./extfigures/LuZ_extrapol_Overall.png" title="Figure 9. Example of LuZ extrapolation to the surface (z=0-) using non-linear fitting with LOESS method (solid line) and the linear method (dashed line) described in Bélanger et al (2017). C-OPS measurements are the small dots while the big solid circles indicate the maximum depth used to make the linear extrapolation of LuZ to 0- depth. " alt="Figure 9. Example of LuZ extrapolation to the surface (z=0-) using non-linear fitting with LOESS method (solid line) and the linear method (dashed line) described in Bélanger et al (2017). C-OPS measurements are the small dots while the big solid circles indicate the maximum depth used to make the linear extrapolation of LuZ to 0- depth. " width="100%" />
 
 The next plot (Fig. 10) is good to appreciate the overall quality of the
 LOESS fit for each 19 wavelenghts. In this optically shallow water
@@ -684,32 +597,9 @@ green horizontal lines are the threshold specified by the parameter
 **sub.surface.removed.layer.optics**, which was set to 0 in this
 example.
 
-<div class="figure">
+<img src="./extfigures/LuZ_extrapol_individual_all_depths.png" title="Figure 10. Example of LuZ fitted with the LOESS method for each individual channels." alt="Figure 10. Example of LuZ fitted with the LOESS method for each individual channels." width="100%" />
 
-<img src="./extfigures/LuZ_extrapol_individual_all_depths.png" alt="Figure 10. Example of LuZ fitted with the LOESS method for each individual channels." width="100%" />
-
-<p class="caption">
-
-Figure 10. Example of LuZ fitted with the LOESS method for each
-individual
-channels.
-
-</p>
-
-</div>
-
-<div class="figure">
-
-<img src="./extfigures/LuZ_extrapol_individual_all_depths_interval_3m.png" alt="Figure 11. Same as 10, but for a depth interval for smoothing reduced at 3 meters" width="100%" />
-
-<p class="caption">
-
-Figure 11. Same as 10, but for a depth interval for smoothing reduced at
-3 meters
-
-</p>
-
-</div>
+<img src="./extfigures/LuZ_extrapol_individual_all_depths_interval_3m.png" title="Figure 11. Same as 10, but for a depth interval for smoothing reduced at 3 meters" alt="Figure 11. Same as 10, but for a depth interval for smoothing reduced at 3 meters" width="100%" />
 
 To compare the linear versus the LOESS fit near the air-water interface,
 two additional plots focusing on the surface are available in the PDF.
@@ -730,35 +620,13 @@ better appreciate the fitting methods comparison.
 Overall, for this profile, we would consider the LOESS fit more
 appropriate because of the strong non-linearity of the light profile.
 For further data exploitation, we will edit the **select.cops.dat** to
-indicate the use of the LOESS for the remote sensing refletance
-as:
+indicate the use of the LOESS for the remote sensing refletance as:
 
 WISE\_MAN\_F5\_CAST\_003\_190818\_181835\_URC.tsv;1;**Rrs.0p**;NA
 
-<div class="figure">
+<img src="./extfigures/LuZ_extrapol_individual_surface_interval_3m.png" title="Figure 12. Same as 11, but for the surface layer." alt="Figure 12. Same as 11, but for the surface layer." width="100%" />
 
-<img src="./extfigures/LuZ_extrapol_individual_surface_interval_3m.png" alt="Figure 12. Same as 11, but for the surface layer." width="100%" />
-
-<p class="caption">
-
-Figure 12. Same as 11, but for the surface
-layer.
-
-</p>
-
-</div>
-
-<div class="figure">
-
-<img src="./extfigures/LuZ_extrapol_4waves_surface_interval_3m.png" alt="Figure 13. Same as 12, but for selected wavelenghts across the spectrum." width="100%" />
-
-<p class="caption">
-
-Figure 13. Same as 12, but for selected wavelenghts across the spectrum.
-
-</p>
-
-</div>
+<img src="./extfigures/LuZ_extrapol_4waves_surface_interval_3m.png" title="Figure 13. Same as 12, but for selected wavelenghts across the spectrum." alt="Figure 13. Same as 12, but for selected wavelenghts across the spectrum." width="100%" />
 
 ### Step 2.4 : Quality check of the EdZ fit
 
@@ -782,48 +650,13 @@ So to keep this feature, we could have increased the
 **depth.interval.for.smoothing.optics** to 3 meters, but here these
 changes did not improved the results significantly (not shown). As for
 LuZ, other plots focusing on the surface layer can be used to compare
-the LOESS with the linear extrapolation are available (Fig.
-17).
+the LOESS with the linear extrapolation are available (Fig. 17).
 
-<div class="figure">
+<img src="./extfigures/EdZ.Fit1.png" title="Figure 14. Example of EdZ fit with the LOESS using a depth interval of 4 meters." alt="Figure 14. Example of EdZ fit with the LOESS using a depth interval of 4 meters." width="100%" />
 
-<img src="./extfigures/EdZ.Fit1.png" alt="Figure 14. Example of EdZ fit with the LOESS using a depth interval of 4 meters." width="100%" />
+<img src="./extfigures/EdZ.Fit2.png" title="Figure 15. Example of EdZ fit with the LOESS using a depth interval of 4 meters for each wavelength." alt="Figure 15. Example of EdZ fit with the LOESS using a depth interval of 4 meters for each wavelength." width="100%" />
 
-<p class="caption">
-
-Figure 14. Example of EdZ fit with the LOESS using a depth interval of 4
-meters.
-
-</p>
-
-</div>
-
-<div class="figure">
-
-<img src="./extfigures/EdZ.Fit2.png" alt="Figure 15. Example of EdZ fit with the LOESS using a depth interval of 4 meters for each wavelength." width="100%" />
-
-<p class="caption">
-
-Figure 15. Example of EdZ fit with the LOESS using a depth interval of 4
-meters for each
-wavelength.
-
-</p>
-
-</div>
-
-<div class="figure">
-
-<img src="./extfigures/EdZ.Fit3.png" alt="Figure 16. Example of EdZ fit with the LOESS and linear at the surface for 4 selected wavelenghts." width="100%" />
-
-<p class="caption">
-
-Figure 16. Example of EdZ fit with the LOESS and linear at the surface
-for 4 selected wavelenghts.
-
-</p>
-
-</div>
+<img src="./extfigures/EdZ.Fit3.png" title="Figure 16. Example of EdZ fit with the LOESS and linear at the surface for 4 selected wavelenghts." alt="Figure 16. Example of EdZ fit with the LOESS and linear at the surface for 4 selected wavelenghts." width="100%" />
 
 Figure 17 shows two extra plots to assess the quality of the EdZ
 extrapolation to the air-water interface. Here the extrapolated values
@@ -837,23 +670,9 @@ in more details Figure 16 that compares the extrapolation methods at
 selected wavelenghts. This example demonstrate the difficulty to
 extrapolate EdZ to 0- under clear sky and vertically inhomogenous water
 column. This is the reason why multiple C-OPS cast are required in such
-conditions to end up with good
-AOPs.
+conditions to end up with good AOPs.
 
-<div class="figure">
-
-<img src="./extfigures/Ed0m_vs_0.97Ed0p.png" alt="Figure 17. Top: relationship between extrapolated irradiance at 0- and the estimated irradiance based on the reference, Ed0*0.957. Bottom: the ratio of extrapolated to estimated Ed at 0- from EdZ and Ed0 respectively." width="100%" />
-
-<p class="caption">
-
-Figure 17. Top: relationship between extrapolated irradiance at 0- and
-the estimated irradiance based on the reference, Ed0\*0.957. Bottom: the
-ratio of extrapolated to estimated Ed at 0- from EdZ and Ed0
-respectively.
-
-</p>
-
-</div>
+<img src="./extfigures/Ed0m_vs_0.97Ed0p.png" title="Figure 17. Top: relationship between extrapolated irradiance at 0- and the estimated irradiance based on the reference, Ed0*0.957. Bottom: the ratio of extrapolated to estimated Ed at 0- from EdZ and Ed0 respectively." alt="Figure 17. Top: relationship between extrapolated irradiance at 0- and the estimated irradiance based on the reference, Ed0*0.957. Bottom: the ratio of extrapolated to estimated Ed at 0- from EdZ and Ed0 respectively." width="100%" />
 
 ### Step 3 : Compare replicates
 
@@ -878,34 +697,11 @@ and 7.5 m. The differenc in depth is consistent with the Rrs values,
 with higher green reflectance for shallower profiles. The cast number 4,
 however, is clearly an outlier in terms of Kd (higher values across the
 spectrum). It is also lower in term of Rrs (deeper waters). This cast
-should be discarded for the data
-base.
+should be discarded for the data base.
 
-<div class="figure">
+<img src="./extfigures/Kd_all.png" title="Figure 18. Example of 4 replicates for Kd for the WISE-Man station MAN-F05 visited on 18th Aug. 2019." alt="Figure 18. Example of 4 replicates for Kd for the WISE-Man station MAN-F05 visited on 18th Aug. 2019." width="70%" />
 
-<img src="./extfigures/Kd_all.png" alt="Figure 18. Example of 4 replicates for Kd for the WISE-Man station MAN-F05 visited on 18th Aug. 2019." width="70%" />
-
-<p class="caption">
-
-Figure 18. Example of 4 replicates for Kd for the WISE-Man station
-MAN-F05 visited on 18th
-Aug. 2019.
-
-</p>
-
-</div>
-
-<div class="figure">
-
-<img src="./extfigures/Rrs_all.png" alt="Figure 19. Same as 18, but for the remote sensing reflectance." width="70%" />
-
-<p class="caption">
-
-Figure 19. Same as 18, but for the remote sensing reflectance.
-
-</p>
-
-</div>
+<img src="./extfigures/Rrs_all.png" title="Figure 19. Same as 18, but for the remote sensing reflectance." alt="Figure 19. Same as 18, but for the remote sensing reflectance." width="70%" />
 
 In general, there are always more differences in Rrs due to the
 extrapolation method. In this example, the linear extrapolation yield
@@ -972,20 +768,9 @@ may be edited using `compute.discrete.aTOT.for.COPS()` function from the
 The importance of this correction can be visualised in the PDF document
 in the page showing the various water-leaving radiances and reflectances
 spectra. The Figure 20 shows a typical Case-2 water case. The correction
-is relatively important in the NIR and UV
-bands.
+is relatively important in the NIR and UV bands.
 
-<div class="figure">
-
-<img src="./extfigures/Rrs_with_ShadowCorrection.png" alt="Figure 20. Example of Rrs and shadow correction coefficient" width="80%" />
-
-<p class="caption">
-
-Figure 20. Example of Rrs and shadow correction coefficient
-
-</p>
-
-</div>
+<img src="./extfigures/Rrs_with_ShadowCorrection.png" title="Figure 20. Example of Rrs and shadow correction coefficient" alt="Figure 20. Example of Rrs and shadow correction coefficient" width="80%" />
 
 ### Step 6 : Generate the data base
 
@@ -1046,8 +831,7 @@ These files contain list of variables named *cops*. All the information
 for a given cast, including the raw data, is stored in this data
 structure (i.e. an R `list`). This is very easy in R to deal with this
 type of data. The example below contains as much as 112 variables,
-including processing parameters, raw data, fitted data and so
-on.
+including processing parameters, raw data, fitted data and so on.
 
 ``` r
 load("~/OneDrive - UQAR/data/WISEMan/L2/20190818_StationMAN-F05/COPS_BU/BIN/WISE_MAN_F5_CAST_003_190818_181835_URC.tsv.RData")
@@ -1257,77 +1041,31 @@ As for the other files, the *time.window* field must be edited in the
 processing. Here is an example of the PDF file produced by a bioshade
 processing. The figure 21 shows that the BioShade was activated during
 the recovering of the profiler. In fact, the profiler was at 30 meters
-depth when the acquisition was
-started.
+depth when the acquisition was started.
 
-<div class="figure">
-
-<img src="./extfigures/BioShade_time.png" alt="Figure 21. Example of depth versus time for a BioShade measurements" width="80%" />
-
-<p class="caption">
-
-Figure 21. Example of depth versus time for a BioShade measurements
-
-</p>
-
-</div>
+<img src="./extfigures/BioShade_time.png" title="Figure 21. Example of depth versus time for a BioShade measurements" alt="Figure 21. Example of depth versus time for a BioShade measurements" width="80%" />
 
 The figure 22 shows the Bioshade position as a function of time, which a
 relative unit. The shadowband is horizontal, i.e. not shading the
 sensor, when it is \<5000 or \>25000. So here the shadowband a
 round-trip, passing twice above the sensor. The red points will be used
 to interpolate Ed0 just before and after the shadowband started to shade
-the
-sensor.
+the sensor.
 
-<div class="figure">
-
-<img src="./extfigures/BioShadePos.png" alt="Figure 22. Example of Bioshade position versus time" width="80%" />
-
-<p class="caption">
-
-Figure 22. Example of Bioshade position versus time
-
-</p>
-
-</div>
+<img src="./extfigures/BioShadePos.png" title="Figure 22. Example of Bioshade position versus time" alt="Figure 22. Example of Bioshade position versus time" width="80%" />
 
 The figure 23 shows the Ed0 as a function of time. The solid lines are
 the interpolated data use to assess the global irradiance when the
 shadowband passed in front the sun, which occured at about 68 and 110
-seconds atfer the begining of the data
-acquisition.
+seconds atfer the begining of the data acquisition.
 
-<div class="figure">
-
-<img src="./extfigures/BioShade_Ed_vs_time.png" alt="Figure 23. Example of downwelling irradiance measured during a Bioshade measurement" width="80%" />
-
-<p class="caption">
-
-Figure 23. Example of downwelling irradiance measured during a Bioshade
-measurement
-
-</p>
-
-</div>
+<img src="./extfigures/BioShade_Ed_vs_time.png" title="Figure 23. Example of downwelling irradiance measured during a Bioshade measurement" alt="Figure 23. Example of downwelling irradiance measured during a Bioshade measurement" width="80%" />
 
 In this example is was a clear sky. The fraction of diffuse skylight to
 the total downwelling irradiance (green curve) increases exponentially
-from the NIR (\<10%) to the UV (~50%) (Fig.
-24).
+from the NIR (\<10%) to the UV (\~50%) (Fig. 24).
 
-<div class="figure">
-
-<img src="./extfigures/BioShade_Ed0.png" alt="Figure 24. Example of total (black), direct (red) and diffuse (blue) downwelling irradiance assessed using the Bioshade measurements" width="80%" />
-
-<p class="caption">
-
-Figure 24. Example of total (black), direct (red) and diffuse (blue)
-downwelling irradiance assessed using the Bioshade measurements
-
-</p>
-
-</div>
+<img src="./extfigures/BioShade_Ed0.png" title="Figure 24. Example of total (black), direct (red) and diffuse (blue) downwelling irradiance assessed using the Bioshade measurements" alt="Figure 24. Example of total (black), direct (red) and diffuse (blue) downwelling irradiance assessed using the Bioshade measurements" width="80%" />
 
 The RData structure saved for a Bioshade file is shown below.
 
