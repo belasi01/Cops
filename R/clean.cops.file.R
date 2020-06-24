@@ -70,23 +70,25 @@ clean.cops.file <- function (in.file="", out.file="cleaned.cops.csv", distance.a
     }
   }
 
+  ix.depth <- which(str_detect(names(df), "Depth"))[1]
 
-  plot(df[,5], ylab = "Depth in m",
-       ylim = rev(range(df[,5])),
+
+  plot(df[,ix.depth], ylab = "Depth in m",
+       ylim = rev(range(df[,ix.depth])),
        main = in.file)
   print("    <-  Click on starting point and then ESC")
-  text(0,min(df[,5]), "    <-  Click on starting point and then ESC", pos=4)
-  ix.min=identify(df[,5])
+  text(0,min(df[,ix.depth]), "    <-  Click on starting point and then ESC", pos=4)
+  ix.min=identify(df[,ix.depth])
 
   print("Click  when COPS hit bottom or at the end of the cast and ESC")
-  text(length(df[,5]),max(df[,5]), "Click on ending point and then ESC ->    ", pos=2)
-  ix.max=identify(df[,5])
-  depthMax=(df[ix.max,5])
+  text(length(df[,ix.depth]),max(df[,ix.depth]), "Click on ending point and then ESC ->    ", pos=2)
+  ix.max=identify(df[,ix.depth])
+  depthMax=(df[ix.max,ix.depth])
   if (is.na(distance.above.bottom)) {
-    ix.cut=which(df[,5] == depthCut)
+    ix.cut=which(df[,ix.depth] == depthCut)
   } else {
     depthCut = depthMax - distance.above.bottom
-    ix.cut=which.min(abs(df[,5]-depthCut))
+    ix.cut=which.min(abs(df[,ix.depth]-depthCut))
   }
 
   print("Cut at Index:")

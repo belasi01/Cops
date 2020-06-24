@@ -79,8 +79,8 @@ compute.aops <- function(cops.data) {
 	  PLOT.LINEAR <- !all(is.na(LuZ.0m.linear))
 
 	  mymessage("Computing nLw.0p ...", head = "-")
-	  nLw.0p <- Lw.0p / Ed0.0p * etirrwindow(waves.u, bandwidth)
-	  nLw.0p.linear <- Lw.0p.linear / Ed0.0p * etirrwindow(waves.u, bandwidth)
+	  nLw.0p <- Lw.0p / Ed0.0p * etirrwindow(waves.d, bandwidth)
+	  nLw.0p.linear <- Lw.0p.linear / Ed0.0p * etirrwindow(waves.d, bandwidth)
 
 	  mymessage("Computing Rrs.0p ...", head = "-")
 	  Rrs.0p <- Lw.0p / Ed0.0p
@@ -98,9 +98,9 @@ compute.aops <- function(cops.data) {
 	  R.0p.linear <- EuZ.0m.linear / Ed0.0p / 0.96
 
 	  mymessage("Computing Forel-Ule Color ...", head = "-")
-	  FU <- Rrs2FU(waves.u, Rrs.0p)$FU
+	  FU <- Rrs2FU(waves.d, Rrs.0p)$FU
 	  if (PLOT.LINEAR) {
-	    FU.linear <- Rrs2FU(waves.u, Rrs.0p.linear)$FU
+	    FU.linear <- Rrs2FU(waves.d, Rrs.0p.linear)$FU
 	  } else FU.linear <- NA
 
 	  if (("LuZ" %in% instruments.optics) && ("EuZ" %in% instruments.optics)) {
@@ -140,22 +140,22 @@ compute.aops <- function(cops.data) {
 	if (cops.data$EXTRAPOLATION.0m) {
 	  if(INTERACTIVE) x11(width = win.width, height = win.height)
 	  par(mfrow = c(2, 3))
-	  plot(1, 1, type = "n", log = "y", xlim = range(waves.u), ylim = c(0.00005, 10), xlab = expression(lambda ~~ nm), ylab = expression(L[w]), axes = FALSE, frame.plot = TRUE)
+	  plot(1, 1, type = "n", log = "y", xlim = range(waves.d), ylim = c(0.00005, 10), xlab = expression(lambda ~~ nm), ylab = expression(L[w]), axes = FALSE, frame.plot = TRUE)
 	  axis(1)
 	  axis.log(2, grid = TRUE, col = 1, lwd = 0.5, lty = 2)
-	  lines(waves.u, Lw.0p, type = "b")
-	  plot(1, 1, type = "n", log = "y", xlim = range(waves.u), ylim = c(0.00005, 10), xlab = expression(lambda ~~ nm), ylab = expression(nL[w]), axes = FALSE, frame.plot = TRUE)
+	  lines(waves.d, Lw.0p, type = "b")
+	  plot(1, 1, type = "n", log = "y", xlim = range(waves.d), ylim = c(0.00005, 10), xlab = expression(lambda ~~ nm), ylab = expression(nL[w]), axes = FALSE, frame.plot = TRUE)
 	  axis(1)
 	  axis.log(2, grid = TRUE, col = 1, lwd = 0.5, lty = 2)
-	  lines(waves.u, nLw.0p, type = "b")
-	  plot(1, 1, type = "n", log = "y", xlim = range(waves.u), ylim = c(0.000005, 0.1), xlab = expression(lambda ~~ nm), ylab = expression(R[0*"-"]), axes = FALSE, frame.plot = TRUE)
+	  lines(waves.d, nLw.0p, type = "b")
+	  plot(1, 1, type = "n", log = "y", xlim = range(waves.d), ylim = c(0.000005, 0.1), xlab = expression(lambda ~~ nm), ylab = expression(R[0*"-"]), axes = FALSE, frame.plot = TRUE)
 	  axis(1)
 	  axis.log(2, grid = TRUE, col = 1, lwd = 0.5, lty = 2)
-	  lines(waves.u, R.0m, type = "b")
-	  plot(1, 1, type = "n", log = "y", xlim = range(waves.u), ylim = c(0.000005, 0.1), xlab = expression(lambda ~~ nm), ylab = expression(Rrs[0*"+"]), axes = FALSE, frame.plot = TRUE)
+	  lines(waves.d, R.0m, type = "b")
+	  plot(1, 1, type = "n", log = "y", xlim = range(waves.d), ylim = c(0.000005, 0.1), xlab = expression(lambda ~~ nm), ylab = expression(Rrs[0*"+"]), axes = FALSE, frame.plot = TRUE)
 	  axis(1)
 	  axis.log(2, grid = TRUE, col = 1, lwd = 0.5, lty = 2)
-	  lines(waves.u, Rrs.0p, type = "b")
+	  lines(waves.d, Rrs.0p, type = "b")
 	  if(!is.null(shadow.coef.EuZ)) {
 	    if(is.na(cops.data$chl)) {
 	      shadow.correction.type <- "measured absorption"
@@ -167,7 +167,7 @@ compute.aops <- function(cops.data) {
 	        shadow.correction.type <- "absorption from chlorophyll\ncase 1 waters model"
 	      }
 	    }
-	    plot(waves.u, shadow.coef.EuZ$EuZ.shad.correction, type = "b", xlim = range(waves.u), ylim = c(0.2, 1), xlab = expression(lambda ~~ nm), ylab = "shadow correction for EuZ", main = shadow.correction.type)
+	    plot(waves.d, shadow.coef.EuZ$EuZ.shad.correction, type = "b", xlim = range(waves.d), ylim = c(0.2, 1), xlab = expression(lambda ~~ nm), ylab = "shadow correction for EuZ", main = shadow.correction.type)
 	    abline(h = seq(0.2, 1, 0.1), lty = 3)
 	  } else {
 	    if("EuZ" %in% cops.data$instruments.optics) {
@@ -186,8 +186,8 @@ compute.aops <- function(cops.data) {
 	        shadow.correction.type <- "absorption from chlorophyll\ncase 1 waters model"
 	      }
 	    }
-	    plot(waves.u, shadow.coef.LuZ$LuZ.shad.correction, type = "b",
-	         xlim = range(waves.u), ylim = c(0.2, 1),
+	    plot(waves.d, shadow.coef.LuZ$LuZ.shad.correction, type = "b",
+	         xlim = range(waves.d), ylim = c(0.2, 1),
 	         xlab = expression(lambda ~~ nm),
 	         ylab = "shadow correction for LuZ",
 	         main = shadow.correction.type)
@@ -202,21 +202,21 @@ compute.aops <- function(cops.data) {
 
 	if(!is.null(Q)) {
 	  par(mfrow = c(2, 1))
-	  plot(waves.u,Q, xlab = expression(lambda ~~ nm),
+	  plot(waves.d,Q, xlab = expression(lambda ~~ nm),
 	       ylab = "Measured Q factor", type = "l", lwd=2)
-	  if (PLOT.LINEAR) lines(waves.u,Q.linear,lty=2, lwd=2)
+	  if (PLOT.LINEAR) lines(waves.d,Q.linear,lty=2, lwd=2)
 	  legend("topright", c("linear fit", "LOESS fit"), lwd=c(2,2), lty=c(2,1))
 
-	  plot(1, 1, type = "n", log = "y", xlim = range(waves.u),
+	  plot(1, 1, type = "n", log = "y", xlim = range(waves.d),
 	       ylim = c(0.00005, 0.1),
 	       xlab = expression(lambda ~~ nm),
 	       ylab = "Subsurface reflectance, R(0-)", axes = FALSE, frame.plot = TRUE)
 	  axis(1)
 	  axis.log(2, grid = TRUE, col = 1, lwd = 0.5, lty = 2)
-	  lines(waves.u, R.0m, type = "b", lwd=2)
-	  lines(waves.u, pi*LuZ.0m/Ed0.0m, lwd=2, col=2)
-	  if (PLOT.LINEAR) lines(waves.u, R.0m.linear, type = "b", lty =2, lwd=2)
-	  if (PLOT.LINEAR) lines(waves.u, pi*LuZ.0m.linear/Ed0.0m, lty =2, col=2, lwd=2)
+	  lines(waves.d, R.0m, type = "b", lwd=2)
+	  lines(waves.d, pi*LuZ.0m/Ed0.0m, lwd=2, col=2)
+	  if (PLOT.LINEAR) lines(waves.d, R.0m.linear, type = "b", lty =2, lwd=2)
+	  if (PLOT.LINEAR) lines(waves.d, pi*LuZ.0m.linear/Ed0.0m, lty =2, col=2, lwd=2)
 	  legend("topright", c("LOESS", "Lu0m*pi LOESS", "Linear","Lu0m*pi linear"),
 	         col=c(1,2,1,2), lty=c(1,1,2,2))
 	}
@@ -245,3 +245,4 @@ compute.aops <- function(cops.data) {
 		shadow.band=shadow.band
 	)))
 }
+

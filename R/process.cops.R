@@ -12,7 +12,7 @@ process.cops <- function(dirdat, ASCII=FALSE, CLEAN.FILES=FALSE) {
 	if(!file.exists(init.file)) {
 		file.copy(from = generic.init.file, to = init.file)
 		cat("EDIT file", init.file, "and CUSTOMIZE IT\n")
-		stop()
+		stop("Please edit init file and run again")
 	}
 	cops.init00 <- read.init(init.file)
 

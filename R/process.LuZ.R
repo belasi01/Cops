@@ -11,6 +11,15 @@ process.LuZ <- function(cops.raw,
 
 	aop <- cops.raw$LuZ
 	correction <- cops.Ed0$Ed0.correction
+
+	### These lines were added to deal with COPS having 18 wavelenghts
+	### Sometime the last wave legnth is replace by a Chla fluosrescence
+	if (dim(correction)[2] != dim(aop)[2]) {
+	  # add a NA column
+	  aop <- cbind(aop, rep(NA, dim(aop)[1]))
+
+	}
+
 	aop <- aop * correction
 	waves <- as.numeric(cops.raw$LuZ.waves)
 	Depth <- cops.dd$Depth + delta.capteur.optics["LuZ"]
