@@ -88,7 +88,8 @@ clean.cops.file <- function (in.file="", out.file="cleaned.cops.csv", distance.a
     ix.cut=which(df[,ix.depth] == depthCut)
   } else {
     depthCut = depthMax - distance.above.bottom
-    ix.cut=which.min(abs(df[,ix.depth]-depthCut))
+    ix.cut=which.min(abs(df[ix.min:ix.max,ix.depth]-depthCut))
+    ix.cut=ix.cut+ix.min-1
   }
 
   print("Cut at Index:")
