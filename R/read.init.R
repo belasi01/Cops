@@ -27,5 +27,15 @@ read.init <- function(init.file) {
 		init.params.names <- append(init.params.names, init.param.name)
 	}
 	names(cops.init) <- init.params.names
+
+	#### Added to avoid failure when bandwidth is absent in the init file.
+	if (is.null(cops.init$bandwidth)) {
+	  print("WARNING: init file does not contain bandwidth parameter")
+	  print("bandwidth is set to 10 nm")
+	  bandwidth = 10
+	  assign("bandwidth", 10, env = .GlobalEnv)
+	  cops.init$bandwidth = bandwidth
+	}
+
 	cops.init
 }
