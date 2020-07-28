@@ -293,9 +293,9 @@ generate.cops.DB <- function(path="./",
       if (!is.na(SHALLOW)) {
         bottom.depth[i] <- cops$bottom.depth
         if (!is.null(cops$Rb.Q)) {
-          Rb[i,xw.DB] = cops$Rb.EuZ[xw]
-          Rb.Q[i,xw.DB] = cops$Rb.Q[xw]
-        } else Rb[i,xw.DB] = cops$Rb.LuZ[xw]
+          Rb.m[i,xw.DB] = cops$Rb.EuZ[xw]
+          Rb.Q.m[i,xw.DB] = cops$Rb.Q[xw]
+        } else Rb.m[i,xw.DB] = cops$Rb.LuZ[xw]
       }
 
       # extract Ed0.0p
