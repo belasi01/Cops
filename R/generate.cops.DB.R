@@ -290,7 +290,7 @@ generate.cops.DB <- function(path="./",
         if (!is.null(cops$Q)) Q.Factor.m[i,xw.DB] = cops$Q[xw]
       }
 
-      if (!is.na(SHALLOW[j])) {
+      if (!is.na(SHALLOW)) {
         bottom.depth[i] <- cops$bottom.depth
         if (!is.null(cops$Rb.Q)) {
           Rb[i,xw.DB] = cops$Rb.EuZ[xw]
@@ -311,19 +311,19 @@ generate.cops.DB <- function(path="./",
       z1 = unlist(z1)[ix.pair]
       z1[z1<0] = NA
       z1[z1 > max(cops$depth.fitted)] = NA
-      mKd1p[j,xw.DB] = 4.605/z1
+      Kd.1p.m[i,xw.DB] = 4.605/z1
 
       z10 = apply(percentEdZ, 2, spline,y=cops$depth.fitted , xout=0.1)
       z10 = unlist(z10)[ix.pair]
       z10[z10<0] = NA
       z10[z10 > max(cops$depth.fitted)] = NA
-      mKd10p[j,xw.DB] = 2.3025/z10
+      Kd.10p.m[i,xw.DB] = 2.3025/z10
 
       zpd = apply(percentEdZ, 2, spline,y=cops$depth.fitted , xout=0.3678)
       zpd = unlist(zpd)[ix.pair]
       zpd[zpd<0] = NA
       zpd[zpd > max(cops$depth.fitted)] = NA
-      mKdpd[j,xw.DB] = 1/zpd
+      Kd.pd.m[i,xw.DB] = 1/zpd
 
       mean.rec.data = c(Rrs.m[i,],
                         nLw.m[i,],
