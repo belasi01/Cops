@@ -36,7 +36,7 @@ process.EuZ <- function(cops.raw,
 
 	##### Remove radiometric measurement below the detection limit
 	aop.all[aop.all < 0] <-0
-	for (w in 1:19) {
+	for (w in 1:length(waves)) {
 	  aop[aop[,w] <= EuZ.detect.lim[w],w] <- NA
 	}
 
@@ -61,7 +61,7 @@ process.EuZ <- function(cops.raw,
 
 	#### Clean calculated AOP
 	n.fitted <- length(depth.fitted)
-	for (w in 1:19) {
+	for (w in 1:length(waves)) {
 	  print(paste("Clean AOP for EuZ ", waves[w]))
 	  if (!all(is.na(aop.fitted[,w]))) { # if all NA, then the AOPs all ready equal to NA
 	    # Apply a smooth.spline on raw data for further flaging on the AOP
