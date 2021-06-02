@@ -186,7 +186,7 @@ compute.aops <- function(cops.data) {
 	        shadow.correction.type <- "absorption from chlorophyll\ncase 1 waters model"
 	      }
 	    }
-	    plot(waves.d, shadow.coef.LuZ$LuZ.shad.correction, type = "b",
+	    plot(waves.u, shadow.coef.LuZ$LuZ.shad.correction, type = "b",
 	         xlim = range(waves.d), ylim = c(0.2, 1),
 	         xlab = expression(lambda ~~ nm),
 	         ylab = "shadow correction for LuZ",
