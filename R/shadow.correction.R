@@ -127,7 +127,7 @@ shadow.correction <- function(instr, cops, SB=NA) {
 	names(aR) <- waves
 
 	### Add the case when the Shadow Band data is available (Simon Belanger 2018/12/15)
-	if (is.na(SB)) {
+	if (is.na(SB)[1]) {
 	  egc <- GreggCarder.f(julian.day, longitude, latitude, sunzen, lam.sel = waves)
 	  Edif <- egc$Edif
 	  Edir <- egc$Edir

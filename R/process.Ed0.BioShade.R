@@ -17,6 +17,7 @@ process.Ed0.BioShade <- function(cops.raw, cops.dd, cops.black) {
   BioShadePos.raw <- cops.raw$Others$BioShade_Position
   if (is.null(BioShadePos.raw)) BioShadePos.raw <- cops.raw$Others$BioShade.Position
   if (is.null(BioShadePos.raw)) BioShadePos.raw <- cops.raw$Others$`BioShade:Position`
+  if (is.null(BioShadePos.raw)) BioShadePos.raw <- cops.raw$Others$BioShadePosition
   if (is.null(BioShadePos.raw)) {
     print("Could not find BioShade Position in the file")
     return(0)
@@ -48,8 +49,8 @@ process.Ed0.BioShade <- function(cops.raw, cops.dd, cops.black) {
   BioShadePos <- BioShadePos[valid.rec]
 
 # METHOD loess to fit this aop
-  ix.no.shade = which(BioShadePos > 24000 | BioShadePos < 5000 )
-  ix.shade = which(BioShadePos < 24000 | BioShadePos > 5000 )
+  ix.no.shade = which(BioShadePos > 24000 | BioShadePos < 2000 )
+  ix.shade = which(BioShadePos < 24000 | BioShadePos > 2000 )
 
   if(INTERACTIVE) x11(width = win.width, height = win.height)
   plot(Time, BioShadePos)
@@ -93,12 +94,12 @@ process.Ed0.BioShade <- function(cops.raw, cops.dd, cops.black) {
   Ed0.f = Ed0.dif/Ed0.tot
 
   par(mar=c(5,4,4,5)+.1)
-  plot(waves, Ed0.tot, type="l", lwd=2, xlab=expression(lambda), ylab="Ed0")
+  plot(waves, Ed0.tot, type="l", lwd=2, xlab=expression(lambda), ylab="Ed0", ylim=c(0,max(Ed0.tot)))
   lines(waves, Ed0.dif, type="l", lwd=2, col=4)
   lines(waves, Ed0.tot-Ed0.dif, type="l", lwd=2, col=2)
 
   par(new=TRUE)
-  plot(waves, Ed0.f,,type="l",col=3,xaxt="n",yaxt="n",xlab="",ylab="")
+  plot(waves, Ed0.f,type="l",col=3,xaxt="n",yaxt="n",xlab="",ylab="")
   axis(4)
   mtext("f_dif",side=4,line=3)
   legend("bottomright", c("Ed0.tot", "Ed0.dif", "Ed0.dir", "Ed0.f"), col=c(1,4,2,3),lwd=c(2,2,2,2))
