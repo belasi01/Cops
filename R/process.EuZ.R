@@ -86,8 +86,8 @@ process.EuZ <- function(cops.raw,
 	# Extrapolate EuZ to 0- using linear method
 	K <- compute.Ksurf.linear(Depth, aop,
 	                          instrument = "EuZ",
-	                          delta.depth= 2.5,
-	                          r2.threshold=0.6)
+	                          delta.depth= linear.fit.max.delta.depth.optics["EuZ"],
+	                          r2.threshold=linear.fit.Rsquared.threshold.optics["EuZ"])
 	r2 <- K$r2
 	K.surf <- K$Kx
 	Z.interval <- K$Z.interval

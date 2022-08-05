@@ -13,7 +13,9 @@ read.init <- function(init.file) {
 			   init.param.name == "depth.interval.for.smoothing.optics" |
 			   init.param.name == "sub.surface.removed.layer.optics" |
 			   init.param.name == "delta.capteur.optics" |
-			   init.param.name == "radius.instrument.optics") {
+			   init.param.name == "radius.instrument.optics" |
+			   init.param.name == "linear.fit.Rsquared.threshold.optics" |
+			   init.param.name == "linear.fit.max.delta.depth.optics") {
 				pv <- as.numeric(init.param.value)
 				names(pv) <- instruments.optics
 				assign(init.param.name, pv, env = .GlobalEnv)
