@@ -98,7 +98,7 @@ compute.Ksurf.linear <- function (Depth, aop,
         ##### to make sure the depth distribution
         ##### is not bimodal. It compare the Z vector
         ##### to an expected Z vector, which an evenly spaced
-        ##### Z vector from the min and maxumum depth
+        ##### Z vector from the min and maximum depth
         ##### If the p.value < 0.05, the Z vector is NOT
         ##### evenly spaced. This situation makes R^2 of linear
         ##### regression not valid

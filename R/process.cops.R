@@ -1,6 +1,12 @@
 #'  This the main function of the Cops package and is
 #'  called by \code{\link{cops.go}}
 #'
+#'@param dirdat is the working directory string
+#' @param ASCII is a logical value: if TRUE the outputs are written in simple ASCII files in a ddition to
+#' the binary files in RData format.
+#' @param CLEAN.FILES is a logical value: if TRUE, the user will be prompt
+#' to select the good part of the COPS file interactively.
+#' IMPORTANT: the input cops file will be OVERWRITE.
 #'
 #' @author Bernard Gentili and Simon Belanger
 #' @export
@@ -34,7 +40,7 @@ process.cops <- function(dirdat, ASCII=FALSE, CLEAN.FILES=FALSE) {
 		file.copy(from = header.info.file, to = info.file)
 		files.in.dirdat <- list.files(dirdat)
 		files.in.dirdat <- files.in.dirdat[! files.in.dirdat %in% c("init.cops.dat", "info.cops.dat")]
-		lines.in.info.file <- paste(files.in.dirdat, "NA", "NA", "999", "x", "x", "x","x", sep = ";")
+		lines.in.info.file <- paste(files.in.dirdat, "NA", "NA", "999", "x", "x", "x","x","x","x", sep = ";")
 		write(file = info.file, lines.in.info.file, append = TRUE, ncolumns = 1)
 		cat("EDIT file", info.file, "and CUSTOMIZE IT\n")
 		cat("  this file must contain as much lines as cops-experiments you want to process\n")
@@ -44,9 +50,9 @@ process.cops <- function(dirdat, ASCII=FALSE, CLEAN.FILES=FALSE) {
 	info.tab <- read.table(info.file,
 		colClasses = c(
 			"character", "numeric", "numeric", "numeric",
-			"character", "character", "character", "character",
+			"character", "character", "character", "character","character","character",
 			"character", "character", "character", "character"),
-		col.names = c("file", "lon", "lat", "chl", "timwin", "ssrm", "tiltm", "smoo", "b1", "b2", "b3", "b4"),
+		col.names = c("file", "lon", "lat", "chl", "timwin", "ssrm", "tiltm", "smoo", "r2thresh", "maxdelta" , "b1", "b2", "b3", "b4"),
 		header = FALSE, fill = TRUE, sep = ";")
 
 	# removal file is obsolete. Version >4.0 uses select.cops.dat
@@ -56,13 +62,13 @@ process.cops <- function(dirdat, ASCII=FALSE, CLEAN.FILES=FALSE) {
 	select.file <- paste(dirdat, "select.cops.dat", sep = "/")
 	if(!file.exists(remove.file) && !file.exists(select.file)) {
 	  # none of them exist
-		write.table(file = select.file, cbind(info.tab[, 1], "1", "Rrs.0p.linear", "NA"), col.names = FALSE, row.names = FALSE, quote = FALSE, sep = ";")
+		write.table(file = select.file, cbind(info.tab[, 1], "1", "Rrs.0p.linear", "0"), col.names = FALSE, row.names = FALSE, quote = FALSE, sep = ";")
 	}
 	if (file.exists(remove.file) && !file.exists(select.file)) {
 	  # only remove.file exist
 	  print("remove.file.dat is obsolete => Changing to select.cops.dat")
 	  remove.tab <- read.table(remove.file, header = FALSE, colClasses = "character", sep = ";")
-	  select.tab <- cbind(remove.tab, "Rrs.0p.linear", "NA")
+	  select.tab <- cbind(remove.tab, "Rrs.0p.linear", "0")
 	  write.table(file = select.file, select.tab, col.names = FALSE, row.names = FALSE, quote = FALSE, sep = ";")
 	}
 	select.tab <- read.table(select.file,
@@ -128,7 +134,7 @@ str(absorption.tab)
 	for(experiment in 1:experiments) {
 
     if (select.tab[experiment,2] == "1"  | select.tab[experiment,2] == "3" ) {
-      mymessage(paste("file", "lon", "lat", "chl", "timwin", "ssrm", "tiltm", "smoo", "blacks"), head = "#", tail = "-")
+      mymessage(paste("file", "lon", "lat", "chl", "timwin", "ssrm", "tiltm", "smoo",  "r2thresh", "maxdelta" ,"blacks"), head = "#", tail = "-")
       mymessage(paste(unlist(info.tab[experiment, ]), collapse = " "), tail = "#")
 
       if (select.tab[experiment,2] == "3" ) {
@@ -234,9 +240,32 @@ str(absorption.tab)
           cat(time.interval.for.smoothing.optics, "\n")
         }
       }
+      #### Added new parameters for linear fitting
+      info9 <- info.tab[experiment, 9]
+      if(info9 != "x") {
+        cat("linear.fit.Rsquared.threshold.optics modified in info.cops.dat file", linear.fit.Rsquared.threshold.optics, "---> ")
+        linear.fit.Rsquared.threshold.optics <- as.numeric(unlist(strsplit(info9, ",")))
+        names(linear.fit.Rsquared.threshold.optics) <- instruments.optics
+        cops.init$linear.fit.Rsquared.threshold.optics <- linear.fit.Rsquared.threshold.optics
+        assign("linear.fit.Rsquared.threshold.optics", linear.fit.Rsquared.threshold.optics, env = .GlobalEnv)
+        rm(linear.fit.Rsquared.threshold.optics)
+        cat(linear.fit.Rsquared.threshold.optics, "\n")
+      }
+      info10 <- info.tab[experiment, 10]
+      if(info10 != "x") {
+        cat("linear.fit.max.delta.depth.optics modified in info.cops.dat file", linear.fit.max.delta.depth.optics, "---> ")
+        linear.fit.max.delta.depth.optics <- as.numeric(unlist(strsplit(info10, ",")))
+        names(linear.fit.max.delta.depth.optics) <- instruments.optics
+        cops.init$linear.fit.max.delta.depth.optics <- linear.fit.max.delta.depth.optics
+        assign("linear.fit.max.delta.depth.optics", linear.fit.max.delta.depth.optics, env = .GlobalEnv)
+        rm(linear.fit.max.delta.depth.optics)
+        cat(linear.fit.max.delta.depth.optics, "\n")
+      }
+      #####
+
       if(verbose) str(cops.init)
       # blacks
-      blacks <- info.tab[experiment, 9:12]
+      blacks <- info.tab[experiment, 11:14]
       blacks <- blacks[blacks != ""]
       cops.info <- list(file = cops.file,
                         chl = chl,
@@ -266,7 +295,7 @@ str(absorption.tab)
       cops.raw <- read.data(cops.file)
       if(verbose) str(cops.raw)
 
-      # Define an instument detection limit variable
+      # Define an instrument detection limit variables
       # (<<- assign it as .Global variable)
       for (instrument in instruments.optics) {
 
@@ -384,6 +413,8 @@ str(absorption.tab)
       assign("time.window", cops.init00$time.window, env = .GlobalEnv)
       assign("sub.surface.removed.layer.optics", cops.init00$sub.surface.removed.layer.optics, env = .GlobalEnv)
       assign("tiltmax.optics", cops.init00$tiltmax.optics, env = .GlobalEnv)
+###     # assign("tiltmax.optics", cops.init00$tiltmax.optics, env = .GlobalEnv)
+
       if (DEPTH.SPAN) {
         assign("depth.interval.for.smoothing.optics", cops.init00$depth.interval.for.smoothing.optics, env = .GlobalEnv)
       } else {
@@ -413,7 +444,7 @@ str(absorption.tab)
 
 ######## New code for BIOSHADE data
     if (select.tab[experiment,2] == "2") {
-      mymessage(paste("file", "lon", "lat", "chl", "timwin", "ssrm", "tiltm", "smoo", "blacks"), head = "#", tail = "-")
+      mymessage(paste("file", "lon", "lat", "chl", "timwin", "ssrm", "tiltm", "smoo", "r2thresh", "maxdelta" ,"blacks"), head = "#", tail = "-")
       mymessage(paste(unlist(info.tab[experiment, ]), collapse = " "), tail = "#")
       # initialization
       cops.init <- cops.init00
@@ -473,10 +504,32 @@ str(absorption.tab)
           cat(time.interval.for.smoothing.optics, "\n")
         }
       }
+      #### Added new parameters for linear fitting
+      info9 <- info.tab[experiment, 9]
+      if(info9 != "x") {
+        cat("linear.fit.Rsquared.threshold.optics modified in info.cops.dat file", linear.fit.Rsquared.threshold.optics, "---> ")
+        linear.fit.Rsquared.threshold.optics <- as.numeric(unlist(strsplit(info9, ",")))
+        names(linear.fit.Rsquared.threshold.optics) <- instruments.optics
+        cops.init$linear.fit.Rsquared.threshold.optics <- linear.fit.Rsquared.threshold.optics
+        assign("linear.fit.Rsquared.threshold.optics", linear.fit.Rsquared.threshold.optics, env = .GlobalEnv)
+        rm(linear.fit.Rsquared.threshold.optics)
+        cat(linear.fit.Rsquared.threshold.optics, "\n")
+      }
+      info10 <- info.tab[experiment, 10]
+      if(info10 != "x") {
+        cat("linear.fit.max.delta.depth.optics modified in info.cops.dat file", linear.fit.max.delta.depth.optics, "---> ")
+        linear.fit.max.delta.depth.optics <- as.numeric(unlist(strsplit(info10, ",")))
+        names(linear.fit.max.delta.depth.optics) <- instruments.optics
+        cops.init$linear.fit.max.delta.depth.optics <- linear.fit.max.delta.depth.optics
+        assign("linear.fit.max.delta.depth.optics", linear.fit.max.delta.depth.optics, env = .GlobalEnv)
+        rm(linear.fit.max.delta.depth.optics)
+        cat(linear.fit.max.delta.depth.optics, "\n")
+      }
+      #####
 
       if(verbose) str(cops.init)
       # blacks
-      blacks <- info.tab[experiment, 9:12]
+      blacks <- info.tab[experiment, 11:14]
       blacks <- blacks[blacks != ""]
       cops.info <- list(file = cops.file, chl = chl, SHADOW.CORRECTION = SHADOW.CORRECTION, absorption.waves = absorption.waves, absorption.values = absorption.values, blacks = blacks)
       if(verbose) str(cops.info)

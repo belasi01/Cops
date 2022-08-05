@@ -12,8 +12,8 @@ process.LuZ <- function(cops.raw,
 	aop <- cops.raw$LuZ
 	correction <- cops.Ed0$Ed0.correction
 
-	### These lines were added to deal with COPS having 18 wavelenghts
-	### Sometime the last wave legnth is replace by a Chla fluosrescence
+	### These lines were added to deal with COPS having 18 wavelengths
+	### Sometime the last wave length is replaced by a Chla fluorescence
 	if (dim(correction)[2] != dim(aop)[2]) {
 	  # add a NA column
 	  aop <- cbind(aop, rep(NA, dim(aop)[1]))
@@ -100,8 +100,8 @@ process.LuZ <- function(cops.raw,
 	# Extrapolate Luz to 0- using linear method
 	K <- compute.Ksurf.linear(Depth, aop,
 	                          instrument = "LuZ",
-	                          delta.depth= 2.5,
-	                          r2.threshold=0.6)
+	                          delta.depth= linear.fit.max.delta.depth.optics["LuZ"],
+	                          r2.threshold=linear.fit.Rsquared.threshold.optics["LuZ"])
 	  r2 <- K$r2
 	  K.surf <- K$Kx
 	  Z.interval <- K$Z.interval
