@@ -19,10 +19,12 @@
 
 plot.bottom.spectra <- function(fullpath, SAVE = F) {
 
+  #required libraries
   #library(ggplot2)
   #library(patchwork)
   #library(scales)
-  #filename=".....RData"
+
+  #filename=".....RData
 
   # parsing the path string for the cast number
   splitu <- unlist(strsplit(fullpath, "_"))
@@ -79,43 +81,67 @@ plot.bottom.spectra <- function(fullpath, SAVE = F) {
   if (cops$SHALLOW) {
 
     R.bottom <- cops$Rb.EuZ
-    dfr <- data.frame(waves = waves, R.bottom = R.bottom, goodR.bottom = R.bottom)
+    df$Rb <- R.bottom
+    df$goodRb <- R.bottom
 
-    for (x in 1:length(dfr$goodR.bottom)) {
-      if (!is.na(dfr$goodR.bottom[x]) && dfr$goodR.bottom[x] > 1)
-        dfr$goodR.bottom[x] <- NA
+    maxR <- max(df$Rb, na.rm = TRUE)
+    maxGR <- max(df$goodRb, na.rm = TRUE)
+
+    #removing the values above 1 in the goodRb column
+    while (maxGR > 1) {
+      df$goodRb[which.max(df$goodRb)] <- NA
+      maxGR <- max(df$goodRb, na.rm = TRUE)
     }
 
-    max1 <- max(dfr$R.bottom, na.rm = TRUE)
-    max2 <- max(dfr$goodR.bottom, na.rm = TRUE)
-    scalerR <- max1 / max2
+    #scaling factor for the sub-1 Rb data, so the relevant part of the
+    #plot is visible
+    scalerR <- maxR / maxGR
+    secondNeeded <- maxR > 1
 
-    plotR <- ggplot(dfr, aes(x = waves, y = R.bottom, color = "Rb")) +
-      geom_line() + scale_y_continuous(sec.axis =
-                                         sec_axis(trans = ~ . / scalerR)) +
-      geom_line(aes(y = scalerR*as.numeric(goodR.bottom),
-                    color = "Rb2")) +
-      theme(axis.line.y.right = element_line(colour = 'blue'),
-            axis.ticks.y.right = element_line(colour = 'blue'),
-            axis.line.y.left = element_line(colour = 'black'),
+    plotR <- ggplot(df, aes(x = waves, y = Rb, color = "Rb")) +
+      geom_line() +
+      theme(axis.line.y.left = element_line(colour = 'black'),
             axis.ticks.y.left = element_line(colour = 'black'),
-            axis.text.y.right = element_text(size = 12, colour = 'blue'),
             axis.text.y.left = element_text(size = 12, colour = 'black'),
             axis.title.x = element_blank(),
             axis.title.y = element_blank(),
             axis.text.x = element_text(size = 12),
             plot.title = element_text(hjust = 0.5),
             legend.position = c(0.85,0.4),
-            legend.text = element_text(size = 13),
-            legend.title = element_text(size = 14)) +
+            legend.text = element_text(size = 12),
+            legend.title = element_text(size = 13)) +
       ggtitle("Calculated Bottom Reflectance") +
-      scale_colour_manual(name = "Line Colour", values = c(Rb = "black",
-                                                           Rb2 = "blue"))
+      scale_colour_manual(name = "Line Colour", values = c(Rb = "black"))
 
-    plot <- plotR / plot + plot_annotation(title = p,
-      theme = theme(plot.title = element_text(hjust = 0.5)))
+    if (secondNeeded) {
+      suppressMessages(plotR <- plotR + scale_y_continuous(sec.axis =
+                                    sec_axis(trans = ~ . / scalerR)) +
+        geom_line(data = df, aes(y = scalerR*as.numeric(goodRb),
+                      color = "Rb2")) +
+        theme(axis.line.y.right = element_line(colour = 'blue'),
+              axis.ticks.y.right = element_line(colour = 'blue'),
+              axis.line.y.left = element_line(colour = 'black'),
+              axis.ticks.y.left = element_line(colour = 'black'),
+              axis.text.y.right = element_text(size = 12, colour = 'blue'),
+              axis.text.y.left = element_text(size = 12, colour = 'black'),
+              axis.title.x = element_blank(),
+              axis.title.y = element_blank(),
+              axis.text.x = element_text(size = 12),
+              plot.title = element_text(hjust = 0.5),
+              legend.position = c(0.85,0.4),
+              legend.text = element_text(size = 12),
+              legend.title = element_text(size = 13)) +
+        scale_colour_manual(name = "Line Colour", values = c(Rb = "black",
+                                                             Rb2 = "blue")))
+
+    }
+    #adding the new plot to the existing one using the patchwork package
+    plot <- plotR / plot
 
   }
+
+  plot <- plot + plot_annotation(title = p,
+                    theme = theme(plot.title = element_text(hjust = 0.5)))
 
   suppressWarnings(print(plot))
 
@@ -125,6 +151,7 @@ plot.bottom.spectra <- function(fullpath, SAVE = F) {
   name <- paste(splitp[1],splitp[2],splitp[3],splitp[4], sep = "_")
 
   if (SAVE)
-    suppressMessages(ggsave(paste(name, "png", sep = "."), path = "./bottom_spectra"))
+    suppressMessages(ggsave(paste(name, "png", sep = "."),
+                            path = "./bottom_spectra"))
 
 }

@@ -9,7 +9,7 @@
 #' The plotting function must have a parameter SAVE (boolean)
 #'
 #' @param functionName is an optional argument specifying the
-#' name of the plotting function to be used. newplot() is called
+#' name of the plotting function to be used. plot.bottom.spectra() is called
 #' by default
 #'
 #' @param save is an optional argument specifying whether the
@@ -30,7 +30,7 @@ plot.all.directories <- function(functionName, save = F) {
                         all.files = FALSE, full.names = FALSE)
     if (missing(functionName)) {
       for (file in files) {
-        newplot(paste(p, file, sep = "/"), SAVE = save)
+        plot.bottom.spectra(paste(p, file, sep = "/"), SAVE = save)
       }
     } else {
       f <- get(functionName)
