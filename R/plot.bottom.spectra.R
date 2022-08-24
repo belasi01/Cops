@@ -1,28 +1,47 @@
+#'
+#' This function makes a plot of the upwelling and downwelling
+#' irradiances at the deepest point of the cast. If the bottom
+#' was reached (cops$SHALLOW = TRUE), then a plot of the
+#' calculated bottom reflectance is generated above the initial
+#' graph.
+#'
+#' @param fullpath is the path from the working directory to
+#' the .RData file of the cast
+#'
+#' @param SAVE is a binary parameter specifying whether the
+#' generated plot should be saved. Plots are saved in the
+#' bottom_spectra folder of the working directory. Make sure to
+#' create this directory beforehand.
+#'
+#' @author Charles-André Roux
+#' @export
+#'
 
+plot.bottom.spectra <- function(fullpath, SAVE = F) {
 
-newplot <- function(fullpath) {
-
-  library(ggplot2)
-  library(patchwork)
-  library(scales)
+  #library(ggplot2)
+  #library(patchwork)
+  #library(scales)
   #filename=".....RData"
 
+  # parsing the path string for the cast number
   splitu <- unlist(strsplit(fullpath, "_"))
   cast <- splitu[length(splitu) - 3]
- # if (missing(df)) {
-    load(fullpath)
-    waves <- cops$EdZ.waves
-    ix.bottom <- length(cops$depth.fitted)
-    EdZ.bottom <- cops$EdZ.fitted[ix.bottom,]
-    EuZ.bottom = cops$EuZ.fitted[ix.bottom,]
-    df <- data.frame(waves = waves,  EdZ.bottom = EdZ.bottom,
-                     EuZ.bottom=EuZ.bottom)
-    #assign(paste("df", cast, sep = ""), df, envir = .GlobalEnv)
-  #}
 
+  # initiating a dataframe used for plotting
+  load(fullpath)
+  waves <- cops$EdZ.waves
+  ix.bottom <- length(cops$depth.fitted)
+  EdZ.bottom <- cops$EdZ.fitted[ix.bottom,]
+  EuZ.bottom = cops$EuZ.fitted[ix.bottom,]
+  df <- data.frame(waves = waves,  EdZ.bottom = EdZ.bottom,
+                     EuZ.bottom=EuZ.bottom)
+
+  # parsing the path string for the .RData file name
   splits <- unlist(strsplit(fullpath, "/"))
   p <- splits[length(splits)]
 
+  # removing outlying data points from the data frame
   maxD <- max(df$EdZ.bottom, na.rm = TRUE)
   maxU <- max(df$EuZ.bottom, na.rm = TRUE)
 
@@ -34,8 +53,10 @@ newplot <- function(fullpath) {
     df$EuZ.bottom[which.max(df$EuZ.bottom)] <- NA
     maxU <- max(df$EdZ.bottom, na.rm = TRUE)
   }
+  # scaler not required for logarithmic scaling in y-axis
   #scaler <- 0.1*maxD/maxU
 
+  # generating initial plot
   plot <- ggplot(df, aes(x = waves, y = EdZ.bottom, color = "EdZ")) +
     geom_line() +
     geom_line(aes(y = as.numeric(EuZ.bottom), color = "EuZ")) +
@@ -54,7 +75,7 @@ newplot <- function(fullpath) {
                                                          EuZ = "blue"))
 
 
-  load(fullpath)
+  #in case the bottom was reached
   if (cops$SHALLOW) {
 
     R.bottom <- cops$Rb.EuZ
@@ -103,6 +124,7 @@ newplot <- function(fullpath) {
   splitp <- unlist(strsplit(p, "_"))
   name <- paste(splitp[1],splitp[2],splitp[3],splitp[4], sep = "_")
 
-  suppressMessages(ggsave(paste(name, "png", sep = "."), path = "./bottom_spectra"))
+  if (SAVE)
+    suppressMessages(ggsave(paste(name, "png", sep = "."), path = "./bottom_spectra"))
 
 }
