@@ -127,7 +127,6 @@ plot.Rrs.Kd.for.station <- function(path="./", depthEdZ = NA) {
 
   ##### in RStudio
   load(paste(listfile[1], ".RData", sep=""))
-  load(paste(listfile[1], ".RData", sep=""))
   ix.depth <- rep(NA,19)
   K0.EdZ.fitted <- rep(NA, 19)
   if (is.na(depthEdZ)) {
