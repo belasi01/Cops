@@ -65,12 +65,14 @@ new.plot.Rrs.Kd.for.station <- function(path = "./", depthEdZ = NA) {
        geom_line(data = df, aes(y = Rrs.0p.linear2,
                                 col = listfile[2]), linetype = "dashed")
   }
+
   if (nf >= 3) {
     plotRrs <- plotRrs + geom_line(data = df, aes(y = Rrs.0p3,
                                                   col = listfile[3])) +
       geom_line(data = df, aes(y = Rrs.0p.linear3,
                                col = listfile[3]), linetype = "dashed")
   }
+
   if (nf >= 4) {
     plotRrs <- plotRrs + geom_line(data = df, aes(y = Rrs.0p4,
                                                   col = listfile[4])) +
@@ -79,10 +81,10 @@ new.plot.Rrs.Kd.for.station <- function(path = "./", depthEdZ = NA) {
     }
 
   plotRrs <- plotRrs +
-    theme(legend.position = c(0.74, 0.92), legend.text = element_text(size = 8),
-          axis.title.y = element_blank(), axis.title.x = element_text(size = 13),
-          legend.title = element_blank()) +
-    xlab("Wavelength (nm)")
+    theme(legend.position = c(0.8, 0.82), legend.text = element_text(size = 8),
+          axis.title.x = element_text(size = 13), legend.title = element_blank(),
+          axis.title.y = element_text(size = 11)) +
+    xlab("\nWavelength (nm)") + ylab("Rrs0+")
 
 
   #plotting Kd
@@ -114,113 +116,130 @@ new.plot.Rrs.Kd.for.station <- function(path = "./", depthEdZ = NA) {
 
   #first cast
   load(paste("./BIN/", listfile[1], ".RData", sep=""))
-  K0.EdZ.fitted <- rep(NA, 19)
+  K0.EdZ.fitted1 <- rep(NA, 19)
+  dfk$K0.EdZ.fitted1 <- K0.EdZ.fitted1
 
   if (anyNA(cops$EdZ.Z.interval)) {
     print("Some invalid linear fit; plot Depth integrated K for the top 2m")
     ix.2 <- which.min(abs(cops$depth.fitted - 2))
-    K0.EdZ.fitted = cops$K0.EdZ.fitted[ix.2,]
+    dfk$K0.EdZ.fitted1 <- cops$K0.EdZ.fitted[ix.2,]
   } else {
     for (w in 1:19) {
       if (!is.na(cops$EdZ.Z.interval[w])) {
         ix.depth[w] <- which.min(abs(cops$depth.fitted - cops$EdZ.Z.interval[w]))
-        K0.EdZ.fitted[w] <- cops$K0.EdZ.fitted[ix.depth[w],w]
+        dfk$K0.EdZ.fitted1[w] <- cops$K0.EdZ.fitted[ix.depth[w],w]
       }
     }
-  dfk <- data.frame(waves = waves, K0.EdZ.fitted = K0.EdZ.fitted)
-  plotKd <- plotKd + geom_line(aes(y = K0.EdZ.fitted), col = "#F8766D")
+  #dfk <- data.frame(waves = waves, K0.EdZ.fitted = K0.EdZ.fitted)
+  plotKd <- plotKd + geom_line(data = dfk, aes(x = waves, y = K0.EdZ.fitted1,
+                                               color = listfile[1]))
 
   if (!all(is.na(cops$EdZ.Z.interval)))
-    plotKd <- plotKd + geom_line(aes(y = cops$K.EdZ.surf),
-                                 col = "#F8766D", linetype = "dashed")
+    dfk$K.EdZ.surf1 <- cops$K.EdZ.surf
+    plotKd <- plotKd + geom_line(data = dfk, aes(x = waves, y = K.EdZ.surf1,
+                                                 color = listfile[1]),
+                                 linetype = "dashed")
 }
 
   #second cast
   if (nf > 1) {
   load(paste("./BIN/", listfile[2], ".RData", sep=""))
-  K0.EdZ.fitted <- rep(NA, 19)
+  dfk$K0.EdZ.fitted2 <- rep(NA, 19)
 
   if (anyNA(cops$EdZ.Z.interval)) {
     print("Some invalid linear fit; plot Depth integrated K for the top 2m")
     ix.2 <- which.min(abs(cops$depth.fitted - 2))
-    K0.EdZ.fitted = cops$K0.EdZ.fitted[ix.2,]
+    dfk$K0.EdZ.fitted2 = cops$K0.EdZ.fitted[ix.2,]
   } else {
     for (w in 1:19) {
       if (!is.na(cops$EdZ.Z.interval[w])) {
         ix.depth[w] <- which.min(abs(cops$depth.fitted - cops$EdZ.Z.interval[w]))
-        K0.EdZ.fitted[w] <- cops$K0.EdZ.fitted[ix.depth[w],w]
+        dfk$K0.EdZ.fitted2[w] <- cops$K0.EdZ.fitted[ix.depth[w],w]
       }
     }
-  dfk <- data.frame(waves = waves, K0.EdZ.fitted = K0.EdZ.fitted)
-  plotKd <- plotKd + geom_line(aes(y = K0.EdZ.fitted), col = "#00BA38")
+
+  plotKd <- plotKd + geom_line(data = dfk, aes(x = waves, y = K0.EdZ.fitted2,
+                                               color = listfile[2]))
 
   if (!all(is.na(cops$EdZ.Z.interval)))
-    plotKd <- plotKd + geom_line(aes(y = cops$K.EdZ.surf),
-                                 col = "#00BA38", linetype = "dashed")
+    dfk$K.EdZ.surf2 <- cops$K.EdZ.surf
+    plotKd <- plotKd + geom_line(data = dfk, aes(x = waves, y = K.EdZ.surf2,
+                                                 color = listfile[2]),
+                                 linetype = "dashed")
   }
 }
 
   #third cast
   if (nf > 2) {
-  load(paste("./BIN/", listfile[3], ".RData", sep=""))
-  K0.EdZ.fitted <- rep(NA, 19)
+    load(paste("./BIN/", listfile[3], ".RData", sep=""))
+    dfk$K0.EdZ.fitted3 <- rep(NA, 19)
 
-  if (anyNA(cops$EdZ.Z.interval)) {
-    print("Some invalid linear fit; plot Depth integrated K for the top 2m")
-    ix.2 <- which.min(abs(cops$depth.fitted - 2))
-    K0.EdZ.fitted = cops$K0.EdZ.fitted[ix.2,]
-  } else {
-    for (w in 1:19) {
-      if (!is.na(cops$EdZ.Z.interval[w])) {
-        ix.depth[w] <- which.min(abs(cops$depth.fitted - cops$EdZ.Z.interval[w]))
-        K0.EdZ.fitted[w] <- cops$K0.EdZ.fitted[ix.depth[w],w]
+    if (anyNA(cops$EdZ.Z.interval)) {
+      print("Some invalid linear fit; plot Depth integrated K for the top 2m")
+      ix.2 <- which.min(abs(cops$depth.fitted - 2))
+      dfk$K0.EdZ.fitted3 = cops$K0.EdZ.fitted[ix.2,]
+    } else {
+      for (w in 1:19) {
+        if (!is.na(cops$EdZ.Z.interval[w])) {
+          ix.depth[w] <- which.min(abs(cops$depth.fitted - cops$EdZ.Z.interval[w]))
+          dfk$K0.EdZ.fitted3[w] <- cops$K0.EdZ.fitted[ix.depth[w],w]
+        }
       }
+
+      plotKd <- plotKd + geom_line(data = dfk, aes(x = waves, y = K0.EdZ.fitted3,
+                                                   color = listfile[3]))
+
+      if (!all(is.na(cops$EdZ.Z.interval)))
+        dfk$K.EdZ.surf3 <- cops$K.EdZ.surf
+      plotKd <- plotKd + geom_line(data = dfk, aes(x = waves, y = K.EdZ.surf3,
+                                                   color = listfile[3]),
+                                   linetype = "dashed")
     }
-    dfk <- data.frame(waves = waves, K0.EdZ.fitted = K0.EdZ.fitted)
-
-  plotKd <- plotKd + geom_line(aes(y = K0.EdZ.fitted), col = "#619CFF")
-
-  if (!all(is.na(cops$EdZ.Z.interval)))
-    plotKd <- plotKd + geom_line(aes(y = cops$K.EdZ.surf),
-                                 col = "#619CFF", linetype = "dashed")
   }
-}
 
   #fourth cast
   if (nf > 3) {
-  load(paste("./BIN/", listfile[4], ".RData", sep=""))
-  K0.EdZ.fitted <- rep(NA, 19)
+    load(paste("./BIN/", listfile[4], ".RData", sep=""))
+    dfk$K0.EdZ.fitted4 <- rep(NA, 19)
 
-  if (anyNA(cops$EdZ.Z.interval[ix.waves])) {
-    print("Some invalid linear fit; plot Depth integrated K for the top 2m")
-    ix.2 <- which.min(abs(cops$depth.fitted - 2))
-    K0.EdZ.fitted = cops$K0.EdZ.fitted[ix.2,]
-  } else {
-    for (w in 1:19) {
-      if (!is.na(cops$EdZ.Z.interval[w])) {
-        ix.depth[w] <- which.min(abs(cops$depth.fitted - cops$EdZ.Z.interval[w]))
-        K0.EdZ.fitted[w] <- cops$K0.EdZ.fitted[ix.depth[w],w]
+    if (anyNA(cops$EdZ.Z.interval)) {
+      print("Some invalid linear fit; plot Depth integrated K for the top 2m")
+      ix.2 <- which.min(abs(cops$depth.fitted - 2))
+      dfk$K0.EdZ.fitted4 = cops$K0.EdZ.fitted[ix.2,]
+    } else {
+      for (w in 1:19) {
+        if (!is.na(cops$EdZ.Z.interval[w])) {
+          ix.depth[w] <- which.min(abs(cops$depth.fitted - cops$EdZ.Z.interval[w]))
+          dfk$K0.EdZ.fitted4[w] <- cops$K0.EdZ.fitted[ix.depth[w],w]
+        }
       }
+
+      plotKd <- plotKd + geom_line(data = dfk, aes(x = waves, y = K0.EdZ.fitted4),
+                                   color = listfile[4])
+
+      if (!all(is.na(cops$EdZ.Z.interval)))
+        dfk$K.EdZ.surf4 <- cops$K.EdZ.surf
+      plotKd <- plotKd + geom_line(data = dfk, aes(x = waves, y = K.EdZ.surf4,
+                                                   color = listfile[4]),
+                                   linetype = "dashed")
     }
   }
 
 
-  plotKd <- plotKd + geom_line(aes(y = K0.EdZ.fitted[ix.waves]), col = "purple")
-  if (!all(is.na(cops$EdZ.Z.interval)))
-    plotKd <- plotKd + geom_line(aes(y = cops$K.EdZ.surf[ix.waves]),
-                                 col = "purple", linetype = "dashed")
-
-}
-
-
   plotKd <- plotKd +
-    theme(legend.position = c(0.74, 0.92), legend.text = element_text(size = 8),
-                           axis.title.y = element_blank(), axis.title.x = element_text(size = 13),
-                           legend.title = element_blank())
+    theme(legend.position = c(0.45, 0.82), legend.text = element_text(size = 8),
+          legend.title = element_blank(), axis.title.y = element_text(size = 11)) +
+    ylab(expression(K[0]~"("*E[d]*"z) linear versus loess"))
 
-  fullplot <- plotKd / plotRrs
+  dir <- dirname(getwd())
+  fullpath <- unlist(strsplit(dir, "/"))
+  station <- fullpath[length(fullpath)]
 
-  plot(fullplot)
+  fullplot <- plotKd / plotRrs + plot_annotation(title = station,
+                                                 theme = theme(plot.title =
+                                                                 element_text(hjust = 0.5)))
+
+  suppressMessages(plot(fullplot))
 
   suppressMessages(ggsave(paste("Kd", "and", "Rrs", "png", sep = "."), path = "./"))
 

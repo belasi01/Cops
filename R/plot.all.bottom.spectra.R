@@ -19,7 +19,7 @@
 #' @author Charles-André Roux
 #' @export
 
-plot.all.directories <- function(functionName, save = F) {
+plot.all.bottom.spectra <- function(functionName, save = F) {
 
   directories <- list.files(path = ".", pattern = "Station",
              all.files = FALSE, full.names = TRUE)
