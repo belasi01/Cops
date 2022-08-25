@@ -39,5 +39,36 @@ read.init <- function(init.file) {
 	  cops.init$bandwidth = bandwidth
 	}
 
+	##### Added to avoid failure when linear fitting parameters are not provided.
+	if (is.null(cops.init$linear.fit.Rsquared.threshold.optics)) {
+	  print("WARNING: init file does not contain linear.fit.Rsquared.threshold.optics parameter")
+	  print("linear.fit.Rsquared.threshold.optics is set to default values")
+	  print("Add this line in the init file and EDIT: ")
+	  print("linear.fit.Rsquared.threshold.optics; numeric; NA, 0.5, 0.6")
+	  if (length(instruments.optics)==1) init.param.value <- 0.5
+	  if (length(instruments.optics)==2) init.param.value <- c(NA,0.5)
+	  if (length(instruments.optics)==3) init.param.value <- c(NA,0.5, 0.6)
+	  if (length(instruments.optics)==4) init.param.value <- c(NA,0.5, 0.6, 0.6)
+	  names(init.param.value) <- instruments.optics
+	  assign("linear.fit.Rsquared.threshold.optics", init.param.value, env = .GlobalEnv)
+	  cops.init$linear.fit.Rsquared.threshold.optics = linear.fit.Rsquared.threshold.optics
+	}
+
+	if (is.null(cops.init$linear.fit.max.delta.depth.optics)) {
+	  print("WARNING: init file does not contain linear.fit.max.delta.depth.optics parameter")
+	  print("linear.fit.max.delta.depth.optics is set to default values")
+	  print("Add this line in the init file and EDIT: ")
+	  print("linear.fit.max.delta.depth.optics; numeric; NA, 3, 2.5")
+	  if (length(instruments.optics)==1) init.param.value <- 3
+	  if (length(instruments.optics)==2) init.param.value <- c(NA,3)
+	  if (length(instruments.optics)==3) init.param.value <- c(NA,3, 2.5)
+	  if (length(instruments.optics)==4) init.param.value <- c(NA,3, 2.5, 2.5)
+	  names(init.param.value) <- instruments.optics
+	  assign("linear.fit.max.delta.depth.optics", init.param.value, env = .GlobalEnv)
+	  cops.init$linear.fit.max.delta.depth.optics = linear.fit.max.delta.depth.optics
+	}
+
+
+
 	cops.init
 }

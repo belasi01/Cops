@@ -243,23 +243,39 @@ str(absorption.tab)
       #### Added new parameters for linear fitting
       info9 <- info.tab[experiment, 9]
       if(info9 != "x") {
-        cat("linear.fit.Rsquared.threshold.optics modified in info.cops.dat file", linear.fit.Rsquared.threshold.optics, "---> ")
-        linear.fit.Rsquared.threshold.optics <- as.numeric(unlist(strsplit(info9, ",")))
-        names(linear.fit.Rsquared.threshold.optics) <- instruments.optics
-        cops.init$linear.fit.Rsquared.threshold.optics <- linear.fit.Rsquared.threshold.optics
-        assign("linear.fit.Rsquared.threshold.optics", linear.fit.Rsquared.threshold.optics, env = .GlobalEnv)
-        rm(linear.fit.Rsquared.threshold.optics)
-        cat(linear.fit.Rsquared.threshold.optics, "\n")
+        if (info9 == "") {
+          print("WARNING: info file does not contain values for linear.fit.Rsquared.threshold.optics or an x")
+          print("Keeping default values:")
+          print(linear.fit.Rsquared.threshold.optics)
+          print("Add an x in the info file for the 9th parameter or edit the init file.")
+        } else {
+          cat("linear.fit.Rsquared.threshold.optics modified in info.cops.dat file", linear.fit.Rsquared.threshold.optics, "---> ")
+          linear.fit.Rsquared.threshold.optics <- as.numeric(unlist(strsplit(info9, ",")))
+          names(linear.fit.Rsquared.threshold.optics) <- instruments.optics
+          cops.init$linear.fit.Rsquared.threshold.optics <- linear.fit.Rsquared.threshold.optics
+          assign("linear.fit.Rsquared.threshold.optics", linear.fit.Rsquared.threshold.optics, env = .GlobalEnv)
+          rm(linear.fit.Rsquared.threshold.optics)
+          cat(linear.fit.Rsquared.threshold.optics, "\n")
+        }
+
       }
       info10 <- info.tab[experiment, 10]
       if(info10 != "x") {
-        cat("linear.fit.max.delta.depth.optics modified in info.cops.dat file", linear.fit.max.delta.depth.optics, "---> ")
-        linear.fit.max.delta.depth.optics <- as.numeric(unlist(strsplit(info10, ",")))
-        names(linear.fit.max.delta.depth.optics) <- instruments.optics
-        cops.init$linear.fit.max.delta.depth.optics <- linear.fit.max.delta.depth.optics
-        assign("linear.fit.max.delta.depth.optics", linear.fit.max.delta.depth.optics, env = .GlobalEnv)
-        rm(linear.fit.max.delta.depth.optics)
-        cat(linear.fit.max.delta.depth.optics, "\n")
+        if (info10 == "") {
+          print("WARNING: info file does not contain values for linear.fit.max.delta.depth.optics or an x")
+          print("Keeping default values:")
+          print(linear.fit.max.delta.depth.optics)
+          print("Add an x in the info file for the 10th parameter or edit the init file.")
+        } else {
+          cat("linear.fit.max.delta.depth.optics modified in info.cops.dat file", linear.fit.max.delta.depth.optics, "---> ")
+          linear.fit.max.delta.depth.optics <- as.numeric(unlist(strsplit(info10, ",")))
+          names(linear.fit.max.delta.depth.optics) <- instruments.optics
+          cops.init$linear.fit.max.delta.depth.optics <- linear.fit.max.delta.depth.optics
+          assign("linear.fit.max.delta.depth.optics", linear.fit.max.delta.depth.optics, env = .GlobalEnv)
+          rm(linear.fit.max.delta.depth.optics)
+          cat(linear.fit.max.delta.depth.optics, "\n")
+        }
+
       }
       #####
 

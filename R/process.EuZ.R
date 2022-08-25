@@ -65,7 +65,7 @@ process.EuZ <- function(cops.raw,
 	  print(paste("Clean AOP for EuZ ", waves[w]))
 	  if (!all(is.na(aop.fitted[,w]))) { # if all NA, then the AOPs all ready equal to NA
 	    # Apply a smooth.spline on raw data for further flaging on the AOP
-	    tmp = smooth.spline(Depth.all, aop.all[,w])
+	    tmp = smooth.spline(Depth.all, aop.all[,w], spar=0.2)
 	    aop.spline = spline(tmp,xout = depth.fitted, method = 'natural')$y
 	    # remove bad data
 	    KZ.fitted[(aop.fitted[(2:n.fitted),w] <= EuZ.detect.lim[w] |

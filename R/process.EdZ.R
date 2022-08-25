@@ -62,7 +62,7 @@ process.EdZ <- function(cops.raw,
 	  print(paste("Clean AOP for EdZ ", waves[w]))
 	  if (!all(is.na(aop.fitted[,w]))) { # if all NA, then the AOPs allready equal to NA
 	    # Apply a spline on raw data for further flaging on the AOP
-	    tmp = smooth.spline(Depth.all, aop.all[,w])
+	    tmp = smooth.spline(Depth.all, aop.all[,w], spar=0.2) # spar was added to make the data smoother
 	    aop.spline = spline(tmp, xout = depth.fitted, method = 'natural')$y
 	    # remove bad data
 	    KZ.fitted[(aop.fitted[(2:n.fitted),w] <= EdZ.detect.lim[w] |

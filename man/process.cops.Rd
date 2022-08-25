@@ -7,6 +7,16 @@ called by \code{\link{cops.go}}}
 \usage{
 process.cops(dirdat, ASCII = FALSE, CLEAN.FILES = FALSE)
 }
+\arguments{
+\item{dirdat}{is the working directory string}
+
+\item{ASCII}{is a logical value: if TRUE the outputs are written in simple ASCII files in a ddition to
+the binary files in RData format.}
+
+\item{CLEAN.FILES}{is a logical value: if TRUE, the user will be prompt
+to select the good part of the COPS file interactively.
+IMPORTANT: the input cops file will be OVERWRITE.}
+}
 \description{
 This the main function of the Cops package and is
 called by \code{\link{cops.go}}
