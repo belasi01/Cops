@@ -1,6 +1,19 @@
+#'
+#' This function finds and calls a specified plotting function in all valid directories
+#'
+#' This function must be launched from the L2 directory, which
+#' should contain all processed data folders containing "Station"
+#' in their name.
+#'
+#'
+#' @param functionName is an optional argument specifying the
+#' name of the plotting function to be used. new.plot.Rrs.Kd.for.station is called
+#' by default
+#'
+#' @author Charles-André Roux
+#' @export
 
-
-plot.all.Kd.Rrs <- function(functionName) {
+plot.all.Kd.Rrs <- function(functionName = "new.plot.Rrs.Kd.for.station") {
 
   here <- getwd()
 
@@ -18,8 +31,7 @@ plot.all.Kd.Rrs <- function(functionName) {
                               pattern = ".dat", all.files = FALSE, full.names = FALSE)
     if (identical(filesInCOPS, character(0))) next
 
-    f <- getFunction("new.plot.Rrs.Kd.for.station")
-    if (!missing(functionName)) f <- get(functionName)
+    f <- get(functionName)
 
     path <- paste(station, "COPS", sep = "/")
     f(path)
