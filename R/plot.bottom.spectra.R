@@ -30,6 +30,12 @@ plot.bottom.spectra <- function(fullpath, SAVE = F) {
   splitu <- unlist(strsplit(fullpath, "_"))
   cast <- splitu[length(splitu) - 3]
 
+  # getting station number
+  pathstring <- normalizePath(fullpath)
+  lst <- unlist(strsplit(pathstring, "\\\\"))
+  stationDir <- lst[length(lst) - 3]
+  stationNum <- str_sub(stationDir, -1, -1)
+
   # initiating a dataframe used for plotting
   load(fullpath)
   waves <- cops$EdZ.waves
@@ -39,19 +45,16 @@ plot.bottom.spectra <- function(fullpath, SAVE = F) {
   df <- data.frame(waves = waves,  EdZ.bottom = EdZ.bottom,
                    EuZ.bottom=EuZ.bottom)
 
-  # parsing the path string for the .RData file name
-  splits <- unlist(strsplit(fullpath, "/"))
-  p <- splits[length(splits)]
-
   # removing outlying data points from the data frame
   maxD <- max(df$EdZ.bottom, na.rm = TRUE)
-  maxU <- max(df$EuZ.bottom, na.rm = TRUE)
+  if (all(!is.na(df$EuZ.bottom)))
+    maxU <- max(df$EuZ.bottom, na.rm = TRUE)
 
   if (maxD > 1000) {
     df$EdZ.bottom[which.max(df$EdZ.bottom)] <- NA
     maxD <- max(df$EdZ.bottom, na.rm = TRUE)
   }
-  if (maxU > 1000) {
+  if (all(!is.na(df$EuZ.bottom)) && maxU > 1000) {
     df$EuZ.bottom[which.max(df$EuZ.bottom)] <- NA
     maxU <- max(df$EdZ.bottom, na.rm = TRUE)
   }
@@ -145,18 +148,26 @@ plot.bottom.spectra <- function(fullpath, SAVE = F) {
 
   }
 
-  plot <- plot + plot_annotation(title = p,
+
+  # parsing the path string for the .RData file name
+  splits <- unlist(strsplit(fullpath, "/"))
+  p <- splits[length(splits)]
+
+  splitp <- unlist(strsplit(p, "_"))
+
+  if (!grepl("\\d", splitp[1]))
+    splitp[1] <- paste0(splitp[1], stationNum)
+
+  name <- paste(splitp[1],splitp[2],splitp[3],splitp[4], sep = "_")
+
+  plot <- plot + plot_annotation(title = name,
                                  theme = theme(plot.title = element_text(hjust = 0.5)))
 
   suppressWarnings(print(plot))
 
-  destination <- paste(splits[1],splits[2],splits[3], sep = "/")
-
-  splitp <- unlist(strsplit(p, "_"))
-  name <- paste(splitp[1],splitp[2],splitp[3],splitp[4], sep = "_")
 
   if (SAVE)
-    suppressMessages(ggsave(paste(name, "png", sep = "."),
+    suppressMessages(ggsave(paste0(name, ".png"),
                             path = "./bottom_spectra"))
 
 }
