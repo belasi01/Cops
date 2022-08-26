@@ -37,7 +37,7 @@ plot.bottom.spectra <- function(fullpath, SAVE = F) {
   EdZ.bottom <- cops$EdZ.fitted[ix.bottom,]
   EuZ.bottom = cops$EuZ.fitted[ix.bottom,]
   df <- data.frame(waves = waves,  EdZ.bottom = EdZ.bottom,
-                     EuZ.bottom=EuZ.bottom)
+                   EuZ.bottom=EuZ.bottom)
 
   # parsing the path string for the .RData file name
   splits <- unlist(strsplit(fullpath, "/"))
@@ -61,7 +61,6 @@ plot.bottom.spectra <- function(fullpath, SAVE = F) {
   # generating initial plot
   plot <- ggplot(df, aes(x = waves, y = EdZ.bottom, color = "EdZ")) +
     geom_line() +
-    geom_line(aes(y = as.numeric(EuZ.bottom), color = "EuZ")) +
     scale_y_continuous(trans = "log", labels = scientific) +
     theme(plot.title = element_text(hjust = 0.5),
           axis.text.x = element_text(size = 12),
@@ -70,11 +69,17 @@ plot.bottom.spectra <- function(fullpath, SAVE = F) {
           axis.title.x = element_text(size = 14),
           legend.position = c(0.85,0.4),
           legend.text = element_text(size = 13),
-          legend.title = element_text(size = 14)) +
+          legend.title = element_blank()) +
     xlab("\nWavelength (nm)") +
     ggtitle("Bottom Irrandiance") +
     scale_colour_manual(name = "Line Colour", values = c(EdZ = "black",
                                                          EuZ = "blue"))
+
+  if (sum(!is.na(df$EuZ.bottom)) > 1)
+    plot <- plot + geom_line(data = df, aes(y = as.numeric(EuZ.bottom), color = "EuZ", group = 1))
+
+  if (sum(!is.na(df$EuZ.bottom)) == 1)
+    plot <- plot + geom_point(data = df, aes(y = as.numeric(EuZ.bottom), color = "EuZ"))
 
 
   #in case the bottom was reached
@@ -109,30 +114,30 @@ plot.bottom.spectra <- function(fullpath, SAVE = F) {
             plot.title = element_text(hjust = 0.5),
             legend.position = c(0.85,0.4),
             legend.text = element_text(size = 12),
-            legend.title = element_text(size = 13)) +
+            legend.title = element_blank()) +
       ggtitle("Calculated Bottom Reflectance") +
       scale_colour_manual(name = "Line Colour", values = c(Rb = "black"))
 
     if (secondNeeded) {
       suppressMessages(plotR <- plotR + scale_y_continuous(sec.axis =
-                                    sec_axis(trans = ~ . / scalerR)) +
-        geom_line(data = df, aes(y = scalerR*as.numeric(goodRb),
-                      color = "Rb2")) +
-        theme(axis.line.y.right = element_line(colour = 'blue'),
-              axis.ticks.y.right = element_line(colour = 'blue'),
-              axis.line.y.left = element_line(colour = 'black'),
-              axis.ticks.y.left = element_line(colour = 'black'),
-              axis.text.y.right = element_text(size = 12, colour = 'blue'),
-              axis.text.y.left = element_text(size = 12, colour = 'black'),
-              axis.title.x = element_blank(),
-              axis.title.y = element_blank(),
-              axis.text.x = element_text(size = 12),
-              plot.title = element_text(hjust = 0.5),
-              legend.position = c(0.85,0.4),
-              legend.text = element_text(size = 12),
-              legend.title = element_text(size = 13)) +
-        scale_colour_manual(name = "Line Colour", values = c(Rb = "black",
-                                                             Rb2 = "blue")))
+                                                             sec_axis(trans = ~ . / scalerR)) +
+                         geom_line(data = df, aes(y = scalerR*as.numeric(goodRb),
+                                                  color = "Rb2"), group = 1) +
+                         theme(axis.line.y.right = element_line(colour = 'blue'),
+                               axis.ticks.y.right = element_line(colour = 'blue'),
+                               axis.line.y.left = element_line(colour = 'black'),
+                               axis.ticks.y.left = element_line(colour = 'black'),
+                               axis.text.y.right = element_text(size = 12, colour = 'blue'),
+                               axis.text.y.left = element_text(size = 12, colour = 'black'),
+                               axis.title.x = element_blank(),
+                               axis.title.y = element_blank(),
+                               axis.text.x = element_text(size = 12),
+                               plot.title = element_text(hjust = 0.5),
+                               legend.position = c(0.85,0.4),
+                               legend.text = element_text(size = 12),
+                               legend.title = element_blank()) +
+                         scale_colour_manual(name = "Line Colour", values = c(Rb = "black",
+                                                                              Rb2 = "blue")))
 
     }
     #adding the new plot to the existing one using the patchwork package
@@ -141,7 +146,7 @@ plot.bottom.spectra <- function(fullpath, SAVE = F) {
   }
 
   plot <- plot + plot_annotation(title = p,
-                    theme = theme(plot.title = element_text(hjust = 0.5)))
+                                 theme = theme(plot.title = element_text(hjust = 0.5)))
 
   suppressWarnings(print(plot))
 

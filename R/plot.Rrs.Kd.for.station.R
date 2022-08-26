@@ -166,7 +166,7 @@ plot.Rrs.Kd.for.station <- function(path = "./", depthEdZ = NA) {
 
   #suppressMessages(ggsave(paste("Kd", "and", "Rrs", "png", sep = "."), path = "./"))
 
-  #suppressMessages(ggsave(paste0(station, ".png"), path = "/Users/simonbelanger/OneDrive - UQAR/data/AlgaeWISE/L2/Kd_and_Rrs"))
+  #suppressMessages(ggsave(paste0(station, ".png"), path = "/Users/charl/rstudio-workspace/AlgaeWISE/L2/Kd_and_Rrs"))
 
 
 }
