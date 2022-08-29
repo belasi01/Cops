@@ -58,8 +58,6 @@ plot.bottom.spectra <- function(fullpath, SAVE = F) {
     df$EuZ.bottom[which.max(df$EuZ.bottom)] <- NA
     maxU <- max(df$EdZ.bottom, na.rm = TRUE)
   }
-  # scaler not required for logarithmic scaling in y-axis
-  #scaler <- 0.1*maxD/maxU
 
   # generating initial plot
   plot <- ggplot(df, aes(x = waves, y = EdZ.bottom, color = "EdZ")) +

@@ -128,7 +128,7 @@ generate.cops.DB <- function(path="./",
         print("Matching wavelenghts: ")
         print(waves.DB[xw.DB])
 
-        # Set the array indices for the current data in case some wavelenghts are dropped
+        # Set the array indices for the current data in case some wavelengths are dropped
         xw <- match(waves.DB[xw.DB], waves)
 
         # extract ancillary info
@@ -151,11 +151,11 @@ generate.cops.DB <- function(path="./",
         }
 
         if (!is.na(SHALLOW[j])) {
-          mbottom.depth[j] <- cops$bottom.depth
+          if (eval(parse(text=SHALLOW[j]))) mbottom.depth[j] <- cops$bottom.depth
           if (!is.null(cops$Rb.Q)) {
             mRb[j,xw.DB] = cops$Rb.EuZ[xw]
             mRb.Q[j,xw.DB] = cops$Rb.Q[xw]
-          } else mRb[j,xw.DB] = cops$Rb.LuZ[xw]
+          } else if (eval(parse(text=SHALLOW[j]))) mRb[j,xw.DB] = cops$Rb.LuZ[xw]
         }
 
         # extract Ed0.0p
