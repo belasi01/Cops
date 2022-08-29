@@ -50,11 +50,11 @@ plot.bottom.spectra <- function(fullpath, SAVE = F) {
   if (all(!is.na(df$EuZ.bottom)))
     maxU <- max(df$EuZ.bottom, na.rm = TRUE)
 
-  if (maxD > 1000) {
+  while (maxD > 1000) {
     df$EdZ.bottom[which.max(df$EdZ.bottom)] <- NA
     maxD <- max(df$EdZ.bottom, na.rm = TRUE)
   }
-  if (all(!is.na(df$EuZ.bottom)) && maxU > 1000) {
+  while (all(!is.na(df$EuZ.bottom)) && maxU > 1000) {
     df$EuZ.bottom[which.max(df$EuZ.bottom)] <- NA
     maxU <- max(df$EdZ.bottom, na.rm = TRUE)
   }
