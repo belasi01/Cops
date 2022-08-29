@@ -35,6 +35,8 @@ compute.aops <- function(cops.data) {
 		  }
 		  EuZ.0m <- EuZ.0m / shadow.coef.EuZ$EuZ.shad.correction
 		  EuZ.0m.linear <- cops.data$EuZ.0m.linear / shadow.coef.EuZ$EuZ.shad.correction
+		  edTot <-   shadow.coef.EuZ$EuZ.shad.Edir + shadow.coef.EuZ$EuZ.shad.Edif # CAUTION: this is from Gregg and Carder OR from Shadow band cast => do not confuse with Ed0.0p!!!
+		  fEd_dir <- shadow.coef.EuZ$EuZ.shad.Edir / edTot
 		}
 		# Added by Simon Belanger to deal with cases when both EuZ and LuZ are present
 		if(!("LuZ" %in% instruments.optics)) {
@@ -63,6 +65,8 @@ compute.aops <- function(cops.data) {
 		  }
 		  LuZ.0m <- LuZ.0m / shadow.coef.LuZ$LuZ.shad.correction
 		  LuZ.0m.linear <- LuZ.0m.linear / shadow.coef.LuZ$LuZ.shad.correction
+		  edTot <-   shadow.coef.LuZ$LuZ.shad.Edir + shadow.coef.LuZ$LuZ.shad.Edif # CAUTION: this is from Gregg and Carder OR from Shadow band cast => do not confuse with Ed0.0p!!!
+		  fEd_dir <- shadow.coef.LuZ$LuZ.shad.Edir / edTot
 
 		}
 		if(!("EuZ" %in% instruments.optics)) {
@@ -87,15 +91,20 @@ compute.aops <- function(cops.data) {
 	  Rrs.0p.linear <- Lw.0p.linear / Ed0.0p
 
 	  mymessage("Computing Ed0.0m ...", head = "-")
-	  Ed0.0m <- 0.96 * Ed0.0p
+	  ## Improve this estimation by accounting for diffuse versus direct component of Ed
+    # get fresnel reflectance factors
+    rhoF <- GreggCarder.sfcrfl(rad = 180.0/pi, theta=cops.data$sunzen, ws=windspeed_ms)
+    ##Ed0.0m <- 0.96 * Ed0.0p
+    Ed0.0m = (Ed0.0p * fEd_dir       * (1 - rhoF$rod)) + # direct
+             (Ed0.0p * (1 - fEd_dir) * (1 - rhoF$ros))   # diffuse
 
 	  mymessage("Computing R.0m ...", head = "-")
 	  R.0m <- EuZ.0m / Ed0.0m
 	  R.0m.linear <- EuZ.0m.linear / Ed0.0m
 
 	  mymessage("Computing R.0p ...", head = "-")
-	  R.0p <- EuZ.0m / Ed0.0p / 0.96
-	  R.0p.linear <- EuZ.0m.linear / Ed0.0p / 0.96
+	  R.0p <- EuZ.0m / Ed0.0m
+	  R.0p.linear <- EuZ.0m.linear / Ed0.0m
 
 	  mymessage("Computing Forel-Ule Color ...", head = "-")
 	  FU <- Rrs2FU(waves.d, Rrs.0p)$FU
@@ -139,6 +148,43 @@ compute.aops <- function(cops.data) {
 # PLOT
 	if (cops.data$EXTRAPOLATION.0m) {
 	  if(INTERACTIVE) x11(width = win.width, height = win.height)
+
+	  #Scatterplot Ed0 methods
+	  #############################
+	  par(mfrow = c(2, 1))
+	  plot(Ed0.0m, cops.data$EdZ.0m,
+	       xlab = "Calculated Ed(0-) from Ed(0+)",
+	       ylab = "Extrapolated Ed(0-) from EdZ",
+	       xlim=c(0,max(cops.data$EdZ.0m+30, na.rm=T)),
+	       ylim=c(0,max(cops.data$EdZ.0m+30, na.rm=T)),
+	       pch=19,col="black")
+	  if (PLOT.LINEAR) points(Ed0.0m, cops.data$EdZ.0m.linear,pch=19,col="blue")
+	  lines(c(0,200), c(0,200), col=2)
+	  legend("bottomright",legend=c("Ed(0-)linear","Ed(0-)LOESS"),
+	         text.col=c("blue", "black"),pch=c(19,19),
+	         col=c("blue", "black"))
+
+	  #Ed(0-)Ratio
+	  #############################
+
+	  Ed0.ratio.linear = cops.data$EdZ.0m.linear/Ed0.0m
+	  Ed0.ratio = cops.data$EdZ.0m/Ed0.0m
+	  plot(waves.d,Ed0.ratio,
+	       xlab = "Wavelength(nm)",
+	       ylab = "Ratio of extrapolated to calculated Ed(0-)",
+	       pch=19,col="black",
+	       ylim= c(0.6,1.4))
+	  abline(h=1.0, col="black")
+	  abline(h=c(0.9,1.1), col="black")
+	  abline(h=c(0.95,1.05), col="red")
+	  if (PLOT.LINEAR) points(waves.d,Ed0.ratio.linear,
+	                          xlab = NA, ylab = NA,pch=19,col="blue")
+	  legend("topright",c("linear","LOESS"),
+	         text.col=c("blue", "black"),
+	         pch=c(19,19),
+	         col=c("blue", "black"))
+
+
 	  par(mfrow = c(2, 3))
 	  plot(1, 1, type = "n", log = "y", xlim = range(waves.d), ylim = c(0.00005, 10), xlab = expression(lambda ~~ nm), ylab = expression(L[w]), axes = FALSE, frame.plot = TRUE)
 	  axis(1)
@@ -198,6 +244,7 @@ compute.aops <- function(cops.data) {
 	      text(1, 1, "NO SHADOW CORRECTION FOR LuZ", adj = c(0.5, 0.5))
 	    }
 	  }
+
 	}
 
 	if(!is.null(Q)) {
