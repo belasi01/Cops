@@ -247,6 +247,14 @@ compute.aops <- function(cops.data) {
 
 	}
 
+
+	### Add QC plot of Rrs based on QWIP developed by Dierssen et al 2022
+	par(mfrow = c(2, 1))
+	QWIP(waves.d, Rrs.0p, LABEL="LOESS")
+	QWIP(waves.d, Rrs.0p.linear, LABEL="Linear")
+
+
+
 	if(!is.null(Q)) {
 	  par(mfrow = c(2, 1))
 	  plot(waves.d,Q, xlab = expression(lambda ~~ nm),
