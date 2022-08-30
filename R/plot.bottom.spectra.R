@@ -13,7 +13,7 @@
 #' bottom_spectra folder of the working directory. Make sure to
 #' create this directory beforehand.
 #'
-#' @author Charles-André Roux
+#' @author Charles-Andre Roux
 #' @export
 #'
 

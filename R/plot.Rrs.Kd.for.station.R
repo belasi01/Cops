@@ -15,7 +15,7 @@
 #' @return It produces 2 plots in PNG format in the working directory.
 #'
 #' @author  Simon Belanger, UQAR
-#' @author Charles-André Roux
+#' @author Charles-Andre Roux
 #' @export
 
 
