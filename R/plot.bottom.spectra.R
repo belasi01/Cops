@@ -17,21 +17,25 @@
 #' @export
 #'
 
-plot.bottom.spectra <- function(fullpath, SAVE = F) {
+plot.bottom.spectra <- function(cops, SAVE = FALSE, MaxThreshold_Ed_Eu = 1000) {
 
-  #required libraries
-  #library(ggplot2)
-  #library(patchwork)
-  #library(scales)
-
-  #filename=".....RData
 
   # parsing the path string for the cast number
+  fullpath <- paste(getwd(),"/BIN/", cops$file,'.RData', sep = "")
   splitu <- unlist(strsplit(fullpath, "_"))
   cast <- splitu[length(splitu) - 3]
+  # parsing the path string for the .RData file name
+  splits <- unlist(strsplit(fullpath, "/"))
+  p <- splits[length(splits)]
+  # getting station number
+  pathstring <- normalizePath(fullpath)
+  lst <- unlist(strsplit(pathstring, "/"))
+  stationDir <- lst[length(lst) - 3]
+  stationNum <- str_sub(stationDir, -1, -1)
 
   # initiating a dataframe used for plotting
-  load(fullpath)
+  #load(fullpath)
+
   waves <- cops$EdZ.waves
   ix.bottom <- length(cops$depth.fitted)
   EdZ.bottom <- cops$EdZ.fitted[ix.bottom,]
@@ -39,29 +43,22 @@ plot.bottom.spectra <- function(fullpath, SAVE = F) {
   df <- data.frame(waves = waves,  EdZ.bottom = EdZ.bottom,
                      EuZ.bottom=EuZ.bottom)
 
-  # parsing the path string for the .RData file name
-  splits <- unlist(strsplit(fullpath, "/"))
-  p <- splits[length(splits)]
-
   # removing outlying data points from the data frame
   maxD <- max(df$EdZ.bottom, na.rm = TRUE)
   maxU <- max(df$EuZ.bottom, na.rm = TRUE)
 
-  if (maxD > 1000) {
+  while (maxD > MaxThreshold_Ed_Eu) {
     df$EdZ.bottom[which.max(df$EdZ.bottom)] <- NA
     maxD <- max(df$EdZ.bottom, na.rm = TRUE)
   }
-  if (maxU > 1000) {
+  while (maxU > MaxThreshold_Ed_Eu) {
     df$EuZ.bottom[which.max(df$EuZ.bottom)] <- NA
     maxU <- max(df$EdZ.bottom, na.rm = TRUE)
   }
-  # scaler not required for logarithmic scaling in y-axis
-  #scaler <- 0.1*maxD/maxU
 
   # generating initial plot
   plot <- ggplot(df, aes(x = waves, y = EdZ.bottom, color = "EdZ")) +
     geom_line() +
-    geom_line(aes(y = as.numeric(EuZ.bottom), color = "EuZ")) +
     scale_y_continuous(trans = "log", labels = scientific) +
     theme(plot.title = element_text(hjust = 0.5),
           axis.text.x = element_text(size = 12),
@@ -75,6 +72,12 @@ plot.bottom.spectra <- function(fullpath, SAVE = F) {
     ggtitle("Bottom Irrandiance") +
     scale_colour_manual(name = "Line Colour", values = c(EdZ = "black",
                                                          EuZ = "blue"))
+
+  if (sum(!is.na(df$EuZ.bottom)) > 1)
+    plot <- plot + geom_line(data = df, aes(y = as.numeric(EuZ.bottom), color = "EuZ", group = 1))
+
+  if (sum(!is.na(df$EuZ.bottom)) == 1)
+    plot <- plot + geom_point(data = df, aes(y = as.numeric(EuZ.bottom), color = "EuZ"))
 
 
   #in case the bottom was reached
@@ -143,15 +146,17 @@ plot.bottom.spectra <- function(fullpath, SAVE = F) {
   plot <- plot + plot_annotation(title = p,
                     theme = theme(plot.title = element_text(hjust = 0.5)))
 
+
   suppressWarnings(print(plot))
 
-  destination <- paste(splits[1],splits[2],splits[3], sep = "/")
 
-  splitp <- unlist(strsplit(p, "_"))
-  name <- paste(splitp[1],splitp[2],splitp[3],splitp[4], sep = "_")
+  if (SAVE) {
+    splitp <- unlist(strsplit(p, "_"))
+    if (!grepl("\\d", splitp[1]))
+      splitp[1] <- paste0(splitp[1], stationNum)
 
-  if (SAVE)
-    suppressMessages(ggsave(paste(name, "png", sep = "."),
-                            path = "./bottom_spectra"))
+    name <- paste(splitp[1],splitp[2],splitp[3],splitp[4], sep = "_")
+    suppressMessages(ggsave(paste(name, "png", sep = ".")))
+  }
 
 }

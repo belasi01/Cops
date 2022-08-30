@@ -46,6 +46,13 @@ compute.bottom <- function(cops, distance.above.bottom.file.cut=0.15) {
   }
 
 
+  cops.shallow <-  list(bottom.depth = bottom.depth,
+                        Rb.depth.over.bottom = depth.over.bottom,
+                        Rb.LuZ = Rb.LuZ,
+                        Rb.EuZ = Rb.EuZ,
+                        Rb.Q = Rb.Q)
+
+
   # PLOT
   aop.cols <- rainbow.modified(length(cops$Ed0.waves))
   if("LuZ" %in% instruments.optics & !("EuZ" %in% instruments.optics)) {
@@ -96,6 +103,11 @@ compute.bottom <- function(cops, distance.above.bottom.file.cut=0.15) {
            xlab="Wavelength (nm)", ylab="Reflectance (unitless)", cex=1.5)
       legend("topleft", expression(E[u]/E[d]), lwd=3, col=1, cex=1.8)
     }
+
+    ######
+    plot.bottom.spectra(c(cops, cops.shallow))
+    ######
+
   }
 
 
@@ -138,12 +150,12 @@ compute.bottom <- function(cops, distance.above.bottom.file.cut=0.15) {
            xlab="Wavelength (nm)", ylab=expression("Q-factor (",sr^-1,")"), cex=1.5)
     }
 
+    ######
+    plot.bottom.spectra(c(cops, cops.shallow))
+    ######
+
   }
 
-  return(list(bottom.depth = bottom.depth,
-              Rb.depth.over.bottom = depth.over.bottom,
-              Rb.LuZ = Rb.LuZ,
-              Rb.EuZ = Rb.EuZ,
-              Rb.Q = Rb.Q))
+  return(cops.shallow)
 
 }
