@@ -128,9 +128,26 @@ shadow.correction <- function(instr, cops, SB=NA) {
 
 	### Add the case when the Shadow Band data is available (Simon Belanger 2018/12/15)
 	if (is.na(SB)[1]) {
-	  egc <- GreggCarder.f(julian.day, longitude, latitude, sunzen, lam.sel = waves)
-	  Edif <- egc$Edif
-	  Edir <- egc$Edir
+	  # This code was added to improve the Edif and Edir estimation using Gregg and Carder model
+	  # The visibility is reduced to match the measured Ed0.0p obtained from the COPS reference sensor
+	  print ("No Bioshade measurements")
+	  print ("Compute Ed0.dif/Ed0.tot using Gregg and Carder model")
+	  julian.day <- as.numeric(format(cops$date.mean, format = "%j"))
+	  visibility <- 25
+	  egc <- GreggCarder.f(julian.day, longitude, latitude, sunzen, lam.sel = waves, Vi=visibility)
+
+	  ix.490 <- which.min(abs(waves - 490))
+
+	  ratio = egc$Ed[ix.490]*100/cops$Ed0.0p[ix.490]
+
+	  while (ratio > 1.05  & visibility > 0.5) {
+	    egc <- GreggCarder.f(julian.day, longitude, latitude, sunzen,lam.sel = waves, Vi=visibility)
+	    ratio = egc$Ed[ix.490]*100/cops$Ed0.0p[ix.490]
+	    visibility = visibility - 0.5
+	  }
+
+	  Edif <- egc$Edif*100 # factor 100 to convert into same COPS units
+	  Edir <- egc$Edir*100
 	} else {
 	  Edif <- SB$Ed0.dif
 	  Edir <- SB$Ed0.tot - Edif

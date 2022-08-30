@@ -274,43 +274,6 @@ process.EdZ <- function(cops.raw,
 	par(xpd = FALSE)
 
   if (EXTRAPOLATION.0m) {
-    #Scatterplot
-    #############################
-    par(mfrow = c(2, 1))
-    Ed0.0p.m = cops.Ed0$Ed0.0p*0.957
-    plot(Ed0.0p.m, aop.0,
-         xlab = "Calculated Ed(0-) from Ed(0+)",
-         ylab = "Extrapolated Ed(0-) from EdZ",
-         xlim=c(0,max(aop.0+30, na.rm=T)),
-         ylim=c(0,max(aop.0+30, na.rm=T)),
-         pch=19,col="black",
-         main =cops.raw$file)
-    if (PLOT.LINEAR) points(Ed0.0p.m, EdZ.0m.linear,pch=19,col="blue")
-    lines(c(0,200), c(0,200), col=2)
-    legend("bottomright",legend=c("Ed(0-)linear","Ed(0-)LOESS"),
-           text.col=c("blue", "black"),pch=c(19,19),
-           col=c("blue", "black"))
-
-    #Ed(0-)Ratio
-    #############################
-
-    Ed0.ratio.linear = EdZ.0m.linear/Ed0.0p.m
-    Ed0.ratio = aop.0/Ed0.0p.m
-    plot(cops.raw$Ed0.waves,Ed0.ratio,
-         xlab = "Wavelength(nm)",
-         ylab = "Ratio of extrapolated to calculated Ed(0-)",
-         pch=19,col="black",
-         ylim= c(0.6,1.4))
-    abline(h=1.0, col="black")
-    abline(h=c(0.9,1.1), col="black")
-    abline(h=c(0.95,1.05), col="red")
-    if (PLOT.LINEAR) points(cops.raw$Ed0.waves,Ed0.ratio.linear,
-           xlab = NA, ylab = NA,pch=19,col="blue")
-    legend("topright",c("linear","LOESS"),
-           text.col=c("blue", "black"),
-           pch=c(19,19),
-           col=c("blue", "black"))
-
     ### Plot PAR
     ### The last depth is remove be cause it is often bad
     par(mfrow = c(1, 2))

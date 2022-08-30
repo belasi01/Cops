@@ -1,10 +1,10 @@
 Package: Cops
-Version: 4.3-1.1
-Date: 2022-08-29
+Version: 4.4
+Date: 2022-08-30
 Title: C-OPS Processing
 Author: Bernard Gentili <bernard.gentili@orange.fr>
 Maintainer: Simon Belanger <simon_belanger@uqar.ca>
-Depends: R (>= 2.0), tcltk, e1071, stringr, ncdf4, ggplot2, patchwork, scales
+Depends: R (>= 2.0), tcltk, e1071, stringr, ncdf4, ggplot2, reshape2, patchwork, scales
 Description: COPS Processing
 License: GPL version 2 or newer
 URL: http://www.obs-vlfr.fr
