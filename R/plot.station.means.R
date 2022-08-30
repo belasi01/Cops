@@ -40,9 +40,24 @@ plot.station.means <- function(stationName = NULL, path2L2 = ".") {
 
     dir <- paste(here, substation, "COPS", sep = "\\")
 
+    rdatafiles <- list.files(path = paste(dir, "BIN", sep = "\\"), pattern = ".RData")
+    bottomlist <- rep(NA, length(rdatafiles))
+
+    for (i in 1:length(rdatafiles)) {
+
+      load(paste(dir, "BIN", rdatafiles[i], sep = "\\"))
+      lastDepth <- length(cops$LuZ.anc$Depth)
+      bottom <- cops$LuZ.anc$Depth[lastDepth]
+      if (is.null(bottom)) bottomlist[i] <- -Inf else bottomlist[i] <- bottom
+    }
+
+    maxBottom <- max(bottomlist)
+    maxBottom <- format(round(maxBottom, 2), nsmall = 2)
+
     copsDB <- as.data.frame(generate.cops.DB(path = dir))
     setwd(here)
 
+    copsDB$stationID <- paste0(copsDB$stationID, ": ", maxBottom, "m")
     dfTemp <- data.frame(waves = df$waves, Rrs.m = copsDB$Rrs.m, Kd.pd.m = copsDB$Kd.pd.m, stationID = copsDB$stationID)
 
 
@@ -60,12 +75,12 @@ plot.station.means <- function(stationName = NULL, path2L2 = ".") {
                          axis.title.y = element_text(size = 13)) + ylab("Mean Kd.pd")
 
   plt <- pltKd / pltRrs + plot_annotation(title = stationName,
-                                          theme = theme(plot.title = element_text(hjust = 0.5)))
+                                          theme = theme(plot.title = element_text(hjust = 0.5))) +
+    plot_layout(guides = "collect")
 
   setwd(here)
 
 
-  suppressMessages(plot(plt))
   filename <- paste0(stationName, ".png")
   suppressMessages(ggsave(filename, plt, device = png, path = paste0(path2L2, "/station_mean_plots")))
   return(plt)
