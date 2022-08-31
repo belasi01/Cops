@@ -128,7 +128,7 @@ generate.cops.DB <- function(path="./",
         print("Matching wavelenghts: ")
         print(waves.DB[xw.DB])
 
-        # Set the array indices for the current data in case some wavelenghts are dropped
+        # Set the array indices for the current data in case some wavelengths are dropped
         xw <- match(waves.DB[xw.DB], waves)
 
         # extract ancillary info
@@ -151,11 +151,11 @@ generate.cops.DB <- function(path="./",
         }
 
         if (!is.na(SHALLOW[j])) {
-          mbottom.depth[j] <- cops$bottom.depth
+          if (eval(parse(text=SHALLOW[j]))) mbottom.depth[j] <- cops$bottom.depth
           if (!is.null(cops$Rb.Q)) {
             mRb[j,xw.DB] = cops$Rb.EuZ[xw]
             mRb.Q[j,xw.DB] = cops$Rb.Q[xw]
-          } else mRb[j,xw.DB] = cops$Rb.LuZ[xw]
+          } else if (eval(parse(text=SHALLOW[j]))) mRb[j,xw.DB] = cops$Rb.LuZ[xw]
         }
 
         # extract Ed0.0p
@@ -166,7 +166,7 @@ generate.cops.DB <- function(path="./",
         # 1% and 10% light level)
 
         # find the depth of the 1% for each wavelength
-        Ed0.0pm = matrix((0.97*cops$Ed0.0p[xw]), nrow=length(cops$depth.fitted), ncol=length(xw), byrow=T)
+        Ed0.0pm = matrix((cops$Ed0.0m[xw]), nrow=length(cops$depth.fitted), ncol=length(xw), byrow=T)
         percentEdZ =  cops$EdZ.fitted[,xw]/Ed0.0pm
         percentEdZ[is.na(percentEdZ)] <- 0
         ix.pair = seq(length(xw))*2
@@ -303,7 +303,7 @@ generate.cops.DB <- function(path="./",
 
       # extract Kd1p and Kd10p (mean Kd fron surface to 1% and 10% light level)
       # find the depth of the 1% for each wavelength
-      Ed0.0pm = matrix((0.97*cops$Ed0.0p[xw]), nrow=length(cops$depth.fitted), ncol=length(xw), byrow=T)
+      Ed0.0pm = matrix((cops$Ed0.0m[xw]), nrow=length(cops$depth.fitted), ncol=length(xw), byrow=T)
       percentEdZ =  cops$EdZ.fitted[,xw]/Ed0.0pm
       percentEdZ[is.na(percentEdZ)] <- 0
       ix.pair = seq(length(xw))*2

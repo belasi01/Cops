@@ -112,7 +112,7 @@ plot.bottom.spectra <- function(cops, SAVE = FALSE, MaxThreshold_Ed_Eu = 1000) {
             plot.title = element_text(hjust = 0.5),
             legend.position = c(0.85,0.4),
             legend.text = element_text(size = 12),
-            legend.title = element_text(size = 13)) +
+            legend.title = element_blank()) +
       ggtitle("Calculated Bottom Reflectance") +
       scale_colour_manual(name = "Line Colour", values = c(Rb = "black"))
 
@@ -156,7 +156,7 @@ plot.bottom.spectra <- function(cops, SAVE = FALSE, MaxThreshold_Ed_Eu = 1000) {
       splitp[1] <- paste0(splitp[1], stationNum)
 
     name <- paste(splitp[1],splitp[2],splitp[3],splitp[4], sep = "_")
-    suppressMessages(ggsave(paste(name, "png", sep = ".")))
+    suppressMessages(ggsave(paste0(name, ".png")))
   }
 
 }
