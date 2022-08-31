@@ -13,7 +13,7 @@
 #' @author Charles-André Roux
 #' @export
 
-plot.all.Kd.Rrs <- function(functionName = "new.plot.Rrs.Kd.for.station") {
+plot.all.Kd.Rrs <- function(functionName = "plot.Rrs.Kd.for.station") {
 
   here <- getwd()
 

@@ -80,7 +80,7 @@ plot.Rrs.Kd.for.station <- function(path = "./", depthEdZ = NA) {
   }
 
   plotRrs <- plotRrs +
-    theme(legend.position = c(0.8, 0.82), legend.text = element_text(size = 8),
+    theme(legend.text = element_text(size = 8),
           axis.title.x = element_text(size = 13), legend.title = element_blank(),
           axis.title.y = element_text(size = 13)) +
     xlab("\nWavelength (nm)") + ylab("Rrs0+")
@@ -148,7 +148,7 @@ plot.Rrs.Kd.for.station <- function(path = "./", depthEdZ = NA) {
 
   #customizing graph
   plotKd <- plotKd +
-    theme(legend.position = c(0.45, 0.82), legend.text = element_text(size = 8),
+    theme(legend.text = element_text(size = 8),
           legend.title = element_blank(), axis.title.y = element_text(size = 13),
           axis.title.x = element_blank()) +
     ylab(expression(K[0]~"("*E[d]*"z) linear versus loess"))
@@ -158,9 +158,10 @@ plot.Rrs.Kd.for.station <- function(path = "./", depthEdZ = NA) {
   station <- fullpath[length(fullpath)]
 
   #combining graphs (library(patchwork) required)
-  fullplot <- plotKd / plotRrs + plot_annotation(title = station,
-                                                 theme = theme(plot.title =
-                                                                 element_text(hjust = 0.5)))
+  fullplot <- plotKd / plotRrs +
+    plot_annotation(title = station,
+                    theme = theme(plot.title = element_text(hjust = 0.5))) +
+    plot_layout(guides = "collect")
 
   suppressMessages(plot(fullplot))
 

@@ -166,7 +166,7 @@ generate.cops.DB <- function(path="./",
         # 1% and 10% light level)
 
         # find the depth of the 1% for each wavelength
-        Ed0.0pm = matrix((0.97*cops$Ed0.0p[xw]), nrow=length(cops$depth.fitted), ncol=length(xw), byrow=T)
+        Ed0.0pm = matrix((cops$Ed0.0m[xw]), nrow=length(cops$depth.fitted), ncol=length(xw), byrow=T)
         percentEdZ =  cops$EdZ.fitted[,xw]/Ed0.0pm
         percentEdZ[is.na(percentEdZ)] <- 0
         ix.pair = seq(length(xw))*2
@@ -303,7 +303,7 @@ generate.cops.DB <- function(path="./",
 
       # extract Kd1p and Kd10p (mean Kd fron surface to 1% and 10% light level)
       # find the depth of the 1% for each wavelength
-      Ed0.0pm = matrix((0.97*cops$Ed0.0p[xw]), nrow=length(cops$depth.fitted), ncol=length(xw), byrow=T)
+      Ed0.0pm = matrix((cops$Ed0.0m[xw]), nrow=length(cops$depth.fitted), ncol=length(xw), byrow=T)
       percentEdZ =  cops$EdZ.fitted[,xw]/Ed0.0pm
       percentEdZ[is.na(percentEdZ)] <- 0
       ix.pair = seq(length(xw))*2
