@@ -72,9 +72,8 @@ plot.bottom.spectra <- function(fullpath, SAVE = F) {
           legend.text = element_text(size = 13),
           legend.title = element_blank()) +
     xlab("\nWavelength (nm)") +
-    ggtitle("Bottom Irrandiance") +
-    scale_colour_manual(name = "Line Colour", values = c(EdZ = "black",
-                                                         EuZ = "blue"))
+    ggtitle("Bottom Irradiance") +
+    scale_colour_manual(values = c(EdZ = "black", EuZ = "blue"))
 
   if (sum(!is.na(df$EuZ.bottom)) > 1)
     plot <- plot + geom_line(data = df, aes(y = as.numeric(EuZ.bottom), color = "EuZ", group = 1))
@@ -117,7 +116,7 @@ plot.bottom.spectra <- function(fullpath, SAVE = F) {
             legend.text = element_text(size = 12),
             legend.title = element_blank()) +
       ggtitle("Calculated Bottom Reflectance") +
-      scale_colour_manual(name = "Line Colour", values = c(Rb = "black"))
+      scale_colour_manual(values = c(Rb = "black"))
 
     if (secondNeeded) {
       suppressMessages(plotR <- plotR + scale_y_continuous(sec.axis =
@@ -137,7 +136,7 @@ plot.bottom.spectra <- function(fullpath, SAVE = F) {
                                legend.position = c(0.85,0.4),
                                legend.text = element_text(size = 12),
                                legend.title = element_blank()) +
-                         scale_colour_manual(name = "Line Colour", values = c(Rb = "black",
+                         scale_colour_manual(values = c(Rb = "black",
                                                                               Rb2 = "blue")))
 
     }
