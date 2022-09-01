@@ -2,9 +2,10 @@
 
 #library(tidyverse)
 
-plot.station.means <- function(stationList = list("PME", "LDX", "BIN", "LDS", "PSO", "BSC", "RBS"), path2L2 = ".") {
+plot.station.means <- function(stationList = list("PME", "LDX", "BIN", "LDS", "PSO", "BSC", "RBS"), path2L2 = ".",
+                               path2DB = "COPS.DB.PackageVersion.4.4.XXX.RData") {
 
-  load("COPS.DB.PackageVersion.4.4.XXX.RData")
+  load(path2DB)
 
   df <- COPS.DB
 
