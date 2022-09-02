@@ -297,7 +297,8 @@ compute.aops <- function(cops.data) {
 		FU.linear = FU.linear,
 		Q = Q,
 		Q.linear = Q.linear,
-		shadow.band=shadow.band
+		shadow.band=shadow.band,
+		Ed0.0m = Ed0.0m
 	)))
 }
 
