@@ -3,7 +3,7 @@
 #library(tidyverse)
 
 plot.station.means <- function(stationList = list("PME", "LDX", "BIN", "LDS", "PSO", "BSC", "RBS"), path2L2 = ".",
-                               version = "4.4.1", mission = "AlgaeWISE") {
+                               version = "4.4.2", mission = "AlgaeWISE") {
 
   load(paste("COPS.DB.PackageVersion", version, mission, "RData", sep = "."))
 
