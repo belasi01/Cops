@@ -3,9 +3,9 @@
 #library(tidyverse)
 
 plot.station.means <- function(stationList = list("PME", "LDX", "BIN", "LDS", "PSO", "BSC", "RBS"), path2L2 = ".",
-                               path2DB = "COPS.DB.PackageVersion.4.4.XXX.RData") {
+                               version = "4.4.1", mission = "AlgaeWISE") {
 
-  load(path2DB)
+  load(paste("COPS.DB.PackageVersion", version, mission, "RData", sep = "."))
 
   df <- COPS.DB
 
