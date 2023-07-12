@@ -88,7 +88,8 @@ file.parts <- unlist(strsplit(file, "_"))
     ns <- sub("[", "", ns, fixed = TRUE)
     ns <- sub("]", "", ns, fixed = TRUE)
   }
-  ns=sapply(ns, strsplit, " ", perl=T) # Modified by Simon on June 22 2015
+  #ns=sapply(ns, strsplit, " ", perl=T) # Modified by Simon on June 22 2015
+  ns = str_split(ns, " ")
   ns = sapply(ns, "[[", 1) # Modified by Simon on June 22 2015
 	names(x) <- ns
 

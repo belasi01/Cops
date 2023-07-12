@@ -165,6 +165,6 @@ plot.Rrs.Kd.for.station <- function(path = "./", depthEdZ = NA) {
 
   suppressMessages(plot(fullplot))
 
-  suppressMessages(ggsave(paste("Kd", "and", "Rrs", "png", sep = "."), path = "./"))
+  suppressMessages(ggsave(paste("Kd", "and", "Rrs", "png", sep = "."), path = "./", device = "png", width = 8, height = 5, units = "in"))
 
 }
