@@ -13,7 +13,7 @@ indice.water;numeric; 1.34
 rau.Fresnel;numeric; 0.043
 
 # Environmental conditions ##########################
-windspeed_ms; numeric; 6
+windspeed_ms; numeric; 4.0
 
 # width and height of graphics windows ###############
 win.width;numeric; 9

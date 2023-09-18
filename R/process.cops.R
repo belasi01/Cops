@@ -37,11 +37,11 @@ process.cops <- function(dirdat, ASCII=FALSE, CLEAN.FILES=FALSE) {
 	if (is.null(cops.init00$windspeed_ms)) {
 	  print("##############   WARNING #############")
 	  print("Wind speed not present in init file!!")
-	  print("Assign the default value to 6.0 m/s.")
+	  print("Assign the default value to 4.0 m/s.")
 	  print("To change the wind speed, add the following line in the init file: ")
-	  print("              windspeed_ms; numeric; 6")
+	  print("              windspeed_ms; numeric; 4")
 	  print("##############")
-	  assign(windspeed_ms, 6.0, env = .GlobalEnv)
+	  assign(windspeed_ms, 4.0, env = .GlobalEnv)
 	} else {
     print("Wind speed found in the init file")
 	  print(paste("Wind speed = ", windspeed_ms))

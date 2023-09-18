@@ -37,6 +37,8 @@ read.init <- function(init.file) {
 	  bandwidth = 10
 	  assign("bandwidth", 10, env = .GlobalEnv)
 	  cops.init$bandwidth = bandwidth
+	  # Update the init faile with new parameter
+	  write.table(file = init.file, append = TRUE, cbind("bandwidth; numeric;", bandwidth), sep=" ", row.names = F, col.names = F, quote = F)
 	}
 
 	##### Added to avoid failure when linear fitting parameters are not provided.
@@ -52,6 +54,9 @@ read.init <- function(init.file) {
 	  names(init.param.value) <- instruments.optics
 	  assign("linear.fit.Rsquared.threshold.optics", init.param.value, env = .GlobalEnv)
 	  cops.init$linear.fit.Rsquared.threshold.optics = linear.fit.Rsquared.threshold.optics
+	  # Update the init faile with new parameter
+	  write.table(file = init.file, append = TRUE, cbind("linear.fit.Rsquared.threshold.optics; numeric;", paste(as.character(linear.fit.Rsquared.threshold.optics), collapse=",")),
+	              sep=" ", row.names = F, col.names = F, quote = F)
 	}
 
 	if (is.null(cops.init$linear.fit.max.delta.depth.optics)) {
@@ -66,7 +71,25 @@ read.init <- function(init.file) {
 	  names(init.param.value) <- instruments.optics
 	  assign("linear.fit.max.delta.depth.optics", init.param.value, env = .GlobalEnv)
 	  cops.init$linear.fit.max.delta.depth.optics = linear.fit.max.delta.depth.optics
+	  # Update the init faile with new parameter
+	  write.table(file = init.file, append = TRUE, cbind("linear.fit.max.delta.depth.optics; numeric;", paste(as.character(linear.fit.max.delta.depth.optics), collapse=",")),
+	              sep=" ", row.names = F, col.names = F, quote = F)
 	}
+
+
+
+	if (is.null(cops.init$windspeed_ms)) {
+	  print("WARNING: init file does not contain windspeed_ms parameter")
+	  print("windspeed_ms is set to default values")
+	  print("Add this line in the init file and EDIT: ")
+	  print("windspeed_ms; numeric; 4.0")
+	  init.param.value <- 4
+	  assign("windspeed_ms", init.param.value, env = .GlobalEnv)
+	  cops.init$windspeed_ms = windspeed_ms
+	  # Update the init faile with new parameter
+	  write.table(file = init.file, append = TRUE, cbind("windspeed_ms; numeric;", windspeed_ms), sep=" ", row.names = F, col.names = F, quote = F)
+	}
+
 
 
 

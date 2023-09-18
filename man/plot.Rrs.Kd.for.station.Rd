@@ -7,20 +7,22 @@ the integrated Kd (K0) from surface to a given depth.}
 \usage{
 \method{plot}{Rrs.Kd.for.station}(path = "./", depthEdZ = NA)
 }
-\description{
-@descripton
-The retained casts have a value of 1 in the select.cops.dat.
-The code reads the files "select.cops.dat" and then load the RData file
-that are stored in the "./BIN/" directory.
-}
-\details{
-@param path is the path where raw COPS data are located.
-@param depthEdZ is the depth of the ingetration of Kd.
-Default is NA and the code will take the same depth used for
-the linear interpolation.
+\arguments{
+\item{path}{is the path where raw COPS data are located.}
 
-@return It produces 2 plots in PNG format in the working directory.
+\item{depthEdZ}{is the depth of the ingetration of Kd.
+Default is NA and the code will take the same depth used for
+the linear interpolation.}
+}
+\value{
+It produces 2 plots in PNG format in the working directory.
+}
+\description{
+This function plot the replicates of Rrs and
+the integrated Kd (K0) from surface to a given depth.
 }
 \author{
 Simon Belanger, UQAR
+
+Charles-André Roux
 }

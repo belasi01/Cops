@@ -8,16 +8,16 @@ was reached (cops$SHALLOW = TRUE), then a plot of the
 calculated bottom reflectance is generated above the initial
 graph.}
 \usage{
-\method{plot}{bottom.spectra}(fullpath, SAVE = F)
+\method{plot}{bottom.spectra}(cops, SAVE = FALSE, MaxThreshold_Ed_Eu = 1000)
 }
 \arguments{
-\item{fullpath}{is the path from the working directory to
-the .RData file of the cast}
-
 \item{SAVE}{is a binary parameter specifying whether the
 generated plot should be saved. Plots are saved in the
 bottom_spectra folder of the working directory. Make sure to
 create this directory beforehand.}
+
+\item{fullpath}{is the path from the working directory to
+the .RData file of the cast}
 }
 \description{
 This function makes a plot of the upwelling and downwelling

@@ -4,7 +4,7 @@
 \alias{plot.all.Kd.Rrs}
 \title{This function finds and calls a specified plotting function in all valid directories}
 \usage{
-\method{plot}{all.Kd.Rrs}(functionName = "new.plot.Rrs.Kd.for.station")
+\method{plot}{all.Kd.Rrs}(functionName = "plot.Rrs.Kd.for.station")
 }
 \arguments{
 \item{functionName}{is an optional argument specifying the
