@@ -1,10 +1,10 @@
 
 #
 
-Rrs2FU <-function(Waves, Rrs){
+Rrs2FU <-function(waves, Rrs){
 
   # interpolate Rrs to CIE wavelength
-  Rrs.int = spline(Waves, Rrs, xout=CIE$waves, method = "natural")$y
+  Rrs.int = spline(waves, Rrs, xout=CIE$waves, method = "natural")$y
 
   Rrs.int[Rrs.int < 0] = 0
   # compute integrals

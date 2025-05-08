@@ -2,11 +2,14 @@ fit.with.loess <- function(waves, Depth, aop, span, depth.fitted,
                            idx.depth.0 = 1,
                            span.wave.correction = FALSE,
                            DEPTH.SPAN = FALSE,
-                           minimum.obs = 3) {
+                           minimum.obs = 3,
+                           idx.bottom = NA) # add this new parameter to return the extrapolated value at the bottom
+  {
 	#browser()
   aop.fitted <- array(NA, dim = c(length(depth.fitted), ncol(aop)),
                              dimnames = list(depth.fitted, colnames(aop)))
   aop.0 <- vector(mode = "numeric", length = ncol(aop))
+  aop.bottom <- vector(mode = "numeric", length = ncol(aop))
 
 	for (i in 1:length(waves)) {
 		if(span.wave.correction) {
@@ -43,6 +46,10 @@ fit.with.loess <- function(waves, Depth, aop, span, depth.fitted,
 		                                                               depth.fitted[idx.depth.0:length(depth.fitted)])
 		     aop.0[i] <- predict(fit.func, depth.fitted[idx.depth.0])
 
+		     if (!is.na(idx.bottom)) {
+		       aop.bottom[i] <- predict(fit.func, depth.fitted[idx.bottom])
+		     }
+
 		     cat(waves[i], "(", span.w.corr, ")", " ")
 
 		   } else {
@@ -52,6 +59,7 @@ fit.with.loess <- function(waves, Depth, aop, span, depth.fitted,
 	}
 	cat("\n")
 	aop.0[aop.0 == 0] <- NA
-	list(aop.fitted = aop.fitted, aop.0 = aop.0)
+	aop.bottom[aop.bottom == 0] <- NA
+	list(aop.fitted = aop.fitted, aop.0 = aop.0, aop.bottom = aop.bottom)
 }
 

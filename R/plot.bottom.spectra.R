@@ -113,7 +113,7 @@ plot.bottom.spectra <- function(cops, SAVE = FALSE, MaxThreshold_Ed_Eu = 1000) {
             legend.position = c(0.85,0.4),
             legend.text = element_text(size = 12),
             legend.title = element_blank()) +
-      ggtitle("Calculated Bottom Reflectance") +
+      ggtitle("Calculated Bottom Reflectance (Eu/Ed)") +
       scale_colour_manual(name = "Line Colour", values = c(Rb = "black"))
 
     if (secondNeeded) {

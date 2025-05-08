@@ -37,7 +37,27 @@ compute.aops <- function(cops.data) {
 		  EuZ.0m.linear <- cops.data$EuZ.0m.linear / shadow.coef.EuZ$EuZ.shad.correction
 		  edTot <-   shadow.coef.EuZ$EuZ.shad.Edir + shadow.coef.EuZ$EuZ.shad.Edif # CAUTION: this is from Gregg and Carder OR from Shadow band cast => do not confuse with Ed0.0p!!!
 		  fEd_dir <- shadow.coef.EuZ$EuZ.shad.Edir / edTot
+		} else {
+		  # added by Simon Bélanger on 26 Nov 2024 to deal with cases when no shadow correction is requested
+		  print ("No Shadow correction")
+		  print ("Compute Ed0.dif/Ed0.tot using Gregg and Carder model")
+		  julian.day <- as.numeric(format(cops$date.mean, format = "%j"))
+		  visibility <- 25
+		  egc <- GreggCarder.f(julian.day, cops$longitude, cops$latitude, cops$sunzen, lam.sel = waves.d, Vi=visibility)
+		  ix.490 <- which.min(abs(waves.d - 490))
+
+		  ratio = egc$Ed[ix.490]*100/cops$Ed0.0p[ix.490]
+
+		  while (ratio > 1.05  & visibility > 0.5) {
+		    egc <- GreggCarder.f(julian.day,cops$longitude, cops$latitude, cops$sunzen,lam.sel = waves.d, Vi=visibility)
+		    ratio = egc$Ed[ix.490]*100/cops$Ed0.0p[ix.490]
+		    visibility = visibility - 0.5
+		  }
+
+		  edTot <-   egc$Edif + egc$Edir
+		  fEd_dir <-  egc$Edir/ edTot
 		}
+
 		# Added by Simon Belanger to deal with cases when both EuZ and LuZ are present
 		if(!("LuZ" %in% instruments.optics)) {
 		  LuZ.0m <- EuZ.0m / cops.data$Q.sun.nadir
@@ -68,6 +88,25 @@ compute.aops <- function(cops.data) {
 		  edTot <-   shadow.coef.LuZ$LuZ.shad.Edir + shadow.coef.LuZ$LuZ.shad.Edif # CAUTION: this is from Gregg and Carder OR from Shadow band cast => do not confuse with Ed0.0p!!!
 		  fEd_dir <- shadow.coef.LuZ$LuZ.shad.Edir / edTot
 
+		} else {
+		  # added by Simon Bélanger on 26 Nov 2024 to deal with cases when no shadow correction is requested
+		  print ("No Shadow correction")
+		  print ("Compute Ed0.dif/Ed0.tot using Gregg and Carder model")
+		  julian.day <- as.numeric(format(cops$date.mean, format = "%j"))
+		  visibility <- 25
+		  egc <- GreggCarder.f(julian.day, cops$longitude, cops$latitude, cops$sunzen, lam.sel = waves.d, Vi=visibility)
+		  ix.490 <- which.min(abs(waves.d - 490))
+
+		  ratio = egc$Ed[ix.490]*100/cops$Ed0.0p[ix.490]
+
+		  while (ratio > 1.05  & visibility > 0.5) {
+		    egc <- GreggCarder.f(julian.day,cops$longitude, cops$latitude, cops$sunzen,lam.sel = waves.d, Vi=visibility)
+		    ratio = egc$Ed[ix.490]*100/cops$Ed0.0p[ix.490]
+		    visibility = visibility - 0.5
+		  }
+
+		  edTot <-   egc$Edif + egc$Edir
+		  fEd_dir <-  egc$Edir/ edTot
 		}
 		if(!("EuZ" %in% instruments.optics)) {
 		  EuZ.0m <- LuZ.0m * cops.data$Q.sun.nadir
@@ -250,8 +289,8 @@ compute.aops <- function(cops.data) {
 
 	### Add QC plot of Rrs based on QWIP developed by Dierssen et al 2022
 	par(mfrow = c(2, 1))
-	QWIP(waves.d, Rrs.0p, LABEL="LOESS")
-	QWIP(waves.d, Rrs.0p.linear, LABEL="Linear")
+	if (!all(is.na(Rrs.0p.linear))) QWIP(waves.d, Rrs.0p, LABEL="LOESS")
+	if (!all(is.na(Rrs.0p.linear))) QWIP(waves.d, Rrs.0p.linear, LABEL="Linear")
 
 
 

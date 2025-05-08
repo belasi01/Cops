@@ -49,13 +49,27 @@ shadow.correction <- function(instr, cops, SB=NA) {
         #### Check for a valid Kd with linear interpolation
         ix.LuZ.0m.valid = which(!is.na(cops$LuZ.0m))
 
+
         if (anyNA(cops$K.EdZ.surf[ix.LuZ.0m.valid]) |
             anyNA(cops$K.LuZ.surf[ix.LuZ.0m.valid])) {
+        ####
+        #### I change the condition because I don't understand why we were checking NA data in the cops$K.LuZ.surf[ix.LuZ.0m.valid]
+        #### Update: Ok I understand why.... it's because R0- needs a valid value of LuZ.0m valid from the linear interpolation
+          #####. going back to the original code
+        #if (anyNA(cops$K.EdZ.surf[ix.LuZ.0m.valid])) { #### We use LOESS only if the linear Kd fails
+        #####
           # check for the depth used for the LuZ extrapolation
           #max.depth <- max(cops$LuZ.Z.interval, na.rm = T)
           #ix.max.depth <- which.min(abs(cops$depth.fitted - max.depth))
           ix.2.5 <- which.min(abs(cops$depth.fitted - 2.5))
+          if (ix.2.5 > length(cops$K0.EdZ.fitted[,1])) ix.2.5 <- length(cops$K0.EdZ.fitted[,1]) # added for shallow profiles
           Kd = cops$K0.EdZ.fitted[ix.2.5,]
+          x = 0
+          while (anyNA(Kd[ix.LuZ.0m.valid])) { # This condition was added because some time the EdZ.fitted extrapolation fail at the end of a profile
+            x = 1 + x
+            Kd = cops$K0.EdZ.fitted[ix.2.5-x,]
+          }
+
           Ed.0m = cops$EdZ.0m
           R = (cops$LuZ.0m*Q)/Ed.0m
           SHADOW.CORRECTION.FROM.KD <- "LOESS"
@@ -79,15 +93,22 @@ shadow.correction <- function(instr, cops, SB=NA) {
 
       }
 
-      ##### The with EuZ
+      ##### With EuZ
       if (!is.null(cops$EuZ.0m.linear)) {
         #### Check for a valid Kd with linear interpolation
         ix.EuZ.0m.valid = which(!is.na(cops$EuZ.0m))
-        if (anyNA(cops$K.EdZ.surf[ix.EuZ.0m.valid]) |
-            anyNA(cops$K.EuZ.surf[ix.LuZ.0m.valid])) {
+       if (anyNA(cops$K.EdZ.surf[ix.EuZ.0m.valid]) |
+            anyNA(cops$K.EuZ.surf[ix.EuZ.0m.valid])) {
+
           # check for the depth used for the LuZ extrapolation
           ix.2.5 <- which.min(abs(cops$depth.fitted - 2.5))
+          if (ix.2.5 > length(cops$K0.EdZ.fitted[,1])) ix.2.5 <- length(cops$K0.EdZ.fitted[,1])  # added for shallow profiles
           Kd = cops$K0.EdZ.fitted[ix.2.5,]
+          x = 0
+          while (anyNA(Kd[ix.EuZ.0m.valid])) { # This condition was added because some time the EdZ.fitted extrapolation fail at the end of a profile
+            x = 1 + x
+            Kd = cops$K0.EdZ.fitted[ix.2.5-x,]
+          }
           Ed.0m = cops$EdZ.0m
           R = (cops$EuZ.0m)/Ed.0m
           SHADOW.CORRECTION.FROM.KD <- "LOESS"
@@ -102,6 +123,7 @@ shadow.correction <- function(instr, cops, SB=NA) {
           ### but the linear fit failed at all bands....
           ### The Kd for the to 2.5 meter is assumed.
           ix.2.5 <- which.min(abs(cops$depth.fitted - 2.5))
+          if (ix.2.5 > length(cops$K0.EdZ.fitted[,1])) ix.2.5 <- length(cops$K0.EdZ.fitted[,1])
           Kd = cops$K0.EdZ.fitted[ix.2.5,]
           Ed.0m = cops$EdZ.0m
           R = (cops$EuZ.0m)/Ed.0m
