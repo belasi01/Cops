@@ -41,16 +41,16 @@ compute.aops <- function(cops.data) {
 		  # added by Simon Bélanger on 26 Nov 2024 to deal with cases when no shadow correction is requested
 		  print ("No Shadow correction")
 		  print ("Compute Ed0.dif/Ed0.tot using Gregg and Carder model")
-		  julian.day <- as.numeric(format(cops$date.mean, format = "%j"))
+		  julian.day <- as.numeric(format(cops.data$date.mean, format = "%j"))
 		  visibility <- 25
-		  egc <- GreggCarder.f(julian.day, cops$longitude, cops$latitude, cops$sunzen, lam.sel = waves.d, Vi=visibility)
+		  egc <- GreggCarder.f(julian.day, cops.data$longitude, cops.data$latitude, cops.data$sunzen, lam.sel = waves.d, Vi=visibility)
 		  ix.490 <- which.min(abs(waves.d - 490))
 
-		  ratio = egc$Ed[ix.490]*100/cops$Ed0.0p[ix.490]
+		  ratio = egc$Ed[ix.490]*100/cops.data$Ed0.0p[ix.490]
 
 		  while (ratio > 1.05  & visibility > 0.5) {
-		    egc <- GreggCarder.f(julian.day,cops$longitude, cops$latitude, cops$sunzen,lam.sel = waves.d, Vi=visibility)
-		    ratio = egc$Ed[ix.490]*100/cops$Ed0.0p[ix.490]
+		    egc <- GreggCarder.f(julian.day,cops.data$longitude, cops.data$latitude, cops.data$sunzen,lam.sel = waves.d, Vi=visibility)
+		    ratio = egc$Ed[ix.490]*100/cops.data$Ed0.0p[ix.490]
 		    visibility = visibility - 0.5
 		  }
 
@@ -92,16 +92,16 @@ compute.aops <- function(cops.data) {
 		  # added by Simon Bélanger on 26 Nov 2024 to deal with cases when no shadow correction is requested
 		  print ("No Shadow correction")
 		  print ("Compute Ed0.dif/Ed0.tot using Gregg and Carder model")
-		  julian.day <- as.numeric(format(cops$date.mean, format = "%j"))
+		  julian.day <- as.numeric(format(cops.data$date.mean, format = "%j"))
 		  visibility <- 25
-		  egc <- GreggCarder.f(julian.day, cops$longitude, cops$latitude, cops$sunzen, lam.sel = waves.d, Vi=visibility)
+		  egc <- GreggCarder.f(julian.day, cops.data$longitude, cops.data$latitude, cops.data$sunzen, lam.sel = waves.d, Vi=visibility)
 		  ix.490 <- which.min(abs(waves.d - 490))
 
-		  ratio = egc$Ed[ix.490]*100/cops$Ed0.0p[ix.490]
+		  ratio = egc$Ed[ix.490]*100/cops.data$Ed0.0p[ix.490]
 
 		  while (ratio > 1.05  & visibility > 0.5) {
-		    egc <- GreggCarder.f(julian.day,cops$longitude, cops$latitude, cops$sunzen,lam.sel = waves.d, Vi=visibility)
-		    ratio = egc$Ed[ix.490]*100/cops$Ed0.0p[ix.490]
+		    egc <- GreggCarder.f(julian.day,cops.data$longitude, cops.data$latitude, cops.data$sunzen,lam.sel = waves.d, Vi=visibility)
+		    ratio = egc$Ed[ix.490]*100/cops.data$Ed0.0p[ix.490]
 		    visibility = visibility - 0.5
 		  }
 
@@ -161,6 +161,10 @@ compute.aops <- function(cops.data) {
 	    ## Set NA to unrealistic values due to noise
 	    Q[Q>10] <-NA
 	    Q.linear[Q.linear>10] <-NA
+
+	    if (!all(is.na(Q))) Q <- NULL
+	    if (!all(is.na(Q.linear))) Q.linear <- NULL
+
 	  } else {
 	    Q <- NULL
 	    Q.linear <- NULL

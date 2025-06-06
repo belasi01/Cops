@@ -284,7 +284,9 @@ process.EuZ <- function(cops.raw,
 	     xlab = "Temperature (Degree)",
 	     ylab = "Depth (m)",
 	     main="Water Temperature profile from EuZ sensor")
-	lines(temperature.fitted, depth.fitted, col = 2, lwd=2)
+	if (EXTRAPOLATION.0m) lines(temperature.fitted, depth.fitted, col = 2, lwd=2) else {
+	  lines(temperature.fitted, depth.fitted[idx.depth.0:n.fitted], col = 2, lwd=2)
+	}
 
 	if (!PLOT.LINEAR) Z.interval <-NA
 
