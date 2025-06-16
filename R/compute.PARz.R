@@ -41,9 +41,14 @@ compute.PARz <- function(Depth, waves, Edz, Ed.0,
       QZ = Edz[i,] * waves / (h*c) * 10000/1e6 #
       # integrated
       QZ[is.na(QZ)] <- 0
-      fx.linear <- approxfun(waves, QZ)
-      tmp = integrate(fx.linear, 380, 700, subdivisions=350, stop.on.error = FALSE)[1]
-      PAR.z[i] = tmp$value
+      if (any(is.infinite(QZ))) {
+        print('WARNING:  infinite values in EdZ vector for PAR calculation')
+        PAR.z[i] = 0
+      } else {
+        fx.linear <- approxfun(waves, QZ)
+        tmp = integrate(fx.linear, 380, 700, subdivisions=350, stop.on.error = FALSE)[1]
+        PAR.z[i] = tmp$value
+      }
   }
 
   # Compute the depth of 90%, 50%, 30%, 10%, 1% and 0.1% PAR
@@ -53,9 +58,11 @@ compute.PARz <- function(Depth, waves, Edz, Ed.0,
   names(z.f.PAR) = c("%PAR", "z")
 
   # compute %PAR at fixed depth
-  res= spline(Depth, (PAR.z/PAR.0m), xout=z.fixed)
-  PAR.at.z= as.data.frame(cbind(z.fixed,res$y*100))
+
+  res= spline(Depth, (PAR.z/PAR.0m), xout=z.fixed[z.fixed < max(Depth)])
+  PAR.at.z= as.data.frame(cbind(z.fixed[z.fixed < max(Depth)],res$y*100))
   names(PAR.at.z) = c("z.fixed", "%PAR")
+
 
   return(list(z.f.PAR=z.f.PAR,
               PAR.z=PAR.z / 6.06E23 *1e6,

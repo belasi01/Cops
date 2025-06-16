@@ -288,16 +288,19 @@ process.EdZ <- function(cops.raw,
          xlab = expression(PAR~"(%)"), log="x",
          ylab = "Depth (m)")
     for (i in 1:5){
-      if (PAR$z.f.PAR[i,2]<max(depth.fitted)) {
-        points(PAR$z.f.PAR[i,], pch=19, col=2, cex=1.5)
-        posi=4
-        if (i == 1) posi = 2
-        text(PAR$z.f.PAR[i,], paste(PAR$z.f.PAR[i,1],
-                                    "% PAR at z=",
-                                    signif(PAR$z.f.PAR[i,2],3)),
-             pos=posi)
+      if (!all(is.na(PAR$z.f.PAR[,2]))) {
+        if (PAR$z.f.PAR[i,2]<max(depth.fitted)) {
+          points(PAR$z.f.PAR[i,], pch=19, col=2, cex=1.5)
+          posi=4
+          if (i == 1) posi = 2
+          text(PAR$z.f.PAR[i,], paste(PAR$z.f.PAR[i,1],
+                                      "% PAR at z=",
+                                      signif(PAR$z.f.PAR[i,2],3)),
+               pos=posi)
 
-      }
+        }
+      } else print("WARNING: PAR calculation not consistent")
+
     }
     par(mfrow = c(1, 1))
 
