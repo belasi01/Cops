@@ -58,10 +58,15 @@ compute.PARz <- function(Depth, waves, Edz, Ed.0,
   names(z.f.PAR) = c("%PAR", "z")
 
   # compute %PAR at fixed depth
+  if (z.fixed[1] >= max(Depth)) {
+    res= spline(Depth, (PAR.z/PAR.0m), xout=z.fixed[z.fixed <= max(Depth)])
+    PAR.at.z= as.data.frame(cbind(z.fixed[z.fixed <= max(Depth)],res$y*100))
+    names(PAR.at.z) = c("z.fixed", "%PAR")
+  } else {
+    print(paste("WARNING : Profile shorter than:", z.fixed[1]))
+    PAR.at.z = NULL
+  }
 
-  res= spline(Depth, (PAR.z/PAR.0m), xout=z.fixed[z.fixed < max(Depth)])
-  PAR.at.z= as.data.frame(cbind(z.fixed[z.fixed < max(Depth)],res$y*100))
-  names(PAR.at.z) = c("z.fixed", "%PAR")
 
 
   return(list(z.f.PAR=z.f.PAR,
